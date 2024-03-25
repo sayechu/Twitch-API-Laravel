@@ -7,4 +7,4 @@ Route::get('/', function () {
     return view('welcome');
 });
  
-Route::get('/users', AnalyticsUsersController::class);
+Route::get('/analytics/users', AnalyticsUsersController::class);

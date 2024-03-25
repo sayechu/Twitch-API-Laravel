@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Analytics\TwitchApi;
 
 class AnalyticsUsersController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
+
     public function __invoke(Request $request)
     {
-        echo "HOLA";
+        include_once __DIR__ . '/../../Services/users.php';
     }
 }
