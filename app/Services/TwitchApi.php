@@ -120,8 +120,7 @@ class TwitchApi
         $streams = json_decode($api_response, true);
 
         if ($streams === null) {
-            echo 'Error decoding JSON response from Twitch API.';
-            exit;
+            return ['error' => 'Error decoding JSON response from Twitch API.'];
         }
 
         if (isset($streams['data']) && is_array($streams['data'])) {
@@ -134,10 +133,9 @@ class TwitchApi
                 ];
             }
 
-            $api_response_pretty = json_encode($filtered_streams, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            $this->mostrarRespuestaJson($api_response_pretty);
+            return $filtered_streams;
         } else {
-            echo '\nNo live streams data found in the Twitch API response.';
+            return ['message' => 'No live streams data found in the Twitch API response.'];
         }
     }
 
