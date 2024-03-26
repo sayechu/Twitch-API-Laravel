@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AnalyticsTopsOfTheTopsRequest;
 use Illuminate\Http\Request;
 use App\Services\TwitchApi;
 use App\Services\Database;
@@ -12,7 +13,7 @@ class AnalyticsTopsOfTheTopsController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke(AnalyticsTopsOfTheTopsRequest $request)
     {
         $client_id = '970almy6xw98ruyojcwqpop0p0o5a2';
         $client_secret = 'yl0nqzjjnadd8wl7zilpr9pzuh979j';
