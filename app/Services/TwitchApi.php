@@ -17,7 +17,7 @@ class TwitchApi
         $this->client_id = $client_id;
         $this->client_secret = $client_secret;
         $this->grant_type = $grant_type;
-        $this->db = new \App\Services\Database();
+        $this->db = new Database();
         $this->token = $this->obtenerToken();
     }
 
@@ -101,18 +101,15 @@ class TwitchApi
     public function getInfoUser($userId)
     {
         if ($this->db->comprobarIdUsuarioEnDB($userId)) {
-            // DEVOLVER lo de la DB
             $api_response_array = ['data' => [$this->db->devolverUsuarioDeBD($userId)]];
         } else {
-            // PETICIÓN a TWITCH API
             $userId = urlencode($userId);
             $api_url = "https://api.twitch.tv/helix/users?id=$userId";
             $api_response = $this->getRespuestaCurl($api_url);
             $api_response_array = json_decode($api_response, true);
             $this->db->anadirUsuarioAdB($api_response_array['data'][0]);
         }
-        $api_response_pretty = json_encode($api_response_array, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $this->mostrarRespuestaJson($api_response_pretty);
+        return $api_response_array;
     }
 
     public function getStreams()
