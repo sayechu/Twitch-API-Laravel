@@ -24,7 +24,7 @@ class Database
             if (!$this->pdo) {
                 echo "Error de conexión: No se pudo conectar a la DB: $this->dbname";
             }
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             echo "Error de conexión: " . $e->getMessage();
         }
     }
@@ -113,7 +113,9 @@ class Database
 
     public function clearTablas()
     {
-        $this->pdo->exec("TRUNCATE TABLE VIDEO CASCADE; TRUNCATE TABLE JUEGO CASCADE; TRUNCATE TABLE FECHACONSULTA;");
+        $this->pdo->exec("DELETE FROM VIDEO;");
+        $this->pdo->exec("DELETE FROM JUEGO;");
+        $this->pdo->exec("DELETE FROM FECHACONSULTA;");
         //$this->pdo->exec("INSERT INTO FECHACONSULTA (fecha) VALUES (NOW())");
         $fechaActual = date('Y-m-d H:i:s');
         $stmt = $this->pdo->prepare("INSERT INTO FECHACONSULTA (fecha) VALUES (:fecha)");
@@ -266,21 +268,21 @@ class Database
 
     public function devolverUsuarioDeBD($userId)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM USUARIO WHERE ID = ?");
+        $stmt = $this->pdo->prepare("SELECT * FROM USUARIO WHERE id = ?");
         $stmt->execute([$userId]);
-        $userData = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
         $userData = array(
             'id' => $userData['id'],
             'login' => $userData['login'],
-            'display_name' => $userData['displayname'],
+            'display_name' => $userData['displayName'],
             'type' => $userData['type'],
-            'broadcaster_type' => $userData['broadcastertype'],
+            'broadcaster_type' => $userData['broadcasterType'],
             'description' => $userData['description'],
-            'profile_image_url' => $userData['profileimageurl'],
-            'offline_image_url' => $userData['offlineimageurl'],
-            'view_count' => $userData['viewcount'],
-            'created_at' => $userData['createdat']
+            'profile_image_url' => $userData['profileImageUrl'],
+            'offline_image_url' => $userData['offlineImageUrl'],
+            'view_count' => $userData['viewCount'],
+            'created_at' => $userData['createdAt']
         );
 
         return $userData;
