@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use PDO;
+
 class Database
 {
     private $host = 'mysql';
