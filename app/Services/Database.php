@@ -31,7 +31,6 @@ class Database
 
     public function borrarTablas()
     {
-        // Sentencia para borrar -> EJECUTAR
         $sql = "DROP TABLE IF EXISTS FECHACONSULTA, VIDEO, JUEGO, TOKEN, USUARIO;";
         $this->pdo->exec($sql);
         echo "Tablas eliminadas\n";
@@ -39,7 +38,6 @@ class Database
 
     public function crearTablas()
     {
-        // Sentencia creacion tablas -> EJECUTAR
         $sql = "CREATE TABLE JUEGO(
                     position SERIAL,
                     gameId INT PRIMARY KEY,
@@ -116,7 +114,6 @@ class Database
         $this->pdo->exec("DELETE FROM VIDEO;");
         $this->pdo->exec("DELETE FROM JUEGO;");
         $this->pdo->exec("DELETE FROM FECHACONSULTA;");
-        //$this->pdo->exec("INSERT INTO FECHACONSULTA (fecha) VALUES (NOW())");
         $fechaActual = date('Y-m-d H:i:s');
         $stmt = $this->pdo->prepare("INSERT INTO FECHACONSULTA (fecha) VALUES (:fecha)");
         $stmt->bindParam(':fecha', $fechaActual, \PDO::PARAM_STR);
@@ -127,9 +124,7 @@ class Database
     {
         $stmt = $this->pdo->prepare("INSERT INTO JUEGO (gameId, gameName) VALUES (?, ?)");
 
-        // Iterar sobre los 3 juegos más populares
         foreach ($topGamesData['data'] as $game) {
-            // Obtener el ID y el nombre del juego
             $gameId = $game['id'];
             $gameName = $game['name'];
 
@@ -158,7 +153,6 @@ class Database
 
     public function obtenerAtributos($gameId)
     {
-        // Preparar sentencia -> EJECUTAR
         $sql = "WITH UserVideos AS (
                     SELECT
                         V.userId,
