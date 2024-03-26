@@ -1,0 +1,164 @@
+{
+	"info": {
+		"_postman_id": "b7746b1f-00b2-4f5f-b829-e5fccbb0938d",
+		"name": "TWITCH API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32919985",
+		"_collection_link": "https://galactic-crescent-514428.postman.co/workspace/4c7ef161-adcf-4739-8dde-920d4e94683b/collection/32919985-b7746b1f-00b2-4f5f-b829-e5fccbb0938d?action=share&source=collection_link&creator=32919985"
+	},
+	"item": [
+		{
+			"name": "http://localhost/analytics/users?id=1234",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Código de respuesta debe ser 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"La respuesta debe ser un objeto JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"La respuesta debe contener datos de usuario válidos\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('data').that.is.an('array').that.is.not.empty;",
+							"    var user = jsonData.data[0];",
+							"    pm.expect(user).to.have.property('id').that.is.a('string').and.is.not.empty;",
+							"    pm.expect(user).to.have.property('login').that.is.a('string').and.is.not.empty;",
+							"    pm.expect(user).to.have.property('display_name').that.is.a('string').and.is.not.empty;",
+							"    pm.expect(user).to.have.property('type').that.is.a('string');",
+							"    pm.expect(user).to.have.property('broadcaster_type').that.is.a('string');",
+							"    pm.expect(user).to.have.property('description').that.is.a('string').and.is.not.empty;",
+							"    pm.expect(user).to.have.property('profile_image_url').that.is.a('string').and.is.not.empty;",
+							"    pm.expect(user).to.have.property('offline_image_url').that.is.a('string');",
+							"    pm.expect(user).to.have.property('view_count').that.is.a('number');",
+							"    pm.expect(user).to.have.property('created_at').that.is.a('string').and.is.not.empty;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/analytics/users?id=1234",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"analytics",
+						"users"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1234"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost/analytics/streams",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"El arreglo debe contener al menos un elemento\", function () {",
+							"    pm.expect(pm.response.json()).to.be.an('array').that.is.not.empty;",
+							"});",
+							"",
+							"",
+							"pm.test(\"Cada elemento del arreglo debe tener las propiedades 'title' y 'user_name'\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.forEach(function(item) {",
+							"        pm.expect(item).to.have.property('title').that.is.a('string').and.is.not.empty;",
+							"        pm.expect(item).to.have.property('user_name').that.is.a('string').and.is.not.empty;",
+							"    });",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/analytics/streams",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"analytics",
+						"streams"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost/analytics/topsofthetops",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"El arreglo debe contener al menos un elemento\", function () {",
+							"    pm.expect(pm.response.json()).to.be.an('array').that.is.not.empty;",
+							"});",
+							"",
+							"pm.test(\"Cada elemento del arreglo debe tener las propiedades necesarias\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.forEach(function(item) {",
+							"        pm.expect(item).to.have.property('game_id').that.is.a('string').and.is.not.empty;",
+							"        pm.expect(item).to.have.property('game_name').that.is.a('string').and.is.not.empty;",
+							"        pm.expect(item).to.have.property('user_name').that.is.a('string').and.is.not.empty;",
+							"        pm.expect(item).to.have.property('total_videos').that.is.a('string').and.is.not.empty;",
+							"        pm.expect(item).to.have.property('total_views').that.is.a('string').and.is.not.empty;",
+							"        pm.expect(item).to.have.property('most_viewed_title').that.is.a('string').and.is.not.empty;",
+							"        pm.expect(item).to.have.property('most_viewed_views').that.is.a('string').and.is.not.empty;",
+							"        pm.expect(item).to.have.property('most_viewed_duration').that.is.a('string').and.is.not.empty;",
+							"        pm.expect(item).to.have.property('most_viewed_created_at').that.is.a('string').and.is.not.empty;",
+							"    });",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/analytics/topsofthetops",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"analytics",
+						"topsofthetops"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
