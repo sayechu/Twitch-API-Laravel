@@ -25,4 +25,5 @@ class AnalyticsUsersRequest extends FormRequest
             'id' => 'required|numeric',
         ];
     }
+    
 }
