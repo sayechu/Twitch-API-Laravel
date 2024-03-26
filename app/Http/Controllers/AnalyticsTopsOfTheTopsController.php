@@ -35,7 +35,6 @@ class AnalyticsTopsOfTheTopsController extends Controller
                 $shouldUpdate = true;
             }
         } else {
-            // Si no hay registros, asumimos que se debe actualizar
             $shouldUpdate = true;
         }
 
@@ -56,8 +55,8 @@ class AnalyticsTopsOfTheTopsController extends Controller
         $results = [];
 
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $fila) {
-            $gameId = $fila['gameid'];
-            $gameName = $fila['gamename'];
+            $gameId = $fila['gameId'];
+            $gameName = $fila['gameName'];
 
             $stmtAtr = $db->obtenerAtributos($gameId);
             if ($row = $stmtAtr->fetch(PDO::FETCH_ASSOC)) {
