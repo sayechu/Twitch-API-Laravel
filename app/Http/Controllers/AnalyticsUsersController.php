@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AnalyticsUsersRequest;
 use Illuminate\Http\Request;
 use App\Services\TwitchApi;
 
 class AnalyticsUsersController extends Controller
 {
-    public function __invoke(Request $request)
+    public function __invoke(AnalyticsUsersRequest $request)
     {
         if ($request->has('id')) {
             $userId = $request->input('id');
