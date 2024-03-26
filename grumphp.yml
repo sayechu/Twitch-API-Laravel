@@ -1,0 +1,27 @@
+grumphp:
+    fixer:
+        enabled: true
+        fix_by_default: true
+    tasks:
+        phpcs:
+            standard: [PSR12]
+            whitelist_patterns:
+                - /^app\/Http\/Controllers\/(.*)/
+                - /^app\/Services\/(.*)/
+        phpmd:
+            whitelist_patterns:
+                - /^app\/Http\/Controllers\/(.*)/
+                - /^app\/Services\/(.*)/
+            ruleset: ['cleancode', 'codesize', 'naming']
+        git_commit_message:
+            allow_empty_message: false
+            enforce_capitalized_subject: false
+            max_subject_width: 100
+            matchers:
+                Must contain follow [1234] - Format: '/^\[[0-9]+\] - [A-Z][a-zA-Z\$]*/'
+            case_insensitive: true
+        git_branch_name:
+            whitelist:
+                - '^\d+-[a-z]+(-[a-z]+)*$'
+                - 'main'
+                - 'master'
