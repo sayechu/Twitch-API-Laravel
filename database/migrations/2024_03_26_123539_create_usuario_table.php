@@ -13,7 +13,7 @@ return new class extends Migration
     {
         $sql = "
             CREATE TABLE USUARIO(
-                ID VARCHAR(255),
+                id VARCHAR(255),
                 login VARCHAR(255),
                 displayName VARCHAR(255),
                 type VARCHAR(255),
