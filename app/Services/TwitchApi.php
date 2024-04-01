@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-require_once __DIR__ . '/Database.php';
+use App\Services\Database;
 
 class TwitchApi
 {
@@ -10,25 +10,23 @@ class TwitchApi
     private $client_secret;
     private $grant_type;
     private $token;
-    private $db;
+    private $dbInstance;
 
     public function __construct($client_id, $client_secret, $grant_type = 'client_credentials')
     {
         $this->client_id = $client_id;
         $this->client_secret = $client_secret;
         $this->grant_type = $grant_type;
-        $this->db = new Database();
+        $this->dbInstance = new Database();
         $this->token = $this->obtenerToken();
     }
 
     private function obtenerToken()
     {
-        if ($this->db->existeTokenDB()) {
-            $getToken = $this->db->getTokenDB();
-        } else {
-            $getToken = $this->peticionTokenTwitch();
+        if ($this->dbInstance->existeTokenDB()) {
+            return $this->dbInstance->getTokenDB();
         }
-        return $getToken;
+        return $this->peticionTokenTwitch();
     }
 
     private function peticionTokenTwitch()
@@ -40,32 +38,30 @@ class TwitchApi
             'grant_type' => $this->grant_type
         );
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
+        $curlHeaders = curl_init();
+        curl_setopt($curlHeaders, CURLOPT_URL, $url);
+        curl_setopt($curlHeaders, CURLOPT_POST, 1);
+        curl_setopt($curlHeaders, CURLOPT_POSTFIELDS, http_build_query($data));
+        curl_setopt($curlHeaders, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curlHeaders, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
 
-        $response = curl_exec($ch);
+        $response = curl_exec($curlHeaders);
 
-        if (curl_errno($ch)) {
-            echo 'Error en la petición cURL para obtener el token: ' . curl_error($ch);
+        if (curl_errno($curlHeaders)) {
+            echo 'Error en la petición cURL para obtener el token: ' . curl_error($curlHeaders);
             exit;
         }
 
-        curl_close($ch);
+        curl_close($curlHeaders);
 
         $result = json_decode($response, true);
 
         if (isset($result['access_token'])) {
             $this->token = $result['access_token'];
-            $db = new \App\Services\Database();
-            $db->insertarToken($this->token);
-        } else {
-            echo 'Error al obtener el token.';
-            exit;
+            $dbInstance = new Database();
+            $dbInstance->insertarToken($this->token);
         }
+
         return $this->token;
     }
 
@@ -76,22 +72,22 @@ class TwitchApi
             'Client-Id: ' . $this->client_id
         );
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $api_url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $api_headers);
-        $api_response = curl_exec($ch);
-        $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlHeaders = curl_init();
+        curl_setopt($curlHeaders, CURLOPT_URL, $api_url);
+        curl_setopt($curlHeaders, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curlHeaders, CURLOPT_HTTPHEADER, $api_headers);
+        $api_response = curl_exec($curlHeaders);
+        $http_status = curl_getinfo($curlHeaders, CURLINFO_HTTP_CODE);
 
 
-        if (curl_errno($ch)) {
-            echo 'Error in cURL request to get live streams: ' . curl_error($ch);
+        if (curl_errno($curlHeaders)) {
+            echo 'Error in cURL request to get live streams: ' . curl_error($curlHeaders);
             exit;
         }
-        curl_close($ch);
+        curl_close($curlHeaders);
         if ($http_status == 401) {
             echo "Token expirado asi que hay que pedirlo de nuevo\n";
-            $this->db->exec("TRUNCATE TABLE TOKEN CASCADE;");
+            $this->dbInstance->exec("TRUNCATE TABLE TOKEN CASCADE;");
             $this->peticionTokenTwitch();
             return $this->getRespuestaCurl($api_url);
         }
@@ -100,15 +96,16 @@ class TwitchApi
 
     public function getInfoUser($userId)
     {
-        if ($this->db->comprobarIdUsuarioEnDB($userId)) {
-            $api_response_array = ['data' => [$this->db->devolverUsuarioDeBD($userId)]];
-        } else {
-            $userId = urlencode($userId);
-            $api_url = "https://api.twitch.tv/helix/users?id=$userId";
-            $api_response = $this->getRespuestaCurl($api_url);
-            $api_response_array = json_decode($api_response, true);
-            $this->db->anadirUsuarioAdB($api_response_array['data'][0]);
+        if ($this->dbInstance->comprobarIdUsuarioEnDB($userId)) {
+            return ['data' => [$this->dbInstance->devolverUsuarioDeBD($userId)]];
         }
+
+        $userId = urlencode($userId);
+        $api_url = "https://api.twitch.tv/helix/users?id=$userId";
+        $api_response = $this->getRespuestaCurl($api_url);
+        $api_response_array = json_decode($api_response, true);
+        $this->dbInstance->anadirUsuarioAdB($api_response_array['data'][0]);
+
         return $api_response_array;
     }
 
@@ -134,8 +131,6 @@ class TwitchApi
             }
 
             return $filtered_streams;
-        } else {
-            return ['message' => 'No live streams data found in the Twitch API response.'];
         }
     }
 
