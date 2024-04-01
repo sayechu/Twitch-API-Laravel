@@ -33,15 +33,21 @@ class Database
     {
         $sql = "DROP TABLE IF EXISTS FECHACONSULTA, VIDEO, JUEGO, TOKEN, USUARIO;";
         $this->pdo->exec($sql);
-        echo "Tablas eliminadas\n";
     }
 
     public function crearTablas()
     {
-        $sql = "CREATE TABLE JUEGO(
+        $sql = "CREATE TABLE FECHACONSULTA(
+                    idFecha SERIAL PRIMARY KEY,
+                    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+
+                CREATE TABLE JUEGO(
                     position SERIAL,
                     gameId INT PRIMARY KEY,
-                    gameName VARCHAR(255)
+                    gameName VARCHAR(255),
+                    idFecha INTEGER,
+                    CONSTRAINT FK_FECHACONSULTA FOREIGN KEY (idFecha) REFERENCES FECHACONSULTA(idFecha)
                 );
     
                 CREATE TABLE VIDEO(
@@ -55,10 +61,6 @@ class Database
                     gameId INT,
             
                     CONSTRAINT FK_GAME1 FOREIGN KEY (gameId) REFERENCES JUEGO(gameId)
-                );
-    
-                CREATE TABLE FECHACONSULTA(
-                    fecha TIMESTAMP
                 );
                 
                 CREATE TABLE TOKEN(
@@ -80,13 +82,14 @@ class Database
                 );";
 
         $this->pdo->exec($sql);
-        echo "Tablas creadas\n";
     }
 
-    public function obtenerFechaUltimaInsercion()
+    public function getOldestUpdateDatetime()
     {
-        $stmt = $this->pdo->query("SELECT fecha FROM FECHACONSULTA ORDER BY fecha DESC LIMIT 1");
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt = $this->pdo->query("SELECT MIN(FC.fecha) AS fecha 
+                                FROM JUEGO J
+                                INNER JOIN FECHACONSULTA FC ON J.idFecha = FC.idFecha");
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function existeTokenDB()
@@ -99,7 +102,7 @@ class Database
     public function getTokenDB()
     {
         $stmt = $this->pdo->query("SELECT token FROM TOKEN ORDER BY tokenId DESC LIMIT 1");
-        $tokenData = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $tokenData = $stmt->fetch(PDO::FETCH_ASSOC);
         return ($tokenData !== false) ? $tokenData['token'] : null;
     }
 
@@ -111,24 +114,25 @@ class Database
 
     public function clearTablas()
     {
-        $this->pdo->exec("DELETE FROM VIDEO;");
-        $this->pdo->exec("DELETE FROM JUEGO;");
-        $this->pdo->exec("DELETE FROM FECHACONSULTA;");
-        $fechaActual = date('Y-m-d H:i:s');
-        $stmt = $this->pdo->prepare("INSERT INTO FECHACONSULTA (fecha) VALUES (:fecha)");
-        $stmt->bindParam(':fecha', $fechaActual, \PDO::PARAM_STR);
-        $stmt->execute();
+        $this->pdo->exec("DELETE FROM VIDEO");
+        $this->pdo->exec("DELETE FROM JUEGO");
+        $this->pdo->exec("DELETE FROM FECHACONSULTA");
     }
 
     public function insertarTopGames($topGamesData)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO JUEGO (gameId, gameName) VALUES (?, ?)");
+        $stmtJuego = $this->pdo->prepare("INSERT INTO JUEGO (gameId, gameName, idFecha) VALUES (?, ?, ?)");
 
         foreach ($topGamesData['data'] as $game) {
+            $sql = "INSERT INTO FECHACONSULTA (fecha) VALUES (DEFAULT)";
+            $this->pdo->exec($sql);
+
+            $idFechaStmt = $this->pdo->query("SELECT MAX(idFecha) FROM FECHACONSULTA");
+            $idFecha = $idFechaStmt->fetchColumn();
+
             $gameId = $game['id'];
             $gameName = $game['name'];
-
-            $stmt->execute([$gameId, $gameName]);
+            $stmtJuego->execute([$gameId, $gameName, $idFecha]);
         }
     }
 
@@ -202,12 +206,19 @@ class Database
         return $this->pdo->query($sql);
     }
 
-    public function obtenerNombreJuegoEId()
+    public function obtenerIdNombreFechadeJuegos()
     {
-        $sql = "SELECT gameId, gameName FROM JUEGO";
-        $stmt = $this->pdo->prepare($sql);
-        $success = $stmt->execute();
-        return $stmt;
+        $sql = "SELECT J.gameId, J.gameName, FC.fecha
+                FROM JUEGO J
+                INNER JOIN FECHACONSULTA FC ON J.idFecha = FC.idFecha";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
     }
 
     public function comprobarIdUsuarioEnDB($userId)
@@ -216,7 +227,6 @@ class Database
         $stmt->execute([$userId]);
         return ($stmt->fetchColumn() > 0);
     }
-
 
     public function anadirUsuarioADb($api_reponse_array)
     {
@@ -262,23 +272,65 @@ class Database
 
     public function devolverUsuarioDeBD($userId)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM USUARIO WHERE id = ?");
+        $stmt = $this->pdo->prepare("SELECT * FROM USUARIO WHERE ID = ?");
         $stmt->execute([$userId]);
         $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
         $userData = array(
             'id' => $userData['id'],
             'login' => $userData['login'],
-            'display_name' => $userData['displayName'],
+            'display_name' => $userData['displayname'],
             'type' => $userData['type'],
-            'broadcaster_type' => $userData['broadcasterType'],
+            'broadcaster_type' => $userData['broadcastertype'],
             'description' => $userData['description'],
-            'profile_image_url' => $userData['profileImageUrl'],
-            'offline_image_url' => $userData['offlineImageUrl'],
-            'view_count' => $userData['viewCount'],
-            'created_at' => $userData['createdAt']
+            'profile_image_url' => $userData['profileimageurl'],
+            'offline_image_url' => $userData['offlineimageurl'],
+            'view_count' => $userData['viewcount'],
+            'created_at' => $userData['createdat']
         );
 
         return $userData;
+    }
+
+    public function actualizarFechaJuego($gameId)
+    {
+        $sql = "UPDATE FECHACONSULTA 
+        SET fecha = CURRENT_TIMESTAMP
+        WHERE idFecha IN (SELECT idFecha FROM JUEGO WHERE gameId = :idGame)";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':idGame', $gameId, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
+    public function updateTopGame($pos, $gameId, $name)
+    {
+        $sql = "UPDATE JUEGO SET gameId = ?, gameName = ? WHERE position = ?";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->bindParam(1, $gameId, PDO::PARAM_INT);
+        $stmt->bindParam(2, $name, PDO::PARAM_STR);
+        $stmt->bindParam(3, $pos, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        $this->actualizarFechaJuego($gameId);
+    }
+
+
+    public function borrarVideosJuego($gameId)
+    {
+        $sql = "DELETE FROM VIDEO WHERE gameId = :gameId";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':gameId', $gameId, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
+    public function isLoadedDatabase()
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM JUEGO");
+        $stmt->execute();
+        return ($stmt->fetchColumn() > 0);
     }
 }
