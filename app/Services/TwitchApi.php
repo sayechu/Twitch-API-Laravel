@@ -114,7 +114,7 @@ class TwitchApi
         $api_url = 'https://api.twitch.tv/helix/streams';
         $api_response = $this->getRespuestaCurl($api_url);
 
-        $streams = json_decode($api_response, true);
+        $streams = json_decode($api_response, true, 512, JSON_UNESCAPED_UNICODE);
 
         if ($streams === null) {
             return ['error' => 'Error decoding JSON response from Twitch API.'];
