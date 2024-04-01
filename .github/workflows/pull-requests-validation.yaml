@@ -1,0 +1,30 @@
+name: Pull Request CI
+
+run-name: PR validator
+
+on: [pull_request]
+
+jobs:
+  pr-validator:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Step 2: Install dependencies
+    - name: Install dependencies
+      run: composer install
+
+    # Step 3: Run unit tests
+    - name: Run unit tests
+      #run: vendor/bin/phpunit
+
+    # Step 4: Execute PHP Code Sniffer
+    - name: Execute PHP Code Sniffer
+      run: vendor/bin/grumphp run --tasks phpcs
+
+    # Step 5: Execute PHP Mess Detector
+    - name: Execute PHP Mess Detector
+      run: vendor/bin/grumphp run --tasks phpmd
