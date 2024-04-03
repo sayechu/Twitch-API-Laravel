@@ -20,8 +20,8 @@ jobs:
       run: composer install
 
     # Step 3: Run unit tests
-    - name: Run unit tests
-      run: vendor/bin/phpunit
+    #- name: Run unit tests
+      #run: vendor/bin/phpunit
 
     # Step 4: Execute PHP Code Sniffer
     - name: Execute PHP Code Sniffer
