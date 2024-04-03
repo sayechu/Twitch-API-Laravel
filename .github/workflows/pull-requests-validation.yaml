@@ -30,3 +30,4 @@ jobs:
     # Step 5: Execute PHP Mess Detector
     - name: Execute PHP Mess Detector
       run: vendor/bin/grumphp run --tasks phpmd
+
