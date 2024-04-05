@@ -3,6 +3,12 @@
 namespace App\Services;
 
 use App\Services\Database;
+use App\Services\DeleteTableManagement;
+use App\Services\InsertTableManagement;
+use App\Services\SelectTableManagement;
+use App\Services\TableManagement;
+use App\Services\TokenManagement;
+use App\Services\UpdateTableManagement;
 
 class TwitchApi
 {
@@ -18,13 +24,19 @@ class TwitchApi
         $this->client_secret = $client_secret;
         $this->grant_type = $grant_type;
         $this->dbInstance = new Database();
+        $this->dbInstanceDelete = new DeleteTableManagement();
+        $this->dbInstanceInsert = new InsertTableManagement();
+        $this->dbInstanceSelect = new SelectTableManagement();
+        $this->dbInstanceUpdate = new UpdateTableManagement();
+        $this->dbInstanceToken = new TokenManagement();
+        $this->dbInstanceTable = new TableManagement();
         $this->token = $this->obtenerToken();
     }
 
     private function obtenerToken()
     {
-        if ($this->dbInstance->existeTokenDB()) {
-            return $this->dbInstance->getTokenDB();
+        if ($this->dbInstanceToken->existeTokenDB()) {
+            return $this->dbInstanceToken->getTokenDB();
         }
         return $this->peticionTokenTwitch();
     }
@@ -58,8 +70,7 @@ class TwitchApi
 
         if (isset($result['access_token'])) {
             $this->token = $result['access_token'];
-            $dbInstance = new Database();
-            $dbInstance->insertarToken($this->token);
+            $this->dbInstanceToken->insertarToken($this->token);
         }
 
         return $this->token;
@@ -97,14 +108,14 @@ class TwitchApi
     public function getInfoUser($userId)
     {
         if ($this->dbInstance->comprobarIdUsuarioEnDB($userId)) {
-            return ['data' => [$this->dbInstance->devolverUsuarioDeBD($userId)]];
+            return ['data' => [$this->dbInstanceSelect->devolverUsuarioDeBD($userId)]];
         }
 
         $userId = urlencode($userId);
         $api_url = "https://api.twitch.tv/helix/users?id=$userId";
         $api_response = $this->getRespuestaCurl($api_url);
         $api_response_array = json_decode($api_response, true);
-        $this->dbInstance->anadirUsuarioAdB($api_response_array['data'][0]);
+        $this->dbInstanceInsert->anadirUsuarioAdB($api_response_array['data'][0]);
 
         return $api_response_array;
     }
@@ -167,5 +178,14 @@ class TwitchApi
     {
         header('Content-Type: application/json');
         echo $api_response_pretty;
+    }
+
+    public function searchDate($topGamesList, $idGame)
+    {
+        foreach ($topGamesList as $game) {
+            if ($game['gameId'] == $idGame) {
+                return $game['fecha'];
+            }
+        }
     }
 }
