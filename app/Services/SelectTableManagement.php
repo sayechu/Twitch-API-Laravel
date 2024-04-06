@@ -13,16 +13,16 @@ class SelectTableManagement extends Database
         $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
         $userData = array(
-            'id' => $userData['id'],
+            'id' => $userData['ID'],
             'login' => $userData['login'],
-            'display_name' => $userData['displayname'],
+            'display_name' => $userData['displayName'],
             'type' => $userData['type'],
-            'broadcaster_type' => $userData['broadcastertype'],
+            'broadcaster_type' => $userData['broadcasterType'],
             'description' => $userData['description'],
-            'profile_image_url' => $userData['profileimageurl'],
-            'offline_image_url' => $userData['offlineimageurl'],
-            'view_count' => $userData['viewcount'],
-            'created_at' => $userData['createdat']
+            'profile_image_url' => $userData['profileImageUrl'],
+            'offline_image_url' => $userData['offlineImageUrl'],
+            'view_count' => $userData['viewCount'],
+            'created_at' => $userData['createdAt']
         );
 
         return $userData;
