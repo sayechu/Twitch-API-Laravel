@@ -1,6 +1,7 @@
 <?php
 
     namespace App\Services;
+
     use PDO;
 
 class DeleteTableManagement extends Database
