@@ -9,8 +9,6 @@ use App\Services\VerificateManagement;
 use App\Services\DeleteTableManagement;
 use App\Services\InsertTableManagement;
 use App\Services\SelectTableManagement;
-use App\Services\TableManagement;
-use App\Services\TokenManagement;
 use App\Services\UpdateTableManagement;
 use PDO;
 
@@ -26,8 +24,6 @@ class AnalyticsTopsOfTheTopsController extends Controller
         $dbInstanceInsert = new InsertTableManagement();
         $dbInstanceSelect = new SelectTableManagement();
         $dbInstanceUpdate = new UpdateTableManagement();
-        $dbInstanceToken = new TokenManagement();
-        $dbInstanceTable = new TableManagement();
         $client_id = '970almy6xw98ruyojcwqpop0p0o5a2';
         $client_secret = 'yl0nqzjjnadd8wl7zilpr9pzuh979j';
         $twitchApi = new TwitchApi($client_id, $client_secret);
