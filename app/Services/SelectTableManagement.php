@@ -103,7 +103,8 @@ class SelectTableManagement extends Database
         return $this->pdo->query($sql);
     }
 
-    public function obtenerGameIdporPosicion($pos) {
+    public function obtenerGameIdporPosicion($pos)
+    {
         $sql = "SELECT J.gameId
                 FROM JUEGO J
                 WHERE J.position = :pos";
@@ -117,5 +118,4 @@ class SelectTableManagement extends Database
             return false;
         }
     }
-    
 }
