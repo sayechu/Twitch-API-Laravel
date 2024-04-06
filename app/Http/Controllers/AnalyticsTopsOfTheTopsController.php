@@ -39,7 +39,14 @@ class AnalyticsTopsOfTheTopsController extends Controller
         if (!$dbInstanceVerificate->isLoadedDatabase()) {
             $results = $this->fetchInitialData($twitchApi, $dbInstanceInsert, $dbInstanceSelect);
         } elseif ($this->shouldReviewEachTopGame($dbInstanceSelect, $since)) {
-            $this->reviewTopGames($twitchApi, $dbInstanceSelect, $dbInstanceDelete, $dbInstanceInsert, $dbInstanceUpdate, $since);
+            $this->reviewTopGames(
+                $twitchApi,
+                $dbInstanceSelect,
+                $dbInstanceDelete,
+                $dbInstanceInsert,
+                $dbInstanceUpdate,
+                $since
+            );
         }
 
         $results = $this->fetchTopGamesData($twitchApi, $dbInstanceSelect);
@@ -90,8 +97,14 @@ class AnalyticsTopsOfTheTopsController extends Controller
         return $maxTimeDifference > $since;
     }
 
-    private function reviewTopGames($twitchApi, $dbInstanceSelect, $dbInstanceDelete, $dbInstanceInsert, $dbInstanceUpdate, $since)
-    {
+    private function reviewTopGames(
+        $twitchApi,
+        $dbInstanceSelect,
+        $dbInstanceDelete,
+        $dbInstanceInsert,
+        $dbInstanceUpdate,
+        $since
+    ) {
         $threeTopGamesTwitch = $twitchApi->getTopGames();
         $threeTopGamesDB = $dbInstanceSelect->obtenerIdNombreFechadeJuegos();
 
@@ -104,13 +117,19 @@ class AnalyticsTopsOfTheTopsController extends Controller
             $fecha = $twitchApi->searchDate($threeTopGamesDB, $gameTwitch['id']);
             if ((in_array($gameTwitch['name'], $gamesArray)) && (time() - strtotime($fecha) > $since)) {
                 $dbInstanceDelete->borrarVideosJuego($gameTwitch['id']);
-                $dbInstanceInsert->insertarVideos($twitchApi->getTop40VideosDadoUnGameId($gameTwitch['id']), $gameTwitch['id']);
+                $dbInstanceInsert->insertarVideos(
+                    $twitchApi->getTop40VideosDadoUnGameId($gameTwitch['id']),
+                    $gameTwitch['id']
+                );
                 $dbInstanceUpdate->actualizarFechaJuego($gameTwitch['id']);
             } elseif (!(in_array($gameTwitch['name'], $gamesArray)) || !(time() - strtotime($fecha) > $since)) {
                 $gameId = $dbInstanceSelect->obtenerGameIdporPosicion($index + 1);
                 $dbInstanceDelete->borrarVideosJuego($gameId[0]['gameId']);
                 $dbInstanceUpdate->updateTopGame($index + 1, $gameTwitch['id'], $gameTwitch['name']);
-                $dbInstanceInsert->insertarVideos($twitchApi->getTop40VideosDadoUnGameId($gameTwitch['id']), $gameTwitch['id']);
+                $dbInstanceInsert->insertarVideos(
+                    $twitchApi->getTop40VideosDadoUnGameId($gameTwitch['id']),
+                    $gameTwitch['id']
+                );
             }
         }
     }
