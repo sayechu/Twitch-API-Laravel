@@ -1,6 +1,7 @@
 <?php
 
     namespace App\Services;
+
     use PDO;
 
 class VerificateManagement extends Database
