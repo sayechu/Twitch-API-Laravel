@@ -107,7 +107,7 @@ class TwitchApi
 
     public function getInfoUser($userId)
     {
-        if ($this->dbInstance->comprobarIdUsuarioEnDB($userId)) {
+        if ($this->dbInstanceVerificate->comprobarIdUsuarioEnDB($userId)) {
             return ['data' => [$this->dbInstanceSelect->devolverUsuarioDeBD($userId)]];
         }
 
