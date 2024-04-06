@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AnalyticsTopsOfTheTopsRequest;
 use Illuminate\Http\Request;
 use App\Services\TwitchApi;
-use App\Services\Database;
+use App\Services\VerificateManagement;
 use App\Services\DeleteTableManagement;
 use App\Services\InsertTableManagement;
 use App\Services\SelectTableManagement;
@@ -21,7 +21,7 @@ class AnalyticsTopsOfTheTopsController extends Controller
      */
     public function __invoke(AnalyticsTopsOfTheTopsRequest $request)
     {
-        $database = new Database();
+        $dbInstanceVerificate = new VerificateManagement();
         $dbInstanceDelete = new DeleteTableManagement();
         $dbInstanceInsert = new InsertTableManagement();
         $dbInstanceSelect = new SelectTableManagement();
@@ -36,7 +36,7 @@ class AnalyticsTopsOfTheTopsController extends Controller
         $since = $_GET['since'] ?? null;
         $since = $since ?? (10 * 60);
 
-        if (!$database->isLoadedDatabase()) {
+        if (!$dbInstanceVerificate->isLoadedDatabase()) {
             $results = $this->fetchInitialData($twitchApi, $dbInstanceInsert, $dbInstanceSelect);
         } elseif ($this->shouldReviewEachTopGame($dbInstanceSelect, $since)) {
             $this->reviewTopGames($twitchApi, $dbInstanceSelect, $dbInstanceDelete, $dbInstanceInsert, $dbInstanceUpdate, $since);
@@ -107,11 +107,8 @@ class AnalyticsTopsOfTheTopsController extends Controller
                 $dbInstanceInsert->insertarVideos($twitchApi->getTop40VideosDadoUnGameId($gameTwitch['id']), $gameTwitch['id']);
                 $dbInstanceUpdate->actualizarFechaJuego($gameTwitch['id']);
             } elseif (!(in_array($gameTwitch['name'], $gamesArray)) || !(time() - strtotime($fecha) > $since)) {
-                // no tiene sentido borrar videos de un juego que no esta en la bd
-                // yo creo que a partir de la posicion, tienes que obtener el id del juego
-                // cuando obtienes ese id, le pasas el id a borrarVideosJuego()
-                // el resto es igual
-                $dbInstanceDelete->borrarVideosJuego($gameTwitch['id']);
+                $gameId = $dbInstanceSelect->obtenerGameIdporPosicion($index + 1);
+                $dbInstanceDelete->borrarVideosJuego($gameId[0]['gameId']);
                 $dbInstanceUpdate->updateTopGame($index + 1, $gameTwitch['id'], $gameTwitch['name']);
                 $dbInstanceInsert->insertarVideos($twitchApi->getTop40VideosDadoUnGameId($gameTwitch['id']), $gameTwitch['id']);
             }

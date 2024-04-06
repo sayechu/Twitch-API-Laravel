@@ -102,4 +102,20 @@ class SelectTableManagement extends Database
 
         return $this->pdo->query($sql);
     }
+
+    public function obtenerGameIdporPosicion($pos) {
+        $sql = "SELECT J.gameId
+                FROM JUEGO J
+                WHERE J.position = :pos";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':pos', $pos, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
+    }
+    
 }

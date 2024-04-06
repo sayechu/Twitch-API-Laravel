@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Services\Database;
+use App\Services\VerificateManagement;
 use App\Services\DeleteTableManagement;
 use App\Services\InsertTableManagement;
 use App\Services\SelectTableManagement;
@@ -23,7 +23,7 @@ class TwitchApi
         $this->client_id = $client_id;
         $this->client_secret = $client_secret;
         $this->grant_type = $grant_type;
-        $this->dbInstance = new Database();
+        $this->dbInstanceVerificate = new VerificateManagement();
         $this->dbInstanceDelete = new DeleteTableManagement();
         $this->dbInstanceInsert = new InsertTableManagement();
         $this->dbInstanceSelect = new SelectTableManagement();
