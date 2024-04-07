@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    
+    # Step 0: Fix PHP version to 8.2
     - name: Use PHP 8.2
       uses: shivammathur/setup-php@v2
       with:
