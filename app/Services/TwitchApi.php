@@ -3,12 +3,9 @@
 namespace App\Services;
 
 use App\Services\VerificateManagement;
-use App\Services\DeleteTableManagement;
 use App\Services\InsertTableManagement;
 use App\Services\SelectTableManagement;
-use App\Services\TableManagement;
 use App\Services\TokenManagement;
-use App\Services\UpdateTableManagement;
 
 class TwitchApi
 {
@@ -24,12 +21,9 @@ class TwitchApi
         $this->client_secret = $client_secret;
         $this->grant_type = $grant_type;
         $this->dbInstanceVerificate = new VerificateManagement();
-        $this->dbInstanceDelete = new DeleteTableManagement();
         $this->dbInstanceInsert = new InsertTableManagement();
         $this->dbInstanceSelect = new SelectTableManagement();
-        $this->dbInstanceUpdate = new UpdateTableManagement();
         $this->dbInstanceToken = new TokenManagement();
-        $this->dbInstanceTable = new TableManagement();
         $this->token = $this->obtenerToken();
     }
 
