@@ -17,7 +17,7 @@ jobs:
 
     # Step 2: Install dependencies
     - name: Install dependencies
-      run: composer install
+      run: composer update && composer install
 
     # Step 3: Run unit tests
     #- name: Run unit tests
