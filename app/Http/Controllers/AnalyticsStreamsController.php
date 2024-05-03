@@ -2,22 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\GetStreamsService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Services\TwitchApi;
 
 class AnalyticsStreamsController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
-    public function __invoke(Request $request)
+    private GetStreamsService $getStreamsService;
+    public function __construct(GetStreamsService $getStreamsService)
     {
-        $client_id = '970almy6xw98ruyojcwqpop0p0o5a2';
-        $client_secret = 'yl0nqzjjnadd8wl7zilpr9pzuh979j';
+        $this->getStreamsService = $getStreamsService;
+    }
 
-        $twitchApi = new TwitchApi($client_id, $client_secret);
-        $streams = $twitchApi->getStreams();
+    public function __invoke(Request $request): JsonResponse
+    {
+        $streams = $this->getStreamsService->getStreams();
 
-        return response()->json($streams, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        return response()->json($streams);
     }
 }
