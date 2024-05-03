@@ -13,6 +13,8 @@ class StreamsManager
 
     public function getStreams(): array
     {
+        $api_url = 'https://api.twitch.tv/helix/streams';
+
         $responseGetToken = $this->apiClient->getToken();
         $twitchToken = json_decode($responseGetToken, true)['access_token'];
 
@@ -20,7 +22,7 @@ class StreamsManager
             'Authorization: Bearer ' . $twitchToken,
         );
 
-        $responseGetStreams = $this->apiClient->getStreamsCall($apiHeaders);
+        $responseGetStreams = $this->apiClient->makeCurlCall($api_url, $apiHeaders);
         return json_decode($responseGetStreams, true)['data'];
     }
 }

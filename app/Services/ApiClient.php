@@ -36,10 +36,8 @@ class ApiClient
         return $response;
     }
 
-    public function getStreamsCall($api_headers): string
+    public function makeCurlCall($api_url, $api_headers): string
     {
-        $api_url = 'https://api.twitch.tv/helix/streams';
-
         $api_headers[] = 'Client-Id: ' . self::CLIENT_ID;
 
         $curlHeaders = curl_init();
