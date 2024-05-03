@@ -3,21 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AnalyticsUsersRequest;
-use Illuminate\Http\Request;
-use App\Services\TwitchApi;
+use App\Services\GetUsersService;
+use Illuminate\Http\JsonResponse;
 
 class AnalyticsUsersController extends Controller
 {
-    public function __invoke(AnalyticsUsersRequest $request)
+    private GetUsersService $getUserService;
+    public function __construct(GetUsersService $getUserService)
+    {
+        $this->getUserService = $getUserService;
+    }
+
+    public function __invoke(AnalyticsUsersRequest $request): JsonResponse
     {
         $userId = $request->input('id');
 
-        $client_id = '970almy6xw98ruyojcwqpop0p0o5a2';
-        $client_secret = 'yl0nqzjjnadd8wl7zilpr9pzuh979j';
+        $userInfo = $this->getUserService->getUserInfoById($userId);
 
-        $twitchApi = new TwitchApi($client_id, $client_secret);
-        $userInfo = $twitchApi->getInfoUser($userId);
-
-        return response()->json($userInfo, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        return response()->json($userInfo);
     }
 }
