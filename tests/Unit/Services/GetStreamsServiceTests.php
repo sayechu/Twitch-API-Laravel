@@ -4,7 +4,6 @@ namespace Tests\Unit\Services;
 
 use App\Services\GetStreamsService;
 use App\Services\StreamsManager;
-use http\Encoding\Stream;
 use Mockery;
 use Tests\TestCase;
 
