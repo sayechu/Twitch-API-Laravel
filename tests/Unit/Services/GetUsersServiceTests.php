@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Services;
 
-use App\Services\GetStreamsService;
 use App\Services\GetUsersService;
 use App\Services\UsersManager;
 use Mockery;
