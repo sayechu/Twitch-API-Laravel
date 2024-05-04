@@ -23,6 +23,7 @@ class UsersManager
         );
 
         $userInfo = $this->apiClient->makeCurlCall($api_url, $api_headers);
+
         return json_decode($userInfo, true)['data'];
     }
 }

@@ -3,40 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AnalyticsTopsOfTheTopsRequest;
-use Illuminate\Http\Request;
-use App\Services\TwitchApi;
+use App\Services\GetTopsOfTheTopsService;
 use App\Services\VerificateManagement;
 use App\Services\DeleteTableManagement;
 use App\Services\InsertTableManagement;
 use App\Services\SelectTableManagement;
 use App\Services\UpdateTableManagement;
+use Illuminate\Http\JsonResponse;
 use PDO;
 
 class AnalyticsTopsOfTheTopsController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
-    public function __invoke(AnalyticsTopsOfTheTopsRequest $request)
+    private GetTopsOfTheTopsService $getTopsOfTheTopsService;
+    public function __construct(GetTopsOfTheTopsService $getTopsOfTheTopsService)
+    {
+        $this->getTopsOfTheTopsService = $getTopsOfTheTopsService;
+    }
+    public function __invoke(AnalyticsTopsOfTheTopsRequest $request): JsonResponse
     {
         $dbInstanceVerificate = new VerificateManagement();
         $dbInstanceDelete = new DeleteTableManagement();
         $dbInstanceInsert = new InsertTableManagement();
         $dbInstanceSelect = new SelectTableManagement();
         $dbInstanceUpdate = new UpdateTableManagement();
-        $client_id = '970almy6xw98ruyojcwqpop0p0o5a2';
-        $client_secret = 'yl0nqzjjnadd8wl7zilpr9pzuh979j';
-        $twitchApi = new TwitchApi($client_id, $client_secret);
         $results = [];
 
         $since = $_GET['since'] ?? null;
         $since = $since ?? (10 * 60);
 
         if (!$dbInstanceVerificate->isLoadedDatabase()) {
-            $results = $this->fetchInitialData($twitchApi, $dbInstanceInsert, $dbInstanceSelect);
+            $results = $this->fetchInitialData($dbInstanceInsert, $dbInstanceSelect);
         } elseif ($this->shouldReviewEachTopGame($dbInstanceSelect, $since)) {
             $this->reviewTopGames(
-                $twitchApi,
                 $dbInstanceSelect,
                 $dbInstanceDelete,
                 $dbInstanceInsert,
@@ -45,46 +43,30 @@ class AnalyticsTopsOfTheTopsController extends Controller
             );
         }
 
-        $results = $this->fetchTopGamesData($twitchApi, $dbInstanceSelect);
+        $results = $this->fetchTopGamesData($dbInstanceSelect);
 
         return response()->json($results, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-    private function fetchInitialData($twitchApi, $dbInstanceInsert, $dbInstanceSelect)
+    private function fetchInitialData($dbInstanceInsert, $dbInstanceSelect): array
     {
-        $threeTopGames = $twitchApi->getTopGames();
+        $threeTopGames = $this->getTopsOfTheTopsService->getTopGames();
         $dbInstanceInsert->insertarTopGames($threeTopGames);
         $results = [];
 
         foreach ($threeTopGames['data'] as $game) {
             $gameId = $game['id'];
             $gameName = $game['name'];
-            $topVideosData = $twitchApi->getTop40VideosDadoUnGameId($gameId);
+            $topVideosData = $this->getTopsOfTheTopsService->getTop40VideosDadoUnGameId($gameId);
             $dbInstanceInsert->insertarVideos($topVideosData, $gameId);
 
-            $stmtAtr = $dbInstanceSelect->obtenerAtributos($gameId);
-            $row = $stmtAtr->fetch(PDO::FETCH_ASSOC);
-            if ($row) {
-                $result = [
-                    'game_id' => strval($gameId),
-                    'game_name' => $gameName,
-                    'user_name' => $row['user_name'],
-                    'total_videos' => strval($row['total_videos']),
-                    'total_views' => strval($row['total_views']),
-                    'most_viewed_title' => $row['most_viewed_title'],
-                    'most_viewed_views' => strval($row['most_viewed_views']),
-                    'most_viewed_duration' => $row['most_viewed_duration'],
-                    'most_viewed_created_at' => $row['most_viewed_created_at']
-                ];
-
-                $results[] = $result;
-            }
+            $results = $this->getRequiredTypesAttributesResult($dbInstanceSelect, $gameId, $gameName, $results);
         }
 
         return $results;
     }
 
-    private function shouldReviewEachTopGame($dbInstanceSelect, $since)
+    private function shouldReviewEachTopGame($dbInstanceSelect, $since): bool
     {
         $lastUpdateTime = strtotime($dbInstanceSelect->getOldestUpdateDatetime()['fecha']);
         $currentTime = time();
@@ -94,14 +76,14 @@ class AnalyticsTopsOfTheTopsController extends Controller
     }
 
     private function reviewTopGames(
-        $twitchApi,
         $dbInstanceSelect,
         $dbInstanceDelete,
         $dbInstanceInsert,
         $dbInstanceUpdate,
         $since
-    ) {
-        $threeTopGamesTwitch = $twitchApi->getTopGames();
+    ): void
+    {
+        $threeTopGamesTwitch = $this->getTopsOfTheTopsService->getTopGames();
         $threeTopGamesDB = $dbInstanceSelect->obtenerIdNombreFechadeJuegos();
 
         $gamesArray = [];
@@ -110,11 +92,11 @@ class AnalyticsTopsOfTheTopsController extends Controller
         $gamesArray[] = $threeTopGamesDB[2]['gameName'];
 
         foreach ($threeTopGamesTwitch['data'] as $index => $gameTwitch) {
-            $fecha = $twitchApi->searchDate($threeTopGamesDB, $gameTwitch['id']);
+            $fecha = $this->searchDate($threeTopGamesDB, $gameTwitch['id']);
             if ((in_array($gameTwitch['name'], $gamesArray)) && (time() - strtotime($fecha) > $since)) {
                 $dbInstanceDelete->borrarVideosJuego($gameTwitch['id']);
                 $dbInstanceInsert->insertarVideos(
-                    $twitchApi->getTop40VideosDadoUnGameId($gameTwitch['id']),
+                    $this->getTopsOfTheTopsService->getTop40VideosDadoUnGameId($gameTwitch['id']),
                     $gameTwitch['id']
                 );
                 $dbInstanceUpdate->actualizarFechaJuego($gameTwitch['id']);
@@ -123,41 +105,57 @@ class AnalyticsTopsOfTheTopsController extends Controller
                 $dbInstanceDelete->borrarVideosJuego($gameId[0]['gameId']);
                 $dbInstanceUpdate->updateTopGame($index + 1, $gameTwitch['id'], $gameTwitch['name']);
                 $dbInstanceInsert->insertarVideos(
-                    $twitchApi->getTop40VideosDadoUnGameId($gameTwitch['id']),
+                    $this->getTopsOfTheTopsService->getTop40VideosDadoUnGameId($gameTwitch['id']),
                     $gameTwitch['id']
                 );
             }
         }
     }
 
-    private function fetchTopGamesData($twitchApi, $dbInstanceSelect)
+    private function fetchTopGamesData($dbInstanceSelect): array
     {
-        $threeTopGames = $twitchApi->getTopGames();
+        $threeTopGames = $this->getTopsOfTheTopsService->getTopGames();
         $results = [];
 
         foreach ($threeTopGames['data'] as $game) {
             $gameId = $game['id'];
             $gameName = $game['name'];
 
-            $stmtAtr = $dbInstanceSelect->obtenerAtributos($gameId);
-            $row = $stmtAtr->fetch(PDO::FETCH_ASSOC);
-            if ($row) {
-                $result = [
-                    'game_id' => strval($gameId),
-                    'game_name' => $gameName,
-                    'user_name' => $row['user_name'],
-                    'total_videos' => strval($row['total_videos']),
-                    'total_views' => strval($row['total_views']),
-                    'most_viewed_title' => $row['most_viewed_title'],
-                    'most_viewed_views' => strval($row['most_viewed_views']),
-                    'most_viewed_duration' => $row['most_viewed_duration'],
-                    'most_viewed_created_at' => $row['most_viewed_created_at']
-                ];
-
-                $results[] = $result;
-            }
+            $results = $this->getRequiredTypesAttributesResult($dbInstanceSelect, $gameId, $gameName, $results);
         }
 
+        return $results;
+    }
+
+    public function searchDate($topGamesList, $idGame)
+    {
+        foreach ($topGamesList as $game) {
+            if ($game['gameId'] == $idGame) {
+                return $game['fecha'];
+            }
+        }
+        return null;
+    }
+
+    private function getRequiredTypesAttributesResult($dbInstanceSelect, mixed $gameId, mixed $gameName, array $results): array
+    {
+        $stmtAtr = $dbInstanceSelect->obtenerAtributos($gameId);
+        $row = $stmtAtr->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            $result = [
+                'game_id' => strval($gameId),
+                'game_name' => $gameName,
+                'user_name' => $row['user_name'],
+                'total_videos' => strval($row['total_videos']),
+                'total_views' => strval($row['total_views']),
+                'most_viewed_title' => $row['most_viewed_title'],
+                'most_viewed_views' => strval($row['most_viewed_views']),
+                'most_viewed_duration' => $row['most_viewed_duration'],
+                'most_viewed_created_at' => $row['most_viewed_created_at']
+            ];
+
+            $results[] = $result;
+        }
         return $results;
     }
 }
