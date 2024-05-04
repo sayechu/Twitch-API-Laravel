@@ -7,7 +7,7 @@ use App\Services\StreamsManager;
 use Tests\TestCase;
 use Mockery;
 
-class ExampleTest extends TestCase
+class GetStreamsTest extends TestCase
 {
     /**
      * @test
