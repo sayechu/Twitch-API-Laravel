@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Services\ApiClient;
+use App\Services\StreamsManager;
 use Tests\TestCase;
 use Mockery;
 
@@ -29,19 +31,18 @@ class ExampleTest extends TestCase
 
         $apiClient
             ->expects('getToken')
-            ->with('https://id.twitch.tv/oauth2/token')
             ->once()
             ->andReturn($getTokenExpectedResponse);
+        $twitchToken = json_decode($getTokenExpectedResponse, true)['access_token'];
         $apiClient
             ->expects('makeCurlCall')
-            ->with('https://id.twitch.tv/helix/streams', [0 => 'Authorization: Bearer zfmr6i7cbwken2maslfu9v89tvq9ne'])
+            ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer ' . $twitchToken])
             ->once()
             ->andReturn($getStreamsExpectedResponse);
 
         $response = $this->get('/analytics/streams');
 
         $response->assertStatus(200);
-        $response->assertContent('[{"title":"Stream title", "user_name":"user_name"}]');
+        $response->assertContent('[{"title":"Stream title","user_name":"user_name"}]');
     }
-
 }

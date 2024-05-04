@@ -36,7 +36,7 @@ class ApiClient
         return $response;
     }
 
-    public function makeCurlCall($api_url, $api_headers): string
+    public function makeCurlCall(string $api_url, array $api_headers): string
     {
         $api_headers[] = 'Client-Id: ' . self::CLIENT_ID;
 
