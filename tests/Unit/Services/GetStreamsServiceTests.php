@@ -28,8 +28,7 @@ class GetStreamsServiceTests extends TestCase
                 'user_name' => 'User Name 1',
                 'game_id' => '21779',
                 'game_name' => 'Game Name',
-                'title' => 'Stream Title 1',
-                'user_name' => 'User Name 1'
+                'title' => 'Stream Title 1'
             ],
             [
                 'id' => 'Stream Id 2',
@@ -38,8 +37,7 @@ class GetStreamsServiceTests extends TestCase
                 'user_name' => 'User Name 2',
                 'game_id' => '21779',
                 'game_name' => 'Game Name',
-                'title' => 'Stream Title 2',
-                'user_name' => 'User Name 2'
+                'title' => 'Stream Title 2'
             ]
         ];
         $expectedFilteredStreams = [
