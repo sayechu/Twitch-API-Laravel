@@ -12,7 +12,7 @@ class GetStreamsTest extends TestCase
     /**
      * @test
      */
-    public function gets_streams()
+    public function gets_streams(): void
     {
         $apiClient = Mockery::mock(ApiClient::class);
         $this->app
