@@ -12,7 +12,12 @@ class SelectTableManagement extends Database
         $stmt->execute([$userId]);
         $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $userData = array(
+        if (!$userData)
+        {
+            return null;
+        }
+
+        $formattedUserData = [
             'id' => $userData['ID'],
             'login' => $userData['login'],
             'display_name' => $userData['displayName'],
@@ -23,9 +28,9 @@ class SelectTableManagement extends Database
             'offline_image_url' => $userData['offlineImageUrl'],
             'view_count' => $userData['viewCount'],
             'created_at' => $userData['createdAt']
-        );
+        ];
 
-        return $userData;
+        return $formattedUserData;
     }
 
     public function obtenerIdNombreFechadeJuegos()
@@ -45,7 +50,7 @@ class SelectTableManagement extends Database
 
     public function getOldestUpdateDatetime()
     {
-        $stmt = $this->pdo->query("SELECT MIN(FC.fecha) AS fecha 
+        $stmt = $this->pdo->query("SELECT MIN(FC.fecha) AS fecha
                                 FROM JUEGO J
                                 INNER JOIN FECHACONSULTA FC ON J.idFecha = FC.idFecha");
         return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -71,28 +76,28 @@ class SelectTableManagement extends Database
                     UV.total_videos,
                     UV.total_views,
                     (
-                        SELECT V.titulo 
-                        FROM VIDEO V 
-                        WHERE V.userId = UV.userId 
-                            AND V.gameId = {$gameId} 
-                            AND V.visitas = UV.MaxVisitas 
+                        SELECT V.titulo
+                        FROM VIDEO V
+                        WHERE V.userId = UV.userId
+                            AND V.gameId = {$gameId}
+                            AND V.visitas = UV.MaxVisitas
                         LIMIT 1
                     ) AS most_viewed_title,
                     UV.MaxVisitas AS most_viewed_views,
                     (
-                        SELECT V.duracion 
-                        FROM VIDEO V 
-                        WHERE V.userId = UV.userId 
-                            AND V.gameId = {$gameId} 
-                            AND V.visitas = UV.MaxVisitas 
+                        SELECT V.duracion
+                        FROM VIDEO V
+                        WHERE V.userId = UV.userId
+                            AND V.gameId = {$gameId}
+                            AND V.visitas = UV.MaxVisitas
                         LIMIT 1
                     ) AS most_viewed_duration,
                     (
-                        SELECT V.fecha 
-                        FROM VIDEO V 
-                        WHERE V.userId = UV.userId 
-                            AND V.gameId = {$gameId} 
-                            AND V.visitas = UV.MaxVisitas 
+                        SELECT V.fecha
+                        FROM VIDEO V
+                        WHERE V.userId = UV.userId
+                            AND V.gameId = {$gameId}
+                            AND V.visitas = UV.MaxVisitas
                         LIMIT 1
                     ) AS most_viewed_created_at
                 FROM UserVideos UV

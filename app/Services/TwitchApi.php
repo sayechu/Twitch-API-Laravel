@@ -109,7 +109,7 @@ class TwitchApi
         $api_url = "https://api.twitch.tv/helix/users?id=$userId";
         $api_response = $this->getRespuestaCurl($api_url);
         $api_response_array = json_decode($api_response, true);
-        $this->dbInstanceInsert->anadirUsuarioAdB($api_response_array['data'][0]);
+        $this->dbInstanceInsert->anadirUsuarioADatabase($api_response_array['data'][0]);
 
         return $api_response_array;
     }

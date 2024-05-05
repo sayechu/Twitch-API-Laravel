@@ -1,48 +1,60 @@
 <?php
 
-    namespace App\Services;
+namespace App\Services;
 
-    use PDO;
+use PDO;
+use PDOException;
 
-class InsertTableManagement extends Database
+class DatabaseClient
 {
-    public function insertarTopGames($topGamesData)
+    private string $host = 'mysql';
+    private string $port = '3306';
+    private string $dbName = 'laravel';
+    private string $username = 'sail';
+    private string $password = 'password';
+    private string $dataSourceName;
+
+    protected PDO $pdo;
+
+    public function __construct()
     {
-        $stmtJuego = $this->pdo->prepare("INSERT INTO JUEGO (gameId, gameName, idFecha) VALUES (?, ?, ?)");
-
-        foreach ($topGamesData['data'] as $game) {
-            $sql = "INSERT INTO FECHACONSULTA (fecha) VALUES (DEFAULT)";
-            $this->pdo->exec($sql);
-
-            $idFechaStmt = $this->pdo->query("SELECT MAX(idFecha) FROM FECHACONSULTA");
-            $idFecha = $idFechaStmt->fetchColumn();
-
-            $gameId = $game['id'];
-            $gameName = $game['name'];
-            $stmtJuego->execute([$gameId, $gameName, $idFecha]);
+        $this->dataSourceName = "mysql:host=$this->host;port=$this->port;dbname=$this->dbName";
+        try {
+            $this->pdo = new PDO($this->dataSourceName, $this->username, $this->password);
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            echo "Error de conexión: " . $e->getMessage();
         }
     }
 
-    public function insertarVideos($topVideosData, $gameId)
+    public function getUserFromDatabase($user)
     {
-        $stmt = $this->pdo->prepare(
-            "INSERT INTO VIDEO (videoId, userId, userName, visitas, duracion, fecha, titulo, gameId)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-        );
-        foreach ($topVideosData['data'] as $video) {
-            $videoId = $video['id'];
-            $userId = $video['user_id'];
-            $username = $video['user_name'];
-            $visitas = $video['view_count'];
-            $duracion = $video['duration'];
-            $fecha = $video['created_at'];
-            $titulo = $video['title'];
+        $stmt = $this->pdo->prepare("SELECT * FROM USUARIO WHERE ID = ?");
+        $stmt->execute([$user]);
+        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            $stmt->execute([$videoId, $userId, $username, $visitas, $duracion, $fecha, $titulo, $gameId]);
+        if (!$userData)
+        {
+            return null;
         }
+
+        $formattedUserData = [
+            'id' => $userData['ID'],
+            'login' => $userData['login'],
+            'display_name' => $userData['displayName'],
+            'type' => $userData['type'],
+            'broadcaster_type' => $userData['broadcasterType'],
+            'description' => $userData['description'],
+            'profile_image_url' => $userData['profileImageUrl'],
+            'offline_image_url' => $userData['offlineImageUrl'],
+            'view_count' => $userData['viewCount'],
+            'created_at' => $userData['createdAt']
+        ];
+
+        return $formattedUserData;
     }
 
-    public function anadirUsuarioADatabase($api_reponse_array)
+    public function addUserToDatabase($api_reponse_array)
     {
         $stmt = $this->pdo->prepare("
                     INSERT INTO USUARIO (
