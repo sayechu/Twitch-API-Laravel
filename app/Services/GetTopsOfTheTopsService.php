@@ -11,13 +11,10 @@ class GetTopsOfTheTopsService
         $this->topsOfTheTopsManager = $topsOfTheTopsManager;
     }
 
-    public function getTop40VideosDadoUnGameId($gameId) : array
+    public function getTopsOfTheTops(int $since): array
     {
-        return $this->topsOfTheTopsManager->getTop40VideosDadoUnGameId($gameId);
-    }
+        $topsOfTheTops = $this->topsOfTheTopsManager->getTopsOfTheTops($since);
 
-    public function getTopGames() : array
-    {
-        return $this->topsOfTheTopsManager->getTopGames();
+        return $topsOfTheTops;
     }
 }
