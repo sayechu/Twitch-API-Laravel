@@ -141,7 +141,6 @@ class DBClient
         return $queryAttributes->fetch(PDO::FETCH_ASSOC);
     }
 
-
     public function getOldestUpdateDatetime(): mixed
     {
         $stmt = $this->pdo->query("SELECT MIN(FC.fecha) AS fecha
