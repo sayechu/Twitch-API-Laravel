@@ -12,8 +12,7 @@ class SelectTableManagement extends Database
         $stmt->execute([$userId]);
         $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$userData)
-        {
+        if (!$userData) {
             return null;
         }
 

@@ -17,8 +17,7 @@ class UsersManager
     {
         $userData = $this->databaseClient->getUserFromDatabase($user);
 
-        if (!$userData)
-        {
+        if (!$userData) {
             $api_url = "https://api.twitch.tv/helix/users?id=" . urlencode($user);
 
             $responseGetToken = $this->apiClient->getToken();

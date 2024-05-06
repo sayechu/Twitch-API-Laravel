@@ -33,8 +33,7 @@ class DatabaseClient
         $stmt->execute([$user]);
         $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$userData)
-        {
+        if (!$userData) {
             return null;
         }
 
