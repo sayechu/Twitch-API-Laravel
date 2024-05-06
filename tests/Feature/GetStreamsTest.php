@@ -45,4 +45,10 @@ class GetStreamsTest extends TestCase
         $response->assertStatus(200);
         $response->assertContent('[{"title":"Stream title","user_name":"user_name"}]');
     }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        Mockery::close();
+    }
 }
