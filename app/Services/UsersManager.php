@@ -17,21 +17,21 @@ class UsersManager
     {
         $userData = $this->databaseClient->getUserFromDatabase($user);
 
-        if (!$userData) {
-            $api_url = "https://api.twitch.tv/helix/users?id=" . urlencode($user);
-
-            $responseGetToken = $this->apiClient->getToken();
-            $twitchToken = json_decode($responseGetToken, true)['access_token'];
-
-            $api_headers = array(
-                'Authorization: Bearer ' . $twitchToken,
-            );
-
-            $userInfo = $this->apiClient->makeCurlCall($api_url, $api_headers);
-            $userData =  json_decode($userInfo, true)['data'];
-
-            $this->databaseClient->addUserToDatabase($userData);
+        if ($userData) {
+            return $userData;
         }
+
+        $api_url = "https://api.twitch.tv/helix/users?id=" . urlencode($user);
+
+        $responseGetToken = $this->apiClient->getToken();
+        $twitchToken = json_decode($responseGetToken, true)['access_token'];
+
+        $api_headers = array('Authorization: Bearer ' . $twitchToken);
+
+        $userInfo = $this->apiClient->makeCurlCall($api_url, $api_headers);
+        $userData =  json_decode($userInfo, true)['data'];
+
+        $this->databaseClient->addUserToDatabase($userData);
 
         return $userData;
     }
