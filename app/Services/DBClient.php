@@ -201,4 +201,72 @@ class DBClient
         $stmt->execute();
         $this->updateDatetime($gameId);
     }
+
+    public function getUserFromDatabase($user)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM USUARIO WHERE ID = ?");
+        $stmt->execute([$user]);
+        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$userData) {
+            return null;
+        }
+
+        $formattedUserData = [
+            'id' => $userData['ID'],
+            'login' => $userData['login'],
+            'display_name' => $userData['displayName'],
+            'type' => $userData['type'],
+            'broadcaster_type' => $userData['broadcasterType'],
+            'description' => $userData['description'],
+            'profile_image_url' => $userData['profileImageUrl'],
+            'offline_image_url' => $userData['offlineImageUrl'],
+            'view_count' => $userData['viewCount'],
+            'created_at' => $userData['createdAt']
+        ];
+
+        return $formattedUserData;
+    }
+
+    public function addUserToDatabase($api_reponse_array)
+    {
+        $stmt = $this->pdo->prepare("
+                    INSERT INTO USUARIO (
+                        ID,
+                        login,
+                        displayName,
+                        type,
+                        broadcasterType,
+                        description,
+                        profileImageUrl,
+                        offlineImageUrl,
+                        viewCount,
+                        createdAt
+                    ) VALUES (
+                        :ID,
+                        :login,
+                        :displayName,
+                        :type,
+                        :broadcasterType,
+                        :description,
+                        :profileImageUrl,
+                        :offlineImageUrl,
+                        :viewCount,
+                        :createdAt
+                    )
+            ");
+
+        $stmt->bindParam(':ID', $api_reponse_array['id']);
+        $stmt->bindParam(':login', $api_reponse_array['login']);
+        $stmt->bindParam(':displayName', $api_reponse_array['display_name']);
+        $stmt->bindParam(':type', $api_reponse_array['type']);
+        $stmt->bindParam(':broadcasterType', $api_reponse_array['broadcaster_type']);
+        $stmt->bindParam(':description', $api_reponse_array['description']);
+        $stmt->bindParam(':profileImageUrl', $api_reponse_array['profile_image_url']);
+        $stmt->bindParam(':offlineImageUrl', $api_reponse_array['offline_image_url']);
+        $stmt->bindParam(':viewCount', $api_reponse_array['view_count']);
+        $stmt->bindParam(':createdAt', $api_reponse_array['created_at']);
+
+        $stmt->execute();
+    }
 }
