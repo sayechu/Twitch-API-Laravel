@@ -15,11 +15,11 @@ class GetStreamsServiceTests extends TestCase
     public function get_streams_test(): void
     {
         $streamsManager = Mockery::mock(StreamsManager::class);
-        $getStreamsService = new GetStreamsService($streamsManager);
         $this->app
             ->when(GetStreamsService::class)
             ->needs(StreamsManager::class)
             ->give(fn() => $streamsManager);
+        $getStreamsService = new GetStreamsService($streamsManager);
         $expectedStreams = [
             [
                 'id' => 'Stream Id 1',
@@ -60,8 +60,10 @@ class GetStreamsServiceTests extends TestCase
 
         $this->assertEquals($expectedFilteredStreams, $returnedStreams);
     }
+
     protected function tearDown(): void
     {
+        parent::tearDown();
         Mockery::close();
     }
 }
