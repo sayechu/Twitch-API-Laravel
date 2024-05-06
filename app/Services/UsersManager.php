@@ -5,9 +5,9 @@ namespace App\Services;
 class UsersManager
 {
     private ApiClient $apiClient;
-    private DatabaseClient $databaseClient;
+    private DBClient $databaseClient;
 
-    public function __construct(ApiClient $apiClient, DatabaseClient $databaseClient)
+    public function __construct(ApiClient $apiClient, DBClient $databaseClient)
     {
         $this->apiClient = $apiClient;
         $this->databaseClient = $databaseClient;
