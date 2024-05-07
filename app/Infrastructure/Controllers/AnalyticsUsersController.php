@@ -3,23 +3,23 @@
 namespace App\Infrastructure\Controllers;
 
 use App\Infrastructure\Requests\AnalyticsUsersRequest;
-use App\Services\GetUsersService;
+use App\Services\UserDataManager;
 use Illuminate\Http\JsonResponse;
 
 class AnalyticsUsersController extends Controller
 {
-    private GetUsersService $getUserService;
-    public function __construct(GetUsersService $getUserService)
+    private UserDataManager $userDataManager;
+    public function __construct(UserDataManager $userDataManager)
     {
-        $this->getUserService = $getUserService;
+        $this->userDataManager = $userDataManager;
     }
 
     public function __invoke(AnalyticsUsersRequest $request): JsonResponse
     {
         $userId = $request->input('id');
 
-        $userInfo = $this->getUserService->getUserInfoById($userId);
+        $userData = $this->userDataManager->getUserData($userId);
 
-        return response()->json($userInfo);
+        return response()->json($userData);
     }
 }
