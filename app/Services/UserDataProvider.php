@@ -11,7 +11,7 @@ class UserDataProvider
         $this->apiClient = $apiClient;
     }
 
-    public function getUserData(string $api_url, array $api_headers): string
+    public function getUserData(string $api_url, array $api_headers): array
     {
         $resultCurlCall = $this->apiClient->makeCurlCall($api_url, $api_headers);
 
@@ -20,7 +20,7 @@ class UserDataProvider
             inténtalo más tarde"}';
         }
 
-        return $resultCurlCall['response'];
+        return json_decode($resultCurlCall['response'], true);
     }
 
     private function isA500Code(int $http_code): bool
