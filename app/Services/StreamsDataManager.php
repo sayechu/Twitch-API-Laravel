@@ -2,21 +2,25 @@
 
 namespace App\Services;
 
-class GetStreamsService
+class StreamsDataManager
 {
-    private StreamsManager $streamsManager;
+    private TokenProvider $tokenProvider;
+    private StreamsDataProvider $streamsDataProvider;
 
-    public function __construct(StreamsManager $streamsManager)
+    public function __construct(TokenProvider $tokenProvider, StreamsDataProvider $streamsDataProvider)
     {
-        $this->streamsManager = $streamsManager;
+        $this->tokenProvider = $tokenProvider;
+        $this->streamsDataProvider = $streamsDataProvider;
     }
 
-    public function getStreams(): array
+    public function getStreamsData(): array
     {
-        $streams = $this->streamsManager->getStreams();
+        $api_headers = array('Authorization: Bearer ' . $this->tokenProvider->getToken());
+
+        $streamsData = $this->streamsDataProvider->streamsUserData($api_headers);
 
         $filteredStreams = [];
-        foreach ($streams as $stream) {
+        foreach ($streamsData as $stream) {
             $filteredStreams[] = [
                 'title' => $stream['title'],
                 'user_name' => $stream['user_name']
