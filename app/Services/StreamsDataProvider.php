@@ -11,7 +11,7 @@ class StreamsDataProvider
         $this->apiClient = $apiClient;
     }
 
-    public function streamsUserData($api_headers): array
+    public function streamsUserData(array $api_headers): array
     {
         $api_url = 'https://api.twitch.tv/helix/streams';
 
@@ -24,7 +24,7 @@ class StreamsDataProvider
         return json_decode($responseCurlCall['response'], true)['data'];
     }
 
-    private function isA500Code($http_code): bool
+    private function isA500Code(int $http_code): bool
     {
         return $http_code == 500;
     }
