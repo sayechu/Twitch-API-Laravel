@@ -2,37 +2,24 @@
 
 namespace App\Services;
 
-class UsersManager
+class UserDataManager
 {
-    private ApiClient $apiClient;
-    private DBClient $databaseClient;
+    private TokenProvider $tokenProvider;
+    private UserDataProvider $userDataProvider;
 
-    public function __construct(ApiClient $apiClient, DBClient $databaseClient)
+    public function __construct(TokenProvider $tokenProvider, UserDataProvider $userDataProvider)
     {
-        $this->apiClient = $apiClient;
-        $this->databaseClient = $databaseClient;
+        $this->tokenProvider = $tokenProvider;
+        $this->userDataProvider = $userDataProvider;
     }
 
-    public function getUserInfoById(string $user): array
+    public function getUserData(string $userId): array
     {
-        $userData = $this->databaseClient->getUserFromDatabase($user);
+        $api_url = "https://api.twitch.tv/helix/users?id=" . urlencode($userId);
 
-        if ($userData) {
-            return $userData;
-        }
-
-        $api_url = "https://api.twitch.tv/helix/users?id=" . urlencode($user);
-
-        $responseGetToken = $this->apiClient->getToken();
-        $twitchToken = json_decode($responseGetToken, true)['access_token'];
+        $twitchToken = $this->tokenProvider->getToken();
 
         $api_headers = array('Authorization: Bearer ' . $twitchToken);
-
-        $userInfo = $this->apiClient->makeCurlCall($api_url, $api_headers);
-        $userData =  json_decode($userInfo, true)['data'];
-
-        $this->databaseClient->addUserToDatabase($userData);
-
-        return $userData;
+        return $this->userDataProvider->getUserData($api_url, $api_headers);
     }
 }
