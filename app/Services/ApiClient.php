@@ -8,7 +8,7 @@ class ApiClient
     private const CLIENT_SECRET = 'yl0nqzjjnadd8wl7zilpr9pzuh979j';
     private const GRANT_TYPE = 'client_credentials';
 
-    public function getToken(): string
+    public function getToken(): array
     {
         $url = 'https://id.twitch.tv/oauth2/token';
         $data = array(
@@ -25,18 +25,17 @@ class ApiClient
         curl_setopt($curlHeaders, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
 
         $response = curl_exec($curlHeaders);
-
-        if (curl_errno($curlHeaders)) {
-            echo 'Error en la petición cURL para obtener el token: ' . curl_error($curlHeaders);
-            exit;
-        }
+        $http_code = curl_getinfo($curlHeaders, CURLINFO_HTTP_CODE);
 
         curl_close($curlHeaders);
 
-        return $response;
+        return [
+            'response' => $response,
+            'http_code' => $http_code
+        ];
     }
 
-    public function makeCurlCall(string $api_url, array $api_headers): string
+    public function makeCurlCall(string $api_url, array $api_headers): array
     {
         $api_headers[] = 'Client-Id: ' . self::CLIENT_ID;
 
@@ -46,15 +45,14 @@ class ApiClient
         curl_setopt($curlHeaders, CURLOPT_HTTPHEADER, $api_headers);
 
         $api_response = curl_exec($curlHeaders);
-
-        if (curl_errno($curlHeaders)) {
-            echo 'Error en la petición cURL para obtener los streams ' . curl_error($curlHeaders);
-            exit;
-        }
+        $http_code = curl_getinfo($curlHeaders, CURLINFO_HTTP_CODE);
 
         curl_close($curlHeaders);
 
-        return $api_response;
+        return [
+            'response' => $api_response,
+            'http_code' => $http_code
+        ];
     }
 
     public function getTopThreeGames(array $api_headers): array
