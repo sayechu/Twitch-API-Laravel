@@ -24,7 +24,7 @@ jobs:
 
     # Step 2: Install dependencies
     - name: Install dependencies
-      run: composer install && php artisan key:generate
+      run: composer update && composer install && php artisan key:generate
 
     # Step 3: Run unit tests
     - name: Run unit tests
