@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Infrastructure\Controllers;
 
 use App\Http\Requests\AnalyticsTopsOfTheTopsRequest;
 use App\Services\GetTopsOfTheTopsService;
