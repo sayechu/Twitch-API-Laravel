@@ -3,7 +3,6 @@
 namespace App\Infrastructure\Controllers;
 
 use App\Services\GetStreamsService;
-use App\Services\StreamsDataManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
