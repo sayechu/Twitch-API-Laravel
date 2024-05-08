@@ -14,7 +14,7 @@ class GetStreamsTest extends TestCase
     /**
      * @test
      */
-    public function gets_streams_with_token_stored_in_database(): void
+    public function gets_streams(): void
     {
         $apiClient = Mockery::mock(ApiClient::class);
         $databaseClient = Mockery::mock(DBClient::class);
