@@ -17,16 +17,6 @@ class StreamsDataManager
     {
         $api_headers = array('Authorization: Bearer ' . $this->tokenProvider->getToken());
 
-        $streamsData = $this->streamsDataProvider->streamsUserData($api_headers);
-
-        $filteredStreams = [];
-        foreach ($streamsData as $stream) {
-            $filteredStreams[] = [
-                'title' => $stream['title'],
-                'user_name' => $stream['user_name']
-            ];
-        }
-
-        return $filteredStreams;
+        return $this->streamsDataProvider->streamsUserData($api_headers);
     }
 }
