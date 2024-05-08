@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Services\ApiClient;
 use App\Services\DBClient;
-use App\Services\StreamsDataProvider;
+use App\Services\StreamsDataManager;
 use App\Services\TokenProvider;
 use Tests\TestCase;
 use Mockery;
@@ -27,7 +27,7 @@ class GetStreamsTest extends TestCase
             ->needs(DBClient::class)
             ->give(fn() => $databaseClient);
         $this->app
-            ->when(StreamsDataProvider::class)
+            ->when(StreamsDataManager::class)
             ->needs(ApiClient::class)
             ->give(fn() => $apiClient);
 
@@ -62,10 +62,10 @@ class GetStreamsTest extends TestCase
         $databaseClient
             ->expects('getToken')
             ->once()
-            ->andReturn('zfmr6i7cbwken2maslfu9v89tvq9ne');
+            ->andReturn('nrtovbe5h02os45krmjzvkt3hp74vf');
         $apiClient
             ->expects('makeCurlCall')
-            ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer zfmr6i7cbwken2maslfu9v89tvq9ne'])
+            ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer nrtovbe5h02os45krmjzvkt3hp74vf'])
             ->once()
             ->andReturn($getStreamsExpectedResponse);
 
