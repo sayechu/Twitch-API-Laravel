@@ -41,7 +41,7 @@ class TokenProvider
         return $http_code == 500;
     }
 
-    private function getTokenFromArray(array $responseArray): string
+    private function getTokenFromArray(string $responseArray): string
     {
         return json_decode($responseArray, true)['access_token'];
     }
