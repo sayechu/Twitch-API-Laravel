@@ -6,7 +6,7 @@ use App\Services\StreamsDataManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class AnalyticsStreamsController extends Controller
+class GetStreamsController extends Controller
 {
     private StreamsDataManager $streamsDataManager;
     public function __construct(StreamsDataManager $streamsDataManager)
