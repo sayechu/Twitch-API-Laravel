@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AnalyticsUsersController;
-use App\Http\Controllers\GetStreamsController;
-use App\Http\Controllers\AnalyticsTopsOfTheTopsController;
+use App\Infrastructure\Controllers\AnalyticsUsersController;
+use App\Infrastructure\Controllers\GetStreamsController;
+use App\Infrastructure\Controllers\AnalyticsTopsOfTheTopsController;
 
 Route::get('/', function () {
     return view('welcome');
