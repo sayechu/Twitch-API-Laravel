@@ -16,8 +16,6 @@ class AnalyticsStreamsController extends Controller
 
     public function __invoke(Request $request): JsonResponse
     {
-        $streams = $this->streamsDataManager->getStreamsData();
-
-        return response()->json($streams);
+        return response()->json($this->streamsDataManager->getStreamsData());
     }
 }
