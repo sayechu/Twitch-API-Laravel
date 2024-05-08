@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Controllers;
 
-use App\Http\Requests\AnalyticsTopsOfTheTopsRequest;
+use App\Infrastructure\Requests\AnalyticsTopsOfTheTopsRequest;
 use App\Services\GetTopsOfTheTopsService;
 use Illuminate\Http\JsonResponse;
 

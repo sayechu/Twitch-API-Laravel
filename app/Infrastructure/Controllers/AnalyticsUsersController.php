@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Controllers;
 
-use App\Http\Requests\AnalyticsUsersRequest;
+use App\Infrastructure\Requests\AnalyticsUsersRequest;
 use App\Services\GetUsersService;
 use Illuminate\Http\JsonResponse;
 
