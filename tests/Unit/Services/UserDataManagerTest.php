@@ -2,26 +2,24 @@
 
 namespace Tests\Unit\Services;
 
-use App\Services\GetUsersService;
+use App\Services\ApiClient;
 use App\Services\TokenProvider;
 use App\Services\UserDataManager;
-use App\Services\UserDataProvider;
-use App\Services\UsersManager;
 use Mockery;
 use Tests\TestCase;
 
 class UserDataManagerTest extends TestCase
 {
     private TokenProvider $tokenProvider;
-    private UserDataProvider $userDataProvider;
+    private ApiClient $apiClient;
     private UserDataManager $userDataManager;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->tokenProvider = Mockery::mock(TokenProvider::class);
-        $this->userDataProvider = Mockery::mock(UserDataProvider::class);
-        $this->userDataManager = new UserDataManager($this->tokenProvider, $this->userDataProvider);
+        $this->apiClient = Mockery::mock(ApiClient::class);
+        $this->userDataManager = new UserDataManager($this->tokenProvider, $this->apiClient);
 
         $this->app
             ->when(UserDataManager::class)
@@ -29,8 +27,8 @@ class UserDataManagerTest extends TestCase
             ->give(fn() => $this->tokenProvider);
         $this->app
             ->when(UserDataManager::class)
-            ->needs(UserDataProvider::class)
-            ->give(fn() => $this->userDataProvider);
+            ->needs(ApiClient::class)
+            ->give(fn() => $this->apiClient);
     }
 
     /**
@@ -79,8 +77,8 @@ class UserDataManagerTest extends TestCase
             ->expects('getToken')
             ->once()
             ->andReturn($getTokenResponse);
-        $this->userDataProvider
-            ->expects('getUserData')
+        $this->apiClient
+            ->expects('makeCurlCall')
             ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer nrtovbe5h02os45krmjzvkt3hp74vf'])
             ->once()
             ->andReturn($getUserDataResponse);
@@ -146,8 +144,8 @@ class UserDataManagerTest extends TestCase
             ->expects('getToken')
             ->once()
             ->andReturn($getTokenResponse);
-        $this->userDataProvider
-            ->expects('getUserData')
+        $this->apiClient
+            ->expects('makeCurlCall')
             ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer nrtovbe5h02os45krmjzvkt3hp74vf'])
             ->once()
             ->andReturn($getUserDataResponse);
