@@ -47,9 +47,4 @@ class TokenProvider
     {
         return json_decode($responseArray, true)['access_token'];
     }
-
-    private function getTokenFromArray(array $responseArray): string
-    {
-        return json_decode($responseArray, true)['access_token'];
-    }
 }
