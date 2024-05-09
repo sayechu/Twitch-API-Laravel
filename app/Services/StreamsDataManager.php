@@ -18,13 +18,13 @@ class StreamsDataManager
     public function getStreamsData(): array | string
     {
         $api_url = 'https://api.twitch.tv/helix/streams';
-        $token = $this->tokenProvider->getToken();
+        $tokenResponse = $this->tokenProvider->getToken();
 
-        if ($this->isA500Code($token)) {
+        if ($this->isA500Code($tokenResponse)) {
             return '503: {"error": "No se puede establecer conexión con Twitch en este momento}';
         }
 
-        $api_headers = array('Authorization: Bearer ' . $token);
+        $api_headers = array('Authorization: Bearer ' . $tokenResponse);
 
         return $this->apiClient->makeCurlCall($api_url, $api_headers);
     }
@@ -33,4 +33,5 @@ class StreamsDataManager
     {
         return isset($token['http_code']) && $token['http_code'] === Response::HTTP_INTERNAL_SERVER_ERROR;
     }
+
 }

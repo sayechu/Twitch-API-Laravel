@@ -28,7 +28,7 @@ class TokenProvider
         $twitchToken = $this->getTokenFromArray($twitchArrayToken['response']);
         $this->databaseClient->addToken($twitchToken);
 
-        return $twitchArrayToken;
+        return $twitchToken;
     }
 
     private function thereIsTokenStored(): bool

@@ -18,6 +18,7 @@ class GetStreamsTest extends TestCase
     {
         $apiClient = Mockery::mock(ApiClient::class);
         $databaseClient = Mockery::mock(DBClient::class);
+
         $this->app
             ->when(TokenProvider::class)
             ->needs(ApiClient::class)
@@ -55,6 +56,7 @@ class GetStreamsTest extends TestCase
             ]),
             'http_code' => 200
         ];
+
         $databaseClient
             ->expects('isTokenStoredInDatabase')
             ->once()
