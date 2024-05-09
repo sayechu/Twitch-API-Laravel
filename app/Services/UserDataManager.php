@@ -15,28 +15,30 @@ class UserDataManager
         $this->apiClient = $apiClient;
     }
 
-    public function getUserData(string $userId): array | string
+    public function getUserData(string $userId): string|array
     {
-        $api_url = "https://api.twitch.tv/helix/users?id=" . urlencode($userId);
-        $tokenResponse = $this->tokenProvider->getToken();
+        $twitchToken = $this->tokenProvider->getToken();
 
-        if ($this->isA500Code($tokenResponse)) {
+        if ($this->requestHas500Code($twitchToken)) {
             return '503: {"error": "No se puede establecer conexión con Twitch en este momento}';
         }
 
-        $api_headers = array('Authorization: Bearer ' . $tokenResponse);
+        $apiUrl = "https://api.twitch.tv/helix/users?id=" . urlencode($userId);
 
-        $userData = $this->apiClient->makeCurlCall($api_url, $api_headers);
+        $apiHeaders = ['Authorization: Bearer ' . $twitchToken];
 
-        if ($this->isA500Code($userData)) {
+        $userData = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
+
+        if ($this->requestHas500Code($userData)) {
             return '503: {"error": "No se pueden devolver usuarios en este momento, inténtalo más tarde"}';
         }
 
         return json_decode($userData['response'], true);
     }
 
-    private function isA500Code(mixed $token): bool
+    private function requestHas500Code(mixed $requestResponse): bool
     {
-        return isset($token['http_code']) && $token['http_code'] === Response::HTTP_INTERNAL_SERVER_ERROR;
+        return isset($requestResponse['http_code']) &&
+            $requestResponse['http_code'] === Response::HTTP_INTERNAL_SERVER_ERROR;
     }
 }
