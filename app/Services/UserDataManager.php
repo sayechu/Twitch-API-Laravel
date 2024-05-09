@@ -7,12 +7,12 @@ use Illuminate\Http\Response;
 class UserDataManager
 {
     private TokenProvider $tokenProvider;
-    private UserDataProvider $userDataProvider;
+    private ApiClient $apiClient;
 
-    public function __construct(TokenProvider $tokenProvider, UserDataProvider $userDataProvider)
+    public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient)
     {
         $this->tokenProvider = $tokenProvider;
-        $this->userDataProvider = $userDataProvider;
+        $this->apiClient = $apiClient;
     }
 
     public function getUserData(string $userId): array | string
@@ -26,7 +26,7 @@ class UserDataManager
 
         $api_headers = array('Authorization: Bearer ' . $tokenResponse);
 
-        $userData = $this->userDataProvider->getUserData($api_url, $api_headers);
+        $userData = $this->apiClient->makeCurlCall($api_url, $api_headers);
 
         if ($this->isA500Code($userData)) {
             return '503: {"error": "No se pueden devolver usuarios en este momento, inténtalo más tarde"}';
