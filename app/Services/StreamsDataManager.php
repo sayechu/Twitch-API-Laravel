@@ -33,5 +33,4 @@ class StreamsDataManager
     {
         return isset($token['http_code']) && $token['http_code'] === Response::HTTP_INTERNAL_SERVER_ERROR;
     }
-
 }

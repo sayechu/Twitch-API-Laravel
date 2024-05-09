@@ -2,38 +2,44 @@
 
 namespace Tests\Unit\Services;
 
-use App\Services\GetStreamsService;
+use App\Services\ApiClient;
 use App\Services\StreamsDataManager;
+use App\Services\TokenProvider;
 use Mockery;
 use Tests\TestCase;
 
-class GetStreamsServiceTest extends TestCase
+class StreamsDataManagerTest extends TestCase
 {
-    private GetStreamsService $getStreamsService;
+    private TokenProvider $tokenProvider;
+    private ApiClient $apiClient;
     private StreamsDataManager $streamsDataManager;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->streamsDataManager = Mockery::mock(StreamsDataManager::class);
+        $this->tokenProvider = Mockery::mock(TokenProvider::class);
+        $this->apiClient = Mockery::mock(ApiClient::class);
 
-        $this->getStreamsService = new GetStreamsService($this->streamsDataManager);
+        $this->streamsDataManager = new StreamsDataManager($this->tokenProvider, $this->apiClient);
     }
 
     /**
      * @test
      */
-    public function execute_token_failure(): void
+    public function get_streams_data_token_failure(): void
     {
-        $streamsExpectedResponse = '503: {"error": "No se puede establecer conexión con Twitch en este momento}';
+        $tokenExpectedResponse = array(
+            "response" => null,
+            "http_code" => 500
+        );
 
-        $this->streamsDataManager
-            ->expects('getStreamsData')
+        $this->tokenProvider
+            ->expects('getToken')
             ->once()
-            ->andReturn($streamsExpectedResponse);
+            ->andReturn($tokenExpectedResponse);
 
-        $returnedStreams = $this->getStreamsService->execute();
+        $returnedStreams = $this->streamsDataManager->getStreamsData();
 
         $this->assertEquals('503: {"error": "No se puede establecer conexión con Twitch en este momento}', $returnedStreams);
     }
@@ -41,8 +47,15 @@ class GetStreamsServiceTest extends TestCase
     /**
      * @test
      */
-    public function execute_token_correct_curl_failure(): void
+    public function get_streams_data_token_correct_curl_failure(): void
     {
+        $tokenExpectedResponse = 'nrtovbe5h02os45krmjzvkt3hp74vf';
+
+        $this->tokenProvider
+            ->expects('getToken')
+            ->once()
+            ->andReturn($tokenExpectedResponse);
+
         $streamsExpectedResponse = [
             'response' => json_encode([
                 'data' => [
@@ -85,27 +98,29 @@ class GetStreamsServiceTest extends TestCase
             'http_code' => 500
         ];
 
-        $this->streamsDataManager
-            ->expects('getStreamsData')
+        $this->apiClient
+            ->expects('makeCurlCall')
             ->once()
             ->andReturn($streamsExpectedResponse);
 
-        $returnedStreams = $this->getStreamsService->execute();
+        $returnedStreams = $this->streamsDataManager->getStreamsData();
 
-        $this->assertEquals('503: {"error": "No se pueden devolver streams en este momento, inténtalo más tarde"}', $returnedStreams);
+        $this->assertEquals(500, $returnedStreams['http_code']);
     }
 
     /**
      * @test
      */
-    public function execute_test(): void
+    public function get_streams_data_test(): void
     {
-        $this->app
-            ->when(GetStreamsService::class)
-            ->needs(StreamsDataManager::class)
-            ->give(fn() => $this->streamsDataManager);
+        $tokenExpectedResponse = 'nrtovbe5h02os45krmjzvkt3hp74vf';
 
-        $streamsExpectedResponse = [
+        $this->tokenProvider
+            ->expects('getToken')
+            ->once()
+            ->andReturn($tokenExpectedResponse);
+
+        $getStreamsExpectedResponse = [
             'response' => json_encode([
                 'data' => [
                     [
@@ -146,25 +161,15 @@ class GetStreamsServiceTest extends TestCase
             ]),
             'http_code' => 200
         ];
-        $expectedFilteredStreams = [
-            [
-                'title' => 'Stream Title 1',
-                'user_name' => 'User Name 1'
-            ],
-            [
-                'title' => 'Stream Title 2',
-                'user_name' => 'User Name 2'
-            ]
-        ];
 
-        $this->streamsDataManager
-            ->expects('getStreamsData')
+        $this->apiClient
+            ->expects('makeCurlCall')
             ->once()
-            ->andReturn($streamsExpectedResponse);
+            ->andReturn($getStreamsExpectedResponse);
 
-        $returnedStreams = $this->getStreamsService->execute();
+        $returnedStreams = $this->streamsDataManager->getStreamsData();
 
-        $this->assertEquals($expectedFilteredStreams, $returnedStreams);
+        $this->assertEquals(200, $returnedStreams['http_code']);
     }
 
     protected function tearDown(): void
