@@ -11,47 +11,51 @@ class ApiClient
     public function getToken(): array
     {
         $url = 'https://id.twitch.tv/oauth2/token';
-        $data = array(
+        $data = [
             'client_id' => self::CLIENT_ID,
             'client_secret' => self::CLIENT_SECRET,
             'grant_type' => self::GRANT_TYPE
-        );
+        ];
 
-        $curlHeaders = curl_init();
-        curl_setopt($curlHeaders, CURLOPT_URL, $url);
-        curl_setopt($curlHeaders, CURLOPT_POST, 1);
-        curl_setopt($curlHeaders, CURLOPT_POSTFIELDS, http_build_query($data));
-        curl_setopt($curlHeaders, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curlHeaders, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $url,
+            CURLOPT_POST => 1,
+            CURLOPT_POSTFIELDS => http_build_query($data),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded']
+        ]);
 
-        $response = curl_exec($curlHeaders);
-        $http_code = curl_getinfo($curlHeaders, CURLINFO_HTTP_CODE);
+        $tokenResponse = curl_exec($curl);
+        $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-        curl_close($curlHeaders);
+        curl_close($curl);
 
         return [
-            'response' => $response,
+            'response' => $tokenResponse,
             'http_code' => $http_code
         ];
     }
 
-    public function makeCurlCall(string $api_url, array $api_headers): array
+    public function makeCurlCall(string $apiUrl, array $apiHeaders): array
     {
-        $api_headers[] = 'Client-Id: ' . self::CLIENT_ID;
+        $apiHeaders[] = 'Client-Id: ' . self::CLIENT_ID;
 
-        $curlHeaders = curl_init();
-        curl_setopt($curlHeaders, CURLOPT_URL, $api_url);
-        curl_setopt($curlHeaders, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curlHeaders, CURLOPT_HTTPHEADER, $api_headers);
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $apiUrl,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => $apiHeaders
+        ]);
 
-        $api_response = curl_exec($curlHeaders);
-        $http_code = curl_getinfo($curlHeaders, CURLINFO_HTTP_CODE);
+        $apiResponse = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-        curl_close($curlHeaders);
+        curl_close($curl);
 
         return [
-            'response' => $api_response,
-            'http_code' => $http_code
+            'response' => $apiResponse,
+            'http_code' => $httpCode
         ];
     }
 
