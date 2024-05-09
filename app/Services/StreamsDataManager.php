@@ -20,8 +20,7 @@ class StreamsDataManager
         $api_url = 'https://api.twitch.tv/helix/streams';
         $token = $this->tokenProvider->getToken();
 
-        if ($this->isA500Code($token))
-        {
+        if ($this->isA500Code($token)) {
             return '503: {"error": "No se puede establecer conexión con Twitch en este momento}';
         }
 

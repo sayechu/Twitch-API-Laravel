@@ -43,8 +43,8 @@ class GetStreamsService
         return $http_code === Response::HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    private function tokenProviderReturns500(mixed $tokenProviderResponse): bool
+    private function tokenProviderReturns500(mixed $tokenResponse): bool
     {
-        return $tokenProviderResponse === '503: {"error": "No se puede establecer conexión con Twitch en este momento}';
+        return $tokenResponse === '503: {"error": "No se puede establecer conexión con Twitch en este momento}';
     }
 }
