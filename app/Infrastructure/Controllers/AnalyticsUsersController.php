@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 class AnalyticsUsersController extends Controller
 {
     private UserDataManager $userDataManager;
+
     public function __construct(UserDataManager $userDataManager)
     {
         $this->userDataManager = $userDataManager;
