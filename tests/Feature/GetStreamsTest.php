@@ -14,11 +14,10 @@ class GetStreamsTest extends TestCase
     /**
      * @test
      */
-    public function gets_streams(): void
+    public function test_gets_streams_with_token_stored_returns_streams(): void
     {
         $apiClient = Mockery::mock(ApiClient::class);
         $databaseClient = Mockery::mock(DBClient::class);
-
         $this->app
             ->when(TokenProvider::class)
             ->needs(ApiClient::class)
@@ -31,7 +30,6 @@ class GetStreamsTest extends TestCase
             ->when(StreamsDataManager::class)
             ->needs(ApiClient::class)
             ->give(fn() => $apiClient);
-
         $getStreamsExpectedResponse = [
             'response' => json_encode([
                 'data' => [
@@ -71,10 +69,10 @@ class GetStreamsTest extends TestCase
             ->once()
             ->andReturn($getStreamsExpectedResponse);
 
-        $response = $this->get('/analytics/streams');
+        $responseGetStreams = $this->get('/analytics/streams');
 
-        $response->assertStatus(200);
-        $response->assertContent('[{"title":"Stream Title","user_name":"User Name"}]');
+        $responseGetStreams->assertStatus(200);
+        $responseGetStreams->assertContent('[{"title":"Stream Title","user_name":"User Name"}]');
     }
 
     protected function tearDown(): void
