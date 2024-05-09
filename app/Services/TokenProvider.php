@@ -13,7 +13,7 @@ class TokenProvider
         $this->databaseClient = $databaseClient;
     }
 
-    public function getToken(): string
+    public function getToken(): array | string
     {
         if ($this->thereIsTokenStored()) {
             return $this->databaseClient->getToken();
@@ -22,13 +22,13 @@ class TokenProvider
         $twitchArrayToken = $this->apiClient->getToken();
 
         if ($this->isA500Code($twitchArrayToken['http_code'])) {
-            return '503: {"error": "No se puede establecer conexión con Twitch en este momento}';
+            return $twitchArrayToken;
         }
 
         $twitchToken = $this->getTokenFromArray($twitchArrayToken['response']);
         $this->databaseClient->addToken($twitchToken);
 
-        return $twitchToken;
+        return $twitchArrayToken;
     }
 
     private function thereIsTokenStored(): bool

@@ -15,22 +15,23 @@ class StreamsDataManager
         $this->apiClient = $apiClient;
     }
 
-    public function getStreamsData(): array
+    public function getStreamsData(): array | string
     {
         $api_url = 'https://api.twitch.tv/helix/streams';
-        $api_headers = array('Authorization: Bearer ' . $this->tokenProvider->getToken());
+        $token = $this->tokenProvider->getToken();
 
-        $responseCurlCall = $this->apiClient->makeCurlCall($api_url, $api_headers);
-
-        if ($this->isA500Code($responseCurlCall['http_code'])) {
-            return '503: {"error": "No se pueden devolver streams en este momento, inténtalo más tarde"}';
+        if ($this->isA500Code($token))
+        {
+            return '503: {"error": "No se puede establecer conexión con Twitch en este momento}';
         }
 
-        return json_decode($responseCurlCall['response'], true)['data'];
+        $api_headers = array('Authorization: Bearer ' . $token);
+
+        return $this->apiClient->makeCurlCall($api_url, $api_headers);
     }
 
-    private function isA500Code(int $http_code): bool
+    private function isA500Code(mixed $token): bool
     {
-        return $http_code === Response::HTTP_INTERNAL_SERVER_ERROR;
+        return isset($token['http_code']) && $token['http_code'] === Response::HTTP_INTERNAL_SERVER_ERROR;
     }
 }
