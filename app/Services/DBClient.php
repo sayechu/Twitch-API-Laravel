@@ -284,7 +284,7 @@ class DBClient
         return $stmt->fetch(PDO::FETCH_ASSOC)['token'];
     }
 
-    public function addToken(string $twitchToken)
+    public function storeToken(string $twitchToken)
     {
         $insertStatement = $this->pdo->prepare('INSERT INTO TOKEN (token) VALUES (?)');
         $insertStatement->execute([$twitchToken]);
