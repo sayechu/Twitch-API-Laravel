@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Response;
+
 class TokenProvider
 {
     private ApiClient $apiClient;
@@ -13,22 +15,19 @@ class TokenProvider
         $this->databaseClient = $databaseClient;
     }
 
-    public function getToken(): array | string
+    public function getToken(): string|array
     {
         if ($this->thereIsTokenStored()) {
             return $this->databaseClient->getToken();
         }
 
-        $twitchArrayToken = $this->apiClient->getToken();
-
-        if ($this->isA500Code($twitchArrayToken['http_code'])) {
-            return $twitchArrayToken;
+        $twitchTokenResponse = $this->apiClient->getToken();
+        if ($this->requestHas500Code($twitchTokenResponse)) {
+            return $twitchTokenResponse;
         }
 
-        $twitchToken = $this->getTokenFromArray($twitchArrayToken['response']);
-        $this->databaseClient->addToken($twitchToken);
-
-        return $twitchToken;
+        $this->storeTokenInDatabase($twitchTokenResponse);
+        return $this->extractToken($twitchTokenResponse['response']);
     }
 
     private function thereIsTokenStored(): bool
@@ -36,13 +35,23 @@ class TokenProvider
         return $this->databaseClient->isTokenStoredInDatabase();
     }
 
-    private function isA500Code(int $http_code): bool
+    private function storeTokenInDatabase(array $twitchTokenResponse): void
     {
-        return $http_code == 500;
+        $twitchToken = $this->extractToken($twitchTokenResponse['response']);
+        $this->databaseClient->storeToken($twitchToken);
     }
 
-    private function getTokenFromArray(string $responseArray): string
+    private function requestHas500Code(mixed $requestResponse): bool
     {
+        return isset($requestResponse['http_code']) &&
+            $requestResponse['http_code'] === Response::HTTP_INTERNAL_SERVER_ERROR;
+    }
+
+    private function extractToken(string $responseArray): string
+    {
+        if ($responseArray == null) {
+            return '';
+        }
         return json_decode($responseArray, true)['access_token'];
     }
 }
