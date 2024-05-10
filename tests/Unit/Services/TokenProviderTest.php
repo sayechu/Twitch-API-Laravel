@@ -17,41 +17,38 @@ class TokenProviderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->databaseClient = Mockery::mock(DBClient::class);
         $this->apiClient = Mockery::mock(ApiClient::class);
-
         $this->tokenProvider = new TokenProvider($this->apiClient, $this->databaseClient);
     }
 
     /**
      * @test
      */
-    public function get_token_from_database(): void
+    public function test_get_token_stored_in_database(): void
     {
-        $tokenExpectedResponse = 'nrtovbe5h02os45krmjzvkt3hp74vf';
+        $tokenResponse = 'nrtovbe5h02os45krmjzvkt3hp74vf';
 
         $this->databaseClient
             ->expects('isTokenStoredInDatabase')
             ->once()
             ->andReturn(true);
-
         $this->databaseClient
             ->expects('getToken')
             ->once()
-            ->andReturn($tokenExpectedResponse);
+            ->andReturn($tokenResponse);
 
-        $tokenResponse = $this->tokenProvider->getToken();
+        $getTokenResponse = $this->tokenProvider->getToken();
 
-        $this->assertEquals('nrtovbe5h02os45krmjzvkt3hp74vf', $tokenResponse);
+        $this->assertEquals($tokenResponse, $getTokenResponse);
     }
 
     /**
      * @test
      */
-    public function get_token_api_failure(): void
+    public function test_get_token_with_api_error(): void
     {
-        $tokenApiExpectedResponse = [
+        $apiResponse = [
             "response" => null,
             "http_code" => 500
         ];
@@ -60,11 +57,10 @@ class TokenProviderTest extends TestCase
             ->expects('isTokenStoredInDatabase')
             ->once()
             ->andReturn(false);
-
         $this->apiClient
             ->expects('getToken')
             ->once()
-            ->andReturn($tokenApiExpectedResponse);
+            ->andReturn($apiResponse);
 
         $tokenResponse = $this->tokenProvider->getToken();
 
@@ -74,9 +70,9 @@ class TokenProviderTest extends TestCase
     /**
      * @test
      */
-    public function get_token_test(): void
+    public function test_get_token(): void
     {
-        $tokenApiExpectedResponse = [
+        $apiResponse = [
             "response" => '{"access_token":"uos0bg0st4mexopq3rhs361mny1fmt","expires_in":5590782,"token_type":"bearer"}',
             "http_code" => 200
         ];
@@ -85,20 +81,18 @@ class TokenProviderTest extends TestCase
             ->expects('isTokenStoredInDatabase')
             ->once()
             ->andReturn(false);
-
         $this->apiClient
             ->expects('getToken')
             ->once()
-            ->andReturn($tokenApiExpectedResponse);
-
+            ->andReturn($apiResponse);
         $this->databaseClient
-            ->shouldReceive('addToken')
+            ->expects('storeToken')
             ->once()
             ->with('uos0bg0st4mexopq3rhs361mny1fmt');
 
-        $tokenResponse = $this->tokenProvider->getToken();
+        $getTokenResponse = $this->tokenProvider->getToken();
 
-        $this->assertEquals('uos0bg0st4mexopq3rhs361mny1fmt', $tokenResponse);
+        $this->assertEquals('uos0bg0st4mexopq3rhs361mny1fmt', $getTokenResponse);
     }
 
     protected function tearDown(): void
