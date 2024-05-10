@@ -49,9 +49,6 @@ class TokenProvider
 
     private function extractToken(string $responseArray): string
     {
-        if ($responseArray == null) {
-            return '';
-        }
         return json_decode($responseArray, true)['access_token'];
     }
 }
