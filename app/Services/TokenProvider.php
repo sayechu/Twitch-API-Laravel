@@ -35,16 +35,16 @@ class TokenProvider
         return $this->databaseClient->isTokenStoredInDatabase();
     }
 
-    private function storeTokenInDatabase(array $twitchTokenResponse): void
-    {
-        $twitchToken = $this->extractToken($twitchTokenResponse['response']);
-        $this->databaseClient->storeToken($twitchToken);
-    }
-
     private function requestHas500Code(mixed $requestResponse): bool
     {
         return isset($requestResponse['http_code']) &&
             $requestResponse['http_code'] === Response::HTTP_INTERNAL_SERVER_ERROR;
+    }
+
+    private function storeTokenInDatabase(array $twitchTokenResponse): void
+    {
+        $twitchToken = $this->extractToken($twitchTokenResponse['response']);
+        $this->databaseClient->storeToken($twitchToken);
     }
 
     private function extractToken(string $responseArray): string
