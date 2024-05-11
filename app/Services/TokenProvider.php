@@ -22,6 +22,7 @@ class TokenProvider
         }
 
         $twitchTokenResponse = $this->apiClient->getToken();
+
         if ($this->requestHas500Code($twitchTokenResponse)) {
             return $twitchTokenResponse;
         }
