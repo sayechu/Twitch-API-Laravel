@@ -42,7 +42,7 @@ class GetStreamsTest extends TestCase
      */
     public function test_gets_streams_with_token_stored_returns_streams(): void
     {
-        $getStreamsExpectedResponse = [
+        $getStreamsResponse = [
             'response' => json_encode([
                 'data' => [
                     [
@@ -79,7 +79,7 @@ class GetStreamsTest extends TestCase
             ->expects('makeCurlCall')
             ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer ' . self::TOKEN])
             ->once()
-            ->andReturn($getStreamsExpectedResponse);
+            ->andReturn($getStreamsResponse);
 
         $responseGetStreams = $this->get('/analytics/streams');
 
@@ -92,7 +92,7 @@ class GetStreamsTest extends TestCase
      */
     public function test_gets_streams_without_token_stored_returns_streams(): void
     {
-        $getStreamsExpectedResponse = [
+        $getStreamsResponse = [
             'response' => json_encode([
                 'data' => [
                     [
@@ -137,7 +137,7 @@ class GetStreamsTest extends TestCase
             ->expects('makeCurlCall')
             ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer ' . self::TOKEN])
             ->once()
-            ->andReturn($getStreamsExpectedResponse);
+            ->andReturn($getStreamsResponse);
 
         $responseGetStreams = $this->get('/analytics/streams');
 
@@ -149,7 +149,7 @@ class GetStreamsTest extends TestCase
      */
     public function test_gets_streams_without_token_stored_returns_token_curl_error(): void
     {
-        $getTokenExpectedResponse = [
+        $getTokenResponse = [
             "response" => null,
             "http_code" => 500
         ];
@@ -162,7 +162,7 @@ class GetStreamsTest extends TestCase
         $this->apiClient
             ->expects('getToken')
             ->once()
-            ->andReturn($getTokenExpectedResponse);
+            ->andReturn($getTokenResponse);
 
         $responseGetStreams = $this->get('/analytics/streams');
 
@@ -175,14 +175,15 @@ class GetStreamsTest extends TestCase
      */
     public function test_gets_streams_without_token_stored_returns_streams_curl_error(): void
     {
-        $getStreamsExpectedResponse = [
+        $getStreamsResponse = [
             'response' => null,
             'http_code' => 500
         ];
-        $getTokenExpectedResponse = [
+        $getTokenResponse = [
             "response" => '{"access_token":"' . self::TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
             "http_code" => 200
         ];
+        $expectedResponse = json_encode(['error' => self::ERROR_GET_STREAMS_FAILED]);
 
         $this->databaseClient
             ->expects('isTokenStoredInDatabase')
@@ -191,7 +192,7 @@ class GetStreamsTest extends TestCase
         $this->apiClient
             ->expects('getToken')
             ->once()
-            ->andReturn($getTokenExpectedResponse);
+            ->andReturn($getTokenResponse);
         $this->databaseClient
             ->expects('storeToken')
             ->with(self::TOKEN)
@@ -200,8 +201,7 @@ class GetStreamsTest extends TestCase
             ->expects('makeCurlCall')
             ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer ' . self::TOKEN])
             ->once()
-            ->andReturn($getStreamsExpectedResponse);
-        $expectedResponse = json_encode(['error' => self::ERROR_GET_STREAMS_FAILED]);
+            ->andReturn($getStreamsResponse);
 
         $responseGetStreams = $this->get('/analytics/streams');
 

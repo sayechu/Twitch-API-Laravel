@@ -103,7 +103,7 @@ class GetStreamsServiceTest extends TestCase
     /**
      * @test
      */
-    public function execute_token_correct_curl_error(): void
+    public function test_execute_token_correct_curl_error(): void
     {
         $streamsResponse = ['error' => self::ERROR_GET_STREAMS_FAILED];
 
