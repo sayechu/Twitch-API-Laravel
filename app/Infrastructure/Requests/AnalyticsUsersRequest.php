@@ -17,4 +17,12 @@ class AnalyticsUsersRequest extends FormRequest
             'id' => 'required|numeric',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'id.required' => 'El Id es obligatorio',
+            'id.numeric' => 'El Id dado no es válido',
+        ];
+    }
 }
