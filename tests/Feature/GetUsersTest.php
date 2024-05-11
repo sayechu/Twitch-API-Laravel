@@ -14,9 +14,10 @@ class GetUsersTest extends TestCase
     private ApiClient $apiClient;
     private DBClient $databaseClient;
 
-    const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
-    const ERROR_GET_USERS_FAILED = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
-    const ERROR_STATUS = 503;
+    private const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
+    private const ERROR_GET_USERS_FAILED = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
+    private const TWITCH_TOKEN = 'nrtovbe5h02os45krmjzvkt3hp74vf';
+    private const ERROR_STATUS = 503;
 
     protected function setUp(): void
     {
@@ -69,10 +70,10 @@ class GetUsersTest extends TestCase
         $this->databaseClient
             ->expects('getToken')
             ->once()
-            ->andReturn('nrtovbe5h02os45krmjzvkt3hp74vf');
+            ->andReturn(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with("https://api.twitch.tv/helix/users?id=1234", [0 => 'Authorization: Bearer nrtovbe5h02os45krmjzvkt3hp74vf'])
+            ->with("https://api.twitch.tv/helix/users?id=1234", [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($usersResponse);
 
@@ -107,7 +108,7 @@ class GetUsersTest extends TestCase
         ];
         $getTokenResponse = [
             'response' => json_encode([
-                'access_token' => 'rz2po6wrbgami5k2qjk0e4q0vwschm',
+                'access_token' => self::TWITCH_TOKEN,
                 'expires_in' => 5089418,
                 'token_type' => 'bearer'
             ]),
@@ -125,10 +126,10 @@ class GetUsersTest extends TestCase
         $this->databaseClient
             ->expects('storeToken')
             ->once()
-            ->with('rz2po6wrbgami5k2qjk0e4q0vwschm');
+            ->with(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with("https://api.twitch.tv/helix/users?id=1234", [0 => 'Authorization: Bearer rz2po6wrbgami5k2qjk0e4q0vwschm'])
+            ->with("https://api.twitch.tv/helix/users?id=1234", [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($userResponse);
 
@@ -181,11 +182,11 @@ class GetUsersTest extends TestCase
         $this->databaseClient
             ->expects('getToken')
             ->once()
-            ->andReturn('nrtovbe5h02os45krmjzvkt3hp74vf');
+            ->andReturn(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
             ->once()
-            ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer nrtovbe5h02os45krmjzvkt3hp74vf'])
+            ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->andReturn($curlCallResponse);
 
         $responseGetUsers = $this->get('/analytics/users?id=1234');
@@ -201,7 +202,7 @@ class GetUsersTest extends TestCase
     {
         $getTokenResponse = [
             'response' => json_encode([
-                'access_token' => 'nrtovbe5h02os45krmjzvkt3hp74vf',
+                'access_token' => self::TWITCH_TOKEN,
                 'expires_in' => 5089418,
                 'token_type' => 'bearer'
             ]),
@@ -224,11 +225,11 @@ class GetUsersTest extends TestCase
         $this->databaseClient
             ->expects('storeToken')
             ->once()
-            ->with('nrtovbe5h02os45krmjzvkt3hp74vf');
+            ->with(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
             ->once()
-            ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer nrtovbe5h02os45krmjzvkt3hp74vf'])
+            ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->andReturn($curlCallResponse);
 
         $responseGetUsers = $this->get('/analytics/users?id=1234');
