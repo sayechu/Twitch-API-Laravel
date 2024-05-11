@@ -11,7 +11,7 @@ class GetStreamsService
         $this->streamsDataManager = $streamsDataManager;
     }
 
-    public function execute(): string|array
+    public function execute(): array
     {
         $streamsData = $this->streamsDataManager->getStreamsData();
 

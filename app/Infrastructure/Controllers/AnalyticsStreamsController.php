@@ -6,10 +6,10 @@ use App\Services\GetStreamsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class GetStreamsController extends Controller
+class AnalyticsStreamsController extends Controller
 {
     private GetStreamsService $getStreamsService;
-    const ERROR_STATUS = 503;
+    private const ERROR_STATUS = 503;
 
     public function __construct(GetStreamsService $getStreamsService)
     {
