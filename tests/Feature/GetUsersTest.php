@@ -14,6 +14,10 @@ class GetUsersTest extends TestCase
     private ApiClient $apiClient;
     private DBClient $databaseClient;
 
+    const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
+    const ERROR_GET_USERS_FAILED = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
+    const ERROR_STATUS = 503;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -57,6 +61,7 @@ class GetUsersTest extends TestCase
             ]),
             'http_code' => 200
         ];
+
         $this->databaseClient
             ->expects('isTokenStoredInDatabase')
             ->once()
@@ -108,6 +113,7 @@ class GetUsersTest extends TestCase
             ]),
             'http_code' => 200
         ];
+
         $this->databaseClient
             ->expects('isTokenStoredInDatabase')
             ->once()
@@ -129,6 +135,106 @@ class GetUsersTest extends TestCase
         $responseGetUsers = $this->get('/analytics/users?id=1234');
 
         $responseGetUsers->assertContent('{"data":[{"id":"userId","login":"userLogin","display_name":"displayName","type":"type","broadcaster_type":"broadcasterType","description":"description","profile_image_url":"profileImageUrl","offline_image_url":"offlineImageUrl","view_count":0,"created_at":"createdAt"}]}');
+    }
+
+    /**
+     * @test
+     */
+    public function test_get_users_with_token_request_to_api_failure()
+    {
+        $expectedResponse = json_encode(['error' => self::ERROR_GET_TOKEN_FAILED]);
+        $getTokenResponse = [
+            'response' => null,
+            'http_code' => 500
+        ];
+
+        $this->databaseClient
+            ->expects('isTokenStoredInDatabase')
+            ->once()
+            ->andReturn(false);
+        $this->apiClient
+            ->expects('getToken')
+            ->once()
+            ->andReturn($getTokenResponse);
+
+        $responseGetUsers = $this->get('/analytics/users?id=1234');
+
+        $responseGetUsers->assertStatus(self::ERROR_STATUS);
+        $this->assertEquals($expectedResponse, $responseGetUsers->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function test_get_users_with_token_stored_and_error_in_user_curl_call()
+    {
+        $expectedResponse = json_encode(['error' => self::ERROR_GET_USERS_FAILED]);
+        $curlCallResponse = [
+            'response' => null,
+            'http_code' => 500
+        ];
+
+        $this->databaseClient
+            ->expects('isTokenStoredInDatabase')
+            ->once()
+            ->andReturn(true);
+        $this->databaseClient
+            ->expects('getToken')
+            ->once()
+            ->andReturn('nrtovbe5h02os45krmjzvkt3hp74vf');
+        $this->apiClient
+            ->expects('makeCurlCall')
+            ->once()
+            ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer nrtovbe5h02os45krmjzvkt3hp74vf'])
+            ->andReturn($curlCallResponse);
+
+        $responseGetUsers = $this->get('/analytics/users?id=1234');
+
+        $responseGetUsers->assertStatus(self::ERROR_STATUS);
+        $this->assertEquals($expectedResponse, $responseGetUsers->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function test_get_users_with_token_request_to_api_and_error_in_user_curl_call()
+    {
+        $getTokenResponse = [
+            'response' => json_encode([
+                'access_token' => 'nrtovbe5h02os45krmjzvkt3hp74vf',
+                'expires_in' => 5089418,
+                'token_type' => 'bearer'
+            ]),
+            'http_code' => 200
+        ];
+        $curlCallResponse = [
+            'response' => null,
+            'http_code' => 500
+        ];
+        $expectedResponse = json_encode(['error' => self::ERROR_GET_USERS_FAILED]);
+
+        $this->databaseClient
+            ->expects('isTokenStoredInDatabase')
+            ->once()
+            ->andReturn(false);
+        $this->apiClient
+            ->expects('getToken')
+            ->once()
+            ->andReturn($getTokenResponse);
+        $this->databaseClient
+            ->expects('storeToken')
+            ->once()
+            ->with('nrtovbe5h02os45krmjzvkt3hp74vf');
+        $this->apiClient
+            ->expects('makeCurlCall')
+            ->once()
+            ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer nrtovbe5h02os45krmjzvkt3hp74vf'])
+            ->andReturn($curlCallResponse);
+
+        $responseGetUsers = $this->get('/analytics/users?id=1234');
+
+        $responseGetUsers->assertStatus(self::ERROR_STATUS);
+        $this->assertEquals($expectedResponse, $responseGetUsers->getContent());
     }
 
     protected function tearDown(): void
