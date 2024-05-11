@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class AnalyticsStreamsController extends Controller
 {
     private GetStreamsService $getStreamsService;
-    private const ERROR_STATUS = 503;
+    private const ERROR_STATUS_CODE = 503;
 
     public function __construct(GetStreamsService $getStreamsService)
     {
@@ -21,7 +21,7 @@ class AnalyticsStreamsController extends Controller
         $streamsData = $this->getStreamsService->execute();
 
         if ($this->containsServerError($streamsData))
-            return response()->json($streamsData, self::ERROR_STATUS);
+            return response()->json($streamsData, self::ERROR_STATUS_CODE);
 
         return response()->json($streamsData);
     }
