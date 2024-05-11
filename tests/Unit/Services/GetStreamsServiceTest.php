@@ -88,7 +88,7 @@ class GetStreamsServiceTest extends TestCase
      */
     public function test_execute_with_token_error(): void
     {
-        $streamsResponse = json_encode(['error' => self::ERROR_GET_TOKEN_FAILED]);
+        $streamsResponse = ['error' => self::ERROR_GET_TOKEN_FAILED];
 
         $this->streamsDataManager
             ->expects('getStreamsData')
@@ -105,7 +105,7 @@ class GetStreamsServiceTest extends TestCase
      */
     public function execute_token_correct_curl_error(): void
     {
-        $streamsResponse = json_encode(['error' => self::ERROR_GET_STREAMS_FAILED]);
+        $streamsResponse = ['error' => self::ERROR_GET_STREAMS_FAILED];
 
         $this->streamsDataManager
             ->expects('getStreamsData')

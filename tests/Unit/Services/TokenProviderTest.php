@@ -13,6 +13,7 @@ class TokenProviderTest extends TestCase
     private DBClient $databaseClient;
     private ApiClient $apiClient;
     private TokenProvider $tokenProvider;
+    const TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
 
     protected function setUp(): void
     {
@@ -73,7 +74,7 @@ class TokenProviderTest extends TestCase
     public function test_get_token(): void
     {
         $apiResponse = [
-            "response" => '{"access_token":"uos0bg0st4mexopq3rhs361mny1fmt","expires_in":5590782,"token_type":"bearer"}',
+            "response" => '{"access_token":"' . self::TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
             "http_code" => 200
         ];
 
@@ -88,11 +89,11 @@ class TokenProviderTest extends TestCase
         $this->databaseClient
             ->expects('storeToken')
             ->once()
-            ->with('uos0bg0st4mexopq3rhs361mny1fmt');
+            ->with(self::TOKEN);
 
         $getTokenResponse = $this->tokenProvider->getToken();
 
-        $this->assertEquals('uos0bg0st4mexopq3rhs361mny1fmt', $getTokenResponse);
+        $this->assertEquals(self::TOKEN, $getTokenResponse);
     }
 
     protected function tearDown(): void
