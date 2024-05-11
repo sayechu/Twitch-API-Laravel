@@ -11,6 +11,8 @@ class GetStreamsServiceTest extends TestCase
 {
     private GetStreamsService $getStreamsService;
     private StreamsDataManager $streamsDataManager;
+    const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
+    const ERROR_GET_STREAMS_FAILED = 'No se pueden devolver streams en este momento, inténtalo más tarde';
 
     protected function setUp(): void
     {
@@ -86,7 +88,7 @@ class GetStreamsServiceTest extends TestCase
      */
     public function test_execute_with_token_error(): void
     {
-        $streamsResponse = '503: {"error": "No se puede establecer conexión con Twitch en este momento}';
+        $streamsResponse = json_encode(['error' => self::ERROR_GET_TOKEN_FAILED]);
 
         $this->streamsDataManager
             ->expects('getStreamsData')
@@ -103,7 +105,7 @@ class GetStreamsServiceTest extends TestCase
      */
     public function execute_token_correct_curl_error(): void
     {
-        $streamsResponse = '503: {"error": "No se pueden devolver streams en este momento, inténtalo más tarde"}';
+        $streamsResponse = json_encode(['error' => self::ERROR_GET_STREAMS_FAILED]);
 
         $this->streamsDataManager
             ->expects('getStreamsData')

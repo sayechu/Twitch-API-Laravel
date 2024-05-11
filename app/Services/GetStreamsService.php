@@ -30,8 +30,8 @@ class GetStreamsService
         return $filteredStreams;
     }
 
-    private function isResponseAnError(array|string $streamsData): bool
+    private function isResponseAnError(array $streamsData): bool
     {
-        return is_string($streamsData);
+        return isset($streamsData['error']);
     }
 }

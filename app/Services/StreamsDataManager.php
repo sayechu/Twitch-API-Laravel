@@ -8,6 +8,9 @@ class StreamsDataManager
 {
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;
+    private const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
+    private const ERROR_GET_STREAMS_FAILED = 'No se pueden devolver streams en este momento, inténtalo más tarde';
+
 
     public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient)
     {
@@ -20,7 +23,7 @@ class StreamsDataManager
         $twitchTokenResponse = $this->tokenProvider->getToken();
 
         if ($this->requestHas500Code($twitchTokenResponse)) {
-            return '503: {"error": "No se puede establecer conexión con Twitch en este momento}';
+            return ['error' => self::ERROR_GET_TOKEN_FAILED];
         }
 
         $apiHeaders = ['Authorization: Bearer ' . $twitchTokenResponse];
@@ -29,7 +32,7 @@ class StreamsDataManager
         $streamsResponse = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
 
         if ($this->requestHas500Code($streamsResponse)) {
-            return '503: {"error": "No se pueden devolver streams en este momento, inténtalo más tarde"}';
+            return ['error' => self::ERROR_GET_STREAMS_FAILED];
         }
 
         return json_decode($streamsResponse['response'], true)['data'];
