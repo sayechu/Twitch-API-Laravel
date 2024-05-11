@@ -11,14 +11,13 @@ class StreamsDataManager
     private const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
     private const ERROR_GET_STREAMS_FAILED = 'No se pueden devolver streams en este momento, inténtalo más tarde';
 
-
     public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient)
     {
         $this->tokenProvider = $tokenProvider;
         $this->apiClient = $apiClient;
     }
 
-    public function getStreamsData(): string|array
+    public function getStreamsData(): array
     {
         $twitchTokenResponse = $this->tokenProvider->getToken();
 
