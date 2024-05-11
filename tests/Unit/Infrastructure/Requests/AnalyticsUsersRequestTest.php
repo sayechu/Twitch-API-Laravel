@@ -20,7 +20,10 @@ class AnalyticsUsersRequestTest extends TestCase
             'id' => ['El Id dado no es válido'],
         ]);
 
-        $validationErrors = Validator::make($analyticsUsersRequest->all(), $analyticsUsersRequest->rules(), $analyticsUsersRequest->messages());
+        $validationErrors = Validator::make(
+            $analyticsUsersRequest->all(),
+            $analyticsUsersRequest->rules(),
+            $analyticsUsersRequest->messages());
 
         $this->assertTrue($validationErrors->fails());
         $this->assertEquals($expectedErrors, $validationErrors->errors());
@@ -36,7 +39,10 @@ class AnalyticsUsersRequestTest extends TestCase
             'id' => ['El Id es obligatorio'],
         ]);
 
-        $validationErrors = Validator::make($analyticsUsersRequest->all(), $analyticsUsersRequest->rules(), $analyticsUsersRequest->messages());
+        $validationErrors = Validator::make(
+            $analyticsUsersRequest->all(),
+            $analyticsUsersRequest->rules(),
+            $analyticsUsersRequest->messages());
 
         $this->assertTrue($validationErrors->fails());
         $this->assertEquals($expectedErrors, $validationErrors->errors());
@@ -50,7 +56,10 @@ class AnalyticsUsersRequestTest extends TestCase
         $analyticsUsersRequest = new AnalyticsUsersRequest();
         $analyticsUsersRequest->merge(['id' => 1234]);
 
-        $validationErrors = Validator::make($analyticsUsersRequest->all(), $analyticsUsersRequest->rules(), $analyticsUsersRequest->messages());
+        $validationErrors = Validator::make(
+            $analyticsUsersRequest->all(),
+            $analyticsUsersRequest->rules(),
+            $analyticsUsersRequest->messages());
 
         $this->assertTrue($validationErrors->passes());
     }
