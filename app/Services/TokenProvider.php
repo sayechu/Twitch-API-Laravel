@@ -17,7 +17,7 @@ class TokenProvider
 
     public function getToken(): string|array
     {
-        if ($this->thereIsTokenStored()) {
+        if ($this->databaseClient->isTokenStoredInDatabase()) {
             return $this->databaseClient->getToken();
         }
 
@@ -28,11 +28,6 @@ class TokenProvider
 
         $this->storeTokenInDatabase($twitchTokenResponse);
         return $this->extractToken($twitchTokenResponse['response']);
-    }
-
-    private function thereIsTokenStored(): bool
-    {
-        return $this->databaseClient->isTokenStoredInDatabase();
     }
 
     private function requestHas500Code(mixed $requestResponse): bool
