@@ -4,19 +4,23 @@ namespace App\Services;
 
 class GetStreamsService
 {
-    private StreamsManager $streamsManager;
+    private StreamsDataManager $streamsDataManager;
 
-    public function __construct(StreamsManager $streamsManager)
+    public function __construct(StreamsDataManager $streamsDataManager)
     {
-        $this->streamsManager = $streamsManager;
+        $this->streamsDataManager = $streamsDataManager;
     }
 
-    public function getStreams(): array
+    public function execute(): array
     {
-        $streams = $this->streamsManager->getStreams();
+        $streamsData = $this->streamsDataManager->getStreamsData();
+
+        if ($this->isResponseAnError($streamsData)) {
+            return $streamsData;
+        }
 
         $filteredStreams = [];
-        foreach ($streams as $stream) {
+        foreach ($streamsData as $stream) {
             $filteredStreams[] = [
                 'title' => $stream['title'],
                 'user_name' => $stream['user_name']
@@ -24,5 +28,10 @@ class GetStreamsService
         }
 
         return $filteredStreams;
+    }
+
+    private function isResponseAnError(array $streamsData): bool
+    {
+        return isset($streamsData['error']);
     }
 }

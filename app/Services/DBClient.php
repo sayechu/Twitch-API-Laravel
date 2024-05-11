@@ -269,4 +269,24 @@ class DBClient
 
         $stmt->execute();
     }
+
+    public function isTokenStoredInDatabase(): bool
+    {
+        $selectStatement = $this->pdo->prepare('SELECT COUNT(*) FROM TOKEN');
+        $selectStatement->execute();
+        return $selectStatement->fetchColumn() > 0;
+    }
+
+    public function getToken(): string
+    {
+        $stmt = $this->pdo->prepare('SELECT token FROM TOKEN');
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['token'];
+    }
+
+    public function storeToken(string $twitchToken)
+    {
+        $insertStatement = $this->pdo->prepare('INSERT INTO TOKEN (token) VALUES (?)');
+        $insertStatement->execute([$twitchToken]);
+    }
 }

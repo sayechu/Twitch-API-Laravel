@@ -11,24 +11,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-    # Step 0: Fix PHP version to 8.2 
+    # Step 0: Fix PHP version to 8.2
     - name: Use PHP 8.2
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
-        
+
     # Step 1: Checkout code
     - name: Checkout code
       uses: actions/checkout@v2
 
     # Step 2: Install dependencies
     - name: Install dependencies
-      run: composer update && composer install
+      run: composer install
 
     # Step 3: Run unit tests
-    #- name: Run unit tests
-      #run: vendor/bin/phpunit
+    - name: Run unit tests
+      run: vendor/bin/phpunit
 
     # Step 4: Execute PHP Code Sniffer
     - name: Execute PHP Code Sniffer
@@ -37,4 +36,3 @@ jobs:
     # Step 5: Execute PHP Mess Detector
     - name: Execute PHP Mess Detector
       run: vendor/bin/grumphp run --tasks phpmd
-
