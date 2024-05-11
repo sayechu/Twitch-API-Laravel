@@ -10,6 +10,8 @@ class AnalyticsUsersController extends Controller
 {
     private UserDataManager $userDataManager;
 
+    const ERROR_STATUS = 503;
+
     public function __construct(UserDataManager $userDataManager)
     {
         $this->userDataManager = $userDataManager;
@@ -21,6 +23,14 @@ class AnalyticsUsersController extends Controller
 
         $userData = $this->userDataManager->getUserData($userId);
 
+        if ($this->containsServerError($userData))
+            return response()->json($userData, self::ERROR_STATUS);
+
         return response()->json($userData);
+    }
+
+    private function containsServerError(array $userData): bool
+    {
+        return isset($userData['error']);
     }
 }
