@@ -25,3 +25,6 @@ grumphp:
                 - '/^\d+-[a-zA-Z\$]+/'
                 - 'main'
                 - 'master'
+        phpunit:
+            config_file: './phpunit.xml'
+            always_execute: true
