@@ -202,6 +202,13 @@ class DBClient
         $this->updateDatetime($gameId);
     }
 
+    public function isUserStoredInDatabase(string $userId): bool
+    {
+        $selectStatement = $this->pdo->prepare('SELECT COUNT(*) FROM USUARIO WHERE ID = ?');
+        $selectStatement->execute([$userId]);
+        return $selectStatement->fetchColumn() > 0;
+    }
+
     public function getUserFromDatabase($user)
     {
         $stmt = $this->pdo->prepare("SELECT * FROM USUARIO WHERE ID = ?");
@@ -228,8 +235,10 @@ class DBClient
         return $formattedUserData;
     }
 
-    public function addUserToDatabase($api_reponse_array)
+    public function addUserToDatabase($api_response_array)
     {
+        $userData = json_decode($api_response_array['response'], true);
+
         $stmt = $this->pdo->prepare("
                     INSERT INTO USUARIO (
                         ID,
@@ -256,16 +265,16 @@ class DBClient
                     )
             ");
 
-        $stmt->bindParam(':ID', $api_reponse_array['id']);
-        $stmt->bindParam(':login', $api_reponse_array['login']);
-        $stmt->bindParam(':displayName', $api_reponse_array['display_name']);
-        $stmt->bindParam(':type', $api_reponse_array['type']);
-        $stmt->bindParam(':broadcasterType', $api_reponse_array['broadcaster_type']);
-        $stmt->bindParam(':description', $api_reponse_array['description']);
-        $stmt->bindParam(':profileImageUrl', $api_reponse_array['profile_image_url']);
-        $stmt->bindParam(':offlineImageUrl', $api_reponse_array['offline_image_url']);
-        $stmt->bindParam(':viewCount', $api_reponse_array['view_count']);
-        $stmt->bindParam(':createdAt', $api_reponse_array['created_at']);
+        $stmt->bindParam(':ID', $userData['id']);
+        $stmt->bindParam(':login', $userData['login']);
+        $stmt->bindParam(':displayName', $userData['display_name']);
+        $stmt->bindParam(':type', $userData['type']);
+        $stmt->bindParam(':broadcasterType', $userData['broadcaster_type']);
+        $stmt->bindParam(':description', $userData['description']);
+        $stmt->bindParam(':profileImageUrl', $userData['profile_image_url']);
+        $stmt->bindParam(':offlineImageUrl', $userData['offline_image_url']);
+        $stmt->bindParam(':viewCount', $userData['view_count']);
+        $stmt->bindParam(':createdAt', $userData['created_at']);
 
         $stmt->execute();
     }

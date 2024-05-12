@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Response;
+
 class UserDataProvider
 {
     private ApiClient $apiClient;
@@ -13,16 +15,28 @@ class UserDataProvider
         $this->apiClient = $apiClient;
     }
 
-    public function getUserResponse(string $userId, string $twitchToken): array
+    public function getUserData(string $userId, string $twitchToken): array
     {
+        if ($this->databaseClient->isUserStoredInDatabase($userId)) {
+            return $this->databaseClient->getUserFromDatabase($userId);
+        }
+
         $apiUrl = "https://api.twitch.tv/helix/users?id=" . urlencode($userId);
         $apiHeaders = ['Authorization: Bearer ' . $twitchToken];
 
-        return $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
+        $userDataResponse = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
+
+        if ($this->requestHas500Code($userDataResponse)) {
+            return $userDataResponse;
+        }
+
+        $this->databaseClient->addUserToDatabase($userDataResponse);
+        return $userDataResponse;
     }
 
-    public function getUserFromDatabase($userId)
+    private function requestHas500Code(mixed $requestResponse): bool
     {
-        return $this->databaseClient->getUserFromDatabase($userId);
+        return isset($requestResponse['http_code']) &&
+            $requestResponse['http_code'] === Response::HTTP_INTERNAL_SERVER_ERROR;
     }
 }

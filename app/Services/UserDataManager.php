@@ -21,19 +21,13 @@ class UserDataManager
 
     public function getUserData(string $userId): array
     {
-        $userDataFromDatabase = $this->userDataProvider->getUserFromDatabase($userId);
-
-        if ($userDataFromDatabase) {
-            return $userDataFromDatabase;
-        }
-
         $twitchToken = $this->tokenProvider->getToken();
 
         if ($this->requestHas500Code($twitchToken)) {
             return ['error' => self::ERROR_GET_TOKEN_FAILED];
         }
 
-        $userData = $this->userDataProvider->getUserResponse($userId, $twitchToken);
+        $userData = $this->userDataProvider->getUserData($userId, $twitchToken);
 
         if ($this->requestHas500Code($userData)) {
             return ['error' => self::ERROR_GET_USERS_FAILED];
