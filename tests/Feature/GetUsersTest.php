@@ -13,7 +13,6 @@ class GetUsersTest extends TestCase
 {
     private ApiClient $apiClient;
     private DBClient $databaseClient;
-
     private const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
     private const ERROR_GET_USERS_FAILED = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
     private const TWITCH_TOKEN = 'nrtovbe5h02os45krmjzvkt3hp74vf';
