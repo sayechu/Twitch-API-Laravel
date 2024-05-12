@@ -13,7 +13,7 @@ class UserDataProvider
         $this->apiClient = $apiClient;
     }
 
-    public function getUserResponse(string $userId, string $twitchToken) : array
+    public function getUserResponse(string $userId, string $twitchToken): array
     {
         $apiUrl = "https://api.twitch.tv/helix/users?id=" . urlencode($userId);
         $apiHeaders = ['Authorization: Bearer ' . $twitchToken];
