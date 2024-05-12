@@ -58,29 +58,4 @@ class ApiClient
             'http_code' => $httpCode
         ];
     }
-
-    public function getTopThreeGames(array $api_headers): array
-    {
-        $api_url = "https://api.twitch.tv/helix/games/top?first=3";
-
-        $topGamesData = $this->makeCurlCall($api_url, $api_headers);
-
-        return json_decode($topGamesData, true)['data'];
-    }
-
-    public function getTopFourtyVideos($gameId): array
-    {
-        $api_url = "https://api.twitch.tv/helix/videos?game_id={$gameId}&sort=views&first=40";
-
-        $responseGetToken = $this->getToken();
-        $twitchToken = json_decode($responseGetToken, true)['access_token'];
-
-        $api_headers = array(
-            'Authorization: Bearer ' . $twitchToken,
-        );
-
-        $topVideosData = $this->makeCurlCall($api_url, $api_headers);
-
-        return json_decode($topVideosData, true)['data'];
-    }
 }
