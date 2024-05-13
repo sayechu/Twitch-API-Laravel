@@ -24,7 +24,7 @@ class GetStreamsServiceTest extends TestCase
     /**
      * @test
      */
-    public function test_execute(): void
+    public function execute_returns_streams_data(): void
     {
         $streamsResponse = [
             [
@@ -86,7 +86,7 @@ class GetStreamsServiceTest extends TestCase
     /**
      * @test
      */
-    public function test_execute_with_token_error(): void
+    public function execute_returns_token_curl_error(): void
     {
         $streamsResponse = ['error' => self::ERROR_GET_TOKEN_FAILED];
 
@@ -103,7 +103,7 @@ class GetStreamsServiceTest extends TestCase
     /**
      * @test
      */
-    public function test_execute_token_correct_curl_error(): void
+    public function execute_returns_streams_curl_error(): void
     {
         $streamsResponse = ['error' => self::ERROR_GET_STREAMS_FAILED];
 

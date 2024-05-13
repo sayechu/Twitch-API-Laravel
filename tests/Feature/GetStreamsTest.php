@@ -40,7 +40,7 @@ class GetStreamsTest extends TestCase
     /**
      * @test
      */
-    public function test_gets_streams_with_token_stored_returns_streams(): void
+    public function gets_streams_with_stored_token(): void
     {
         $getStreamsResponse = [
             'response' => json_encode([
@@ -90,7 +90,7 @@ class GetStreamsTest extends TestCase
     /**
      * @test
      */
-    public function test_gets_streams_without_token_stored_returns_streams(): void
+    public function gets_streams_without_stored_token(): void
     {
         $getStreamsResponse = [
             'response' => json_encode([
@@ -147,7 +147,7 @@ class GetStreamsTest extends TestCase
     /**
      * @test
      */
-    public function test_gets_streams_without_token_stored_returns_token_curl_error(): void
+    public function gets_streams_without_stored_token_returns_token_curl_error(): void
     {
         $getTokenResponse = [
             "response" => null,
@@ -173,7 +173,7 @@ class GetStreamsTest extends TestCase
     /**
      * @test
      */
-    public function test_gets_streams_without_token_stored_returns_streams_curl_error(): void
+    public function gets_streams_without_token_stored_returns_streams_curl_error(): void
     {
         $getStreamsResponse = [
             'response' => null,

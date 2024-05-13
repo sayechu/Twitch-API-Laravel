@@ -28,7 +28,7 @@ class StreamsDataManagerTest extends TestCase
     /**
      * @test
      */
-    public function test_get_streams_data(): void
+    public function get_streams_returns_streams_data(): void
     {
         $tokenResponse = self::TOKEN;
         $curlCallResponse = [

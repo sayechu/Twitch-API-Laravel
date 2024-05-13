@@ -40,7 +40,7 @@ class GetUsersTest extends TestCase
     /**
      * @test
      */
-    public function test_get_users_with_token_stored_returns_user_data(): void
+    public function get_users_with_token_stored_returns_user_data(): void
     {
         $usersResponse = [
             'response' => json_encode([
@@ -84,7 +84,7 @@ class GetUsersTest extends TestCase
     /**
      * @test
      */
-    public function test_get_users_with_token_from_api_returns_user_data()
+    public function get_users_with_token_from_api_returns_user_data()
     {
         $userResponse = [
             'response' => json_encode([
@@ -140,7 +140,7 @@ class GetUsersTest extends TestCase
     /**
      * @test
      */
-    public function test_get_users_with_token_request_to_api_failure()
+    public function get_users_with_token_from_api_failure()
     {
         $expectedResponse = json_encode(['error' => self::ERROR_GET_TOKEN_FAILED]);
         $getTokenResponse = [
@@ -166,7 +166,7 @@ class GetUsersTest extends TestCase
     /**
      * @test
      */
-    public function test_get_users_with_token_stored_and_error_in_user_curl_call()
+    public function get_users_with_token_stored_returns_users_curl_error()
     {
         $expectedResponse = json_encode(['error' => self::ERROR_GET_USERS_FAILED]);
         $curlCallResponse = [
@@ -197,7 +197,7 @@ class GetUsersTest extends TestCase
     /**
      * @test
      */
-    public function test_get_users_with_token_request_to_api_and_error_in_user_curl_call()
+    public function get_users_with_token_from_api_returns_users_curl_error()
     {
         $getTokenResponse = [
             'response' => json_encode([

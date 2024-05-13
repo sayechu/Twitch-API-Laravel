@@ -12,7 +12,7 @@ class AnalyticsUsersRequestTest extends TestCase
     /**
      * @test
      */
-    public function requestDataIsInvalid(): void
+    public function request_data_is_invalid(): void
     {
         $analyticsUsersRequest = new AnalyticsUsersRequest();
         $analyticsUsersRequest->merge(['id' => 'abc']);
@@ -32,7 +32,7 @@ class AnalyticsUsersRequestTest extends TestCase
     /**
      * @test
      */
-    public function idRequiredInRequest(): void
+    public function id_required_in_request(): void
     {
         $analyticsUsersRequest = new AnalyticsUsersRequest();
         $expectedErrors = new MessageBag([
@@ -51,7 +51,7 @@ class AnalyticsUsersRequestTest extends TestCase
     /**
      * @test
      */
-    public function idIsValid(): void
+    public function id_is_valid(): void
     {
         $analyticsUsersRequest = new AnalyticsUsersRequest();
         $analyticsUsersRequest->merge(['id' => 1234]);
