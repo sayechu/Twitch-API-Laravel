@@ -17,6 +17,7 @@ class UserDataManagerTest extends TestCase
     private const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
     private const ERROR_GET_USERS_FAILED = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
     private const TWITCH_TOKEN = 'nrtovbe5h02os45krmjzvkt3hp74vf';
+    private const USERS_URL = 'https://api.twitch.tv/helix/users';
 
     protected function setUp(): void
     {
@@ -82,7 +83,7 @@ class UserDataManagerTest extends TestCase
             ->andReturn(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(self::USERS_URL . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($getUserDataResponse);
 
@@ -148,7 +149,7 @@ class UserDataManagerTest extends TestCase
             ->andReturn(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(self::USERS_URL . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($getUserDataResponse);
 

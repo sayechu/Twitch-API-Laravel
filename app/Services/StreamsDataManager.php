@@ -10,6 +10,7 @@ class StreamsDataManager
     private ApiClient $apiClient;
     private const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
     private const ERROR_GET_STREAMS_FAILED = 'No se pueden devolver streams en este momento, inténtalo más tarde';
+    private const STREAMS_URL = 'https://api.twitch.tv/helix/streams';
 
     public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient)
     {
@@ -26,7 +27,7 @@ class StreamsDataManager
         }
 
         $apiHeaders = ['Authorization: Bearer ' . $twitchTokenResponse];
-        $apiUrl = 'https://api.twitch.tv/helix/streams';
+        $apiUrl = self::STREAMS_URL;
 
         $streamsResponse = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
 

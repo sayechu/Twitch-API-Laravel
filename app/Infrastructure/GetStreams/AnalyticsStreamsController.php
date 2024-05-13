@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Infrastructure\Controllers;
+namespace App\Infrastructure\GetStreams;
 
+use App\Infrastructure\Controllers\Controller;
 use App\Services\GetStreamsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

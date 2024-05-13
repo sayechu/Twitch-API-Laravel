@@ -15,7 +15,8 @@ class StreamsDataManagerTest extends TestCase
     private StreamsDataManager $streamsDataManager;
     const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
     const ERROR_GET_STREAMS_FAILED = 'No se pueden devolver streams en este momento, inténtalo más tarde';
-    const TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
+    const TWITCH_TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
+    private const STREAMS_URL = 'https://api.twitch.tv/helix/streams';
 
     protected function setUp(): void
     {
@@ -28,9 +29,9 @@ class StreamsDataManagerTest extends TestCase
     /**
      * @test
      */
-    public function get_streams_returns_streams_data(): void
+    public function get_streams_data_returns_streams_data(): void
     {
-        $tokenResponse = self::TOKEN;
+        $tokenResponse = self::TWITCH_TOKEN;
         $curlCallResponse = [
             'response' => json_encode([
                 'data' => [
@@ -115,6 +116,7 @@ class StreamsDataManagerTest extends TestCase
             ->andReturn($tokenResponse);
         $this->apiClient
             ->expects('makeCurlCall')
+            ->with(self::STREAMS_URL, [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($curlCallResponse);
 
@@ -126,7 +128,7 @@ class StreamsDataManagerTest extends TestCase
     /**
      * @test
      */
-    public function test_get_streams_data_with_token_error(): void
+    public function get_streams_data_returns_token_error(): void
     {
         $expectedResponse = ['error' => self::ERROR_GET_TOKEN_FAILED];
         $tokenResponse = [
@@ -147,9 +149,9 @@ class StreamsDataManagerTest extends TestCase
     /**
      * @test
      */
-    public function test_get_streams_data_with_correct_token_but_curl_error(): void
+    public function get_streams_data_returns_streams_curl_error(): void
     {
-        $tokenResponse = self::TOKEN;
+        $tokenResponse = self::TWITCH_TOKEN;
         $streamsResponse = [
             'response' => json_encode([
                 'data' => [
@@ -199,6 +201,7 @@ class StreamsDataManagerTest extends TestCase
             ->andReturn($tokenResponse);
         $this->apiClient
             ->expects('makeCurlCall')
+            ->with(self::STREAMS_URL, [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($streamsResponse);
 

@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Infrastructure\Controllers;
+namespace App\Infrastructure\GetUsers;
 
-use App\Infrastructure\Requests\AnalyticsUsersRequest;
+use App\Infrastructure\Controllers\Controller;
 use App\Services\UserDataManager;
 use Illuminate\Http\JsonResponse;
 
 class AnalyticsUsersController extends Controller
 {
     private UserDataManager $userDataManager;
-
-    const ERROR_STATUS = 503;
+    private const ERROR_STATUS = 503;
 
     public function __construct(UserDataManager $userDataManager)
     {

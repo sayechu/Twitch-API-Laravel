@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Infrastructure\Requests;
 
-use App\Infrastructure\Requests\AnalyticsUsersRequest;
+use App\Infrastructure\GetUsers\AnalyticsUsersRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Tests\TestCase;

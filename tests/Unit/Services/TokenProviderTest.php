@@ -26,7 +26,7 @@ class TokenProviderTest extends TestCase
     /**
      * @test
      */
-    public function test_get_token_stored_in_database(): void
+    public function get_token_stored(): void
     {
         $tokenResponse = 'nrtovbe5h02os45krmjzvkt3hp74vf';
 
@@ -47,7 +47,7 @@ class TokenProviderTest extends TestCase
     /**
      * @test
      */
-    public function test_get_token_with_api_error(): void
+    public function get_token_returns_curl_error(): void
     {
         $apiResponse = [
             "response" => null,
@@ -71,7 +71,7 @@ class TokenProviderTest extends TestCase
     /**
      * @test
      */
-    public function test_get_token(): void
+    public function get_token_returns_token_response(): void
     {
         $apiResponse = [
             "response" => '{"access_token":"' . self::TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
