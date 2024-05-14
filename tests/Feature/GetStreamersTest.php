@@ -10,7 +10,7 @@ use App\Services\DBClient;
 use App\Services\TokenProvider;
 use Mockery;
 
-class GetUsersTest extends TestCase
+class GetStreamersTest extends TestCase
 {
     private ApiClient $apiClient;
     private DBClient $databaseClient;
@@ -18,6 +18,7 @@ class GetUsersTest extends TestCase
     private const GET_USERS_ERROR_MESSAGE = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
     private const TWITCH_TOKEN = 'nrtovbe5h02os45krmjzvkt3hp74vf';
     private const GET_USERS_URL = 'https://api.twitch.tv/helix/users';
+    private const ENDPOINT = "streamers";
     private const USER_ID = 1234;
 
     protected function setUp(): void
@@ -78,7 +79,7 @@ class GetUsersTest extends TestCase
             ->once()
             ->andReturn($usersResponse);
 
-        $responseGetUsers = $this->get('/analytics/users?id=' . self::USER_ID);
+        $responseGetUsers = $this->get('/analytics/' . self::ENDPOINT . '?id=' . self::USER_ID);
 
         $responseGetUsers->assertContent('{"data":[{"id":"userId","login":"userLogin","display_name":"displayName","type":"type","broadcaster_type":"broadcasterType","description":"description","profile_image_url":"profileImageUrl","offline_image_url":"offlineImageUrl","view_count":0,"created_at":"createdAt"}]}');
     }
@@ -134,7 +135,7 @@ class GetUsersTest extends TestCase
             ->once()
             ->andReturn($userResponse);
 
-        $responseGetUsers = $this->get('/analytics/users?id=' . self::USER_ID);
+        $responseGetUsers = $this->get('/analytics/' . self::ENDPOINT . '?id=' . self::USER_ID);
 
         $responseGetUsers->assertContent('{"data":[{"id":"userId","login":"userLogin","display_name":"displayName","type":"type","broadcaster_type":"broadcasterType","description":"description","profile_image_url":"profileImageUrl","offline_image_url":"offlineImageUrl","view_count":0,"created_at":"createdAt"}]}');
     }
@@ -159,7 +160,7 @@ class GetUsersTest extends TestCase
             ->once()
             ->andReturn($getTokenResponse);
 
-        $responseGetUsers = $this->get('/analytics/users?id=' . self::USER_ID);
+        $responseGetUsers = $this->get('/analytics/' . self::ENDPOINT . '?id=' . self::USER_ID);
 
         $responseGetUsers->assertStatus(Response::HTTP_SERVICE_UNAVAILABLE);
         $this->assertEquals($expectedResponse, $responseGetUsers->getContent());
@@ -190,7 +191,7 @@ class GetUsersTest extends TestCase
             ->with(self::GET_USERS_URL . '?id=' . self::USER_ID, [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->andReturn($curlCallResponse);
 
-        $responseGetUsers = $this->get('/analytics/users?id=' . self::USER_ID);
+        $responseGetUsers = $this->get('/analytics/' . self::ENDPOINT . '?id=' . self::USER_ID);
 
         $responseGetUsers->assertStatus(Response::HTTP_SERVICE_UNAVAILABLE);
         $this->assertEquals($expectedResponse, $responseGetUsers->getContent());
@@ -233,7 +234,7 @@ class GetUsersTest extends TestCase
             ->with(self::GET_USERS_URL . '?id=' . self::USER_ID, [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->andReturn($curlCallResponse);
 
-        $responseGetUsers = $this->get('/analytics/users?id=' . self::USER_ID);
+        $responseGetUsers = $this->get('/analytics/' . self::ENDPOINT . '?id=' . self::USER_ID);
 
         $responseGetUsers->assertStatus(Response::HTTP_SERVICE_UNAVAILABLE);
         $this->assertEquals($expectedResponse, $responseGetUsers->getContent());

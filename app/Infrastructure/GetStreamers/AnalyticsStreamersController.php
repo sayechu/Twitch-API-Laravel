@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\GetUsers;
+namespace App\Infrastructure\GetStreamers;
 
 use Exception;
 use Illuminate\Http\Response;
@@ -8,7 +8,7 @@ use App\Infrastructure\Controllers\Controller;
 use App\Services\UserDataManager;
 use Illuminate\Http\JsonResponse;
 
-class AnalyticsUsersController extends Controller
+class AnalyticsStreamersController extends Controller
 {
     private UserDataManager $userDataManager;
 
@@ -17,7 +17,7 @@ class AnalyticsUsersController extends Controller
         $this->userDataManager = $userDataManager;
     }
 
-    public function __invoke(AnalyticsUsersRequest $request): JsonResponse
+    public function __invoke(AnalyticsStreamersRequest $request): JsonResponse
     {
         $userId = $request->input('id');
 

@@ -9,7 +9,7 @@ use App\Services\UserDataManager;
 use Mockery;
 use Tests\TestCase;
 
-class UserDataManagerTest extends TestCase
+class StreamersDataManagerTest extends TestCase
 {
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;

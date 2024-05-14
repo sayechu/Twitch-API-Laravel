@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Infrastructure\GetUsers;
+namespace App\Infrastructure\GetStreamers;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AnalyticsUsersRequest extends FormRequest
+class AnalyticsStreamersRequest extends FormRequest
 {
     public function authorize(): bool
     {
