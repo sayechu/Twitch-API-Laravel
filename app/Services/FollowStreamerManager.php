@@ -38,20 +38,4 @@ class FollowStreamerManager
     {
         return json_decode($twitchIdResponse['response'], true)['data'][0]['id'];
     }
-
-    public function followStreamer($userIdNumeric, $streamerIdNumeric, $twitchToken)
-    {
-        $followUrl = "https://api.twitch.tv/helix/users/follows";
-
-        $postData = json_encode(['from_id' => $userIdNumeric, 'to_id' => $streamerIdNumeric]);
-        $apiHeaders = [
-            'Authorization: Bearer ' . $twitchToken,
-            'Client-ID: YOUR_CLIENT_ID',
-            'Content-Type: application/json'
-        ];
-
-        $followResponse = $this->apiClient->post($followUrl, $apiHeaders, $postData);
-
-        return json_decode($followResponse['response'], true);
-    }
 }
