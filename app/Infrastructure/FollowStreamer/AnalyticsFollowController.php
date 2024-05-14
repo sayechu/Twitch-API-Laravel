@@ -20,7 +20,7 @@ class AnalyticsFollowController extends Controller
         $userId = $request->input('userId');
         $streamerId = $request->input('streamerId');
 
-        $followConfirmationMessage = $this->followManager->getFollowMessage($userId, $streamerId);
-        return response()->json($followConfirmationMessage);
+        $followMessage = $this->followManager->getFollowMessage($userId, $streamerId);
+        return response()->json($followMessage);
     }
 }
