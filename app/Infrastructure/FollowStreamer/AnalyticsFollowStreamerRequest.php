@@ -1,31 +1,31 @@
 <?php
 
-namespace App\Infrastructure\FollowStreamer;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
 class AnalyticsFollowStreamerRequest extends FormRequest
 {
-    public function authorize(): bool
+    public function authorize()
     {
         return true;
     }
 
-    public function rules(): array
+    public function rules()
     {
         return [
-            'username' => 'required|string',
-            'streamerId' => 'required|numeric',
+            'userId' => 'required|string',
+            'streamerId' => 'required|string',
         ];
     }
 
     public function messages()
     {
         return [
-            'username.required' => 'El username es obligatorio',
-            'username.string' => 'El username debe ser una cadena de texto',
-            'streamerId.required' => 'El streamerId es obligatorio',
-            'streamerId.numeric' => 'El streamerId debe ser un número',
+            'userId.required' => 'El campo userId es obligatorio.',
+            'userId.string' => 'El campo userId debe ser una cadena de caracteres.',
+            'streamerId.required' => 'El campo streamerId es obligatorio.',
+            'streamerId.string' => 'El campo streamerId debe ser una cadena de caracteres.',
         ];
     }
 }
