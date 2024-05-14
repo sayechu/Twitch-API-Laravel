@@ -1,7 +1,7 @@
 <?php
 
-use App\Infrastructure\Controllers\AnalyticsTopsOfTheTopsController;
 use App\Infrastructure\GetStreams\AnalyticsStreamsController;
+use App\Infrastructure\GetTopsOfTheTops\AnalyticsTopsOfTheTopsController;
 use App\Infrastructure\GetUsers\AnalyticsUsersController;
 use Illuminate\Support\Facades\Route;
 
