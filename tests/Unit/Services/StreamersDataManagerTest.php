@@ -5,7 +5,7 @@ namespace Tests\Unit\Services;
 use Illuminate\Http\Response;
 use App\Services\ApiClient;
 use App\Services\TokenProvider;
-use App\Services\UserDataManager;
+use App\Services\StreamersDataManager;
 use Mockery;
 use Tests\TestCase;
 
@@ -13,7 +13,7 @@ class StreamersDataManagerTest extends TestCase
 {
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;
-    private UserDataManager $userDataManager;
+    private StreamersDataManager $userDataManager;
 
     private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
     private const GET_USERS_ERROR_MESSAGE = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
@@ -25,14 +25,14 @@ class StreamersDataManagerTest extends TestCase
         parent::setUp();
         $this->tokenProvider = Mockery::mock(TokenProvider::class);
         $this->apiClient = Mockery::mock(ApiClient::class);
-        $this->userDataManager = new UserDataManager($this->tokenProvider, $this->apiClient);
+        $this->userDataManager = new StreamersDataManager($this->tokenProvider, $this->apiClient);
 
         $this->app
-            ->when(UserDataManager::class)
+            ->when(StreamersDataManager::class)
             ->needs(TokenProvider::class)
             ->give(fn() => $this->tokenProvider);
         $this->app
-            ->when(UserDataManager::class)
+            ->when(StreamersDataManager::class)
             ->needs(ApiClient::class)
             ->give(fn() => $this->apiClient);
     }

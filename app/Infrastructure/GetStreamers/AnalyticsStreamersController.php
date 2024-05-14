@@ -5,14 +5,14 @@ namespace App\Infrastructure\GetStreamers;
 use Exception;
 use Illuminate\Http\Response;
 use App\Infrastructure\Controllers\Controller;
-use App\Services\UserDataManager;
+use App\Services\StreamersDataManager;
 use Illuminate\Http\JsonResponse;
 
 class AnalyticsStreamersController extends Controller
 {
-    private UserDataManager $userDataManager;
+    private StreamersDataManager $userDataManager;
 
-    public function __construct(UserDataManager $userDataManager)
+    public function __construct(StreamersDataManager $userDataManager)
     {
         $this->userDataManager = $userDataManager;
     }

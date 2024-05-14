@@ -5,7 +5,7 @@ namespace App\Services;
 use Illuminate\Http\Response;
 use Mockery\Exception;
 
-class UserDataManager
+class StreamersDataManager
 {
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;

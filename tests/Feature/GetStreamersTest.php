@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Http\Response;
-use App\Services\UserDataManager;
+use App\Services\StreamersDataManager;
 use Illuminate\Foundation\Testing\TestCase;
 use App\Services\ApiClient;
 use App\Services\DBClient;
@@ -35,7 +35,7 @@ class GetStreamersTest extends TestCase
             ->needs(DBClient::class)
             ->give(fn() => $this->databaseClient);
         $this->app
-            ->when(UserDataManager::class)
+            ->when(StreamersDataManager::class)
             ->needs(ApiClient::class)
             ->give(fn() => $this->apiClient);
     }
