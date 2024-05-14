@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Http\Response;
+use Mockery\Exception;
 
 class UserDataManager
 {
@@ -25,7 +26,7 @@ class UserDataManager
         $twitchToken = $this->tokenProvider->getToken();
 
         if ($this->requestHas500Code($twitchToken)) {
-            return ['error' => self::GET_TOKEN_ERROR_MESSAGE];
+            throw new Exception(self::GET_TOKEN_ERROR_MESSAGE);
         }
 
         $apiUrl = self::GET_USERS_URL . "?id=" . urlencode($userId);
@@ -34,7 +35,7 @@ class UserDataManager
         $userData = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
 
         if ($this->requestHas500Code($userData)) {
-            return ['error' => self::GET_USERS_ERROR_MESSAGE];
+            throw new Exception(self::GET_USERS_ERROR_MESSAGE);
         }
 
         return json_decode($userData['response'], true);

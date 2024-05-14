@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\GetUsers;
 
+use Exception;
 use Illuminate\Http\Response;
 use App\Infrastructure\Controllers\Controller;
 use App\Services\UserDataManager;
@@ -20,16 +21,11 @@ class AnalyticsUsersController extends Controller
     {
         $userId = $request->input('id');
 
-        $userData = $this->userDataManager->getUserData($userId);
-
-        if ($this->containsServerError($userData))
-            return response()->json($userData, Response::HTTP_SERVICE_UNAVAILABLE);
-
-        return response()->json($userData);
-    }
-
-    private function containsServerError(array $userData): bool
-    {
-        return isset($userData['error']);
+        try {
+            $userData = $this->userDataManager->getUserData($userId);
+            return response()->json($userData);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_SERVICE_UNAVAILABLE);
+        }
     }
 }
