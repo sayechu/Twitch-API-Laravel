@@ -46,7 +46,7 @@ class DBClient
         $insertStatement = $this->pdo->prepare('INSERT INTO TOKEN (token) VALUES (?)');
         $insertStatement->execute([$twitchToken]);
     }
-
+    
     /**
      * @throws InternalServerErrorException
      */
@@ -73,6 +73,7 @@ class DBClient
             throw new InternalServerErrorException("Error del servidor al crear el usuario");
         }
     }
+
     public function isLoadedDB(): bool
     {
         $selectStatement = $this->pdo->prepare("SELECT COUNT(*) FROM JUEGO");
