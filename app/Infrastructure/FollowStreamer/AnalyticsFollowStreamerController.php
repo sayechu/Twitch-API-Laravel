@@ -2,10 +2,10 @@
 
 namespace App\Infrastructure\FollowStreamer;
 
-use App\Http\Requests\AnalyticsFollowStreamerRequest;
 use App\Services\FollowStreamerManager;
-use Illuminate\Http\Request;
 use App\Infrastructure\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AnalyticsFollowStreamerController extends Controller
 {
@@ -13,9 +13,9 @@ class AnalyticsFollowStreamerController extends Controller
 
     public function __construct(FollowStreamerManager $followManager)
     {
-        $this->$followManager = $followManager;
+        $this->followManager = $followManager;
     }
-    public function __invoke(AnalyticsFollowStreamerRequest $request)
+    public function __invoke(Request $request): JsonResponse
     {
         $userId = $request->input('userId');
         $streamerId = $request->input('streamerId');
