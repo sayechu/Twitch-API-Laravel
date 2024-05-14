@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use Illuminate\Http\Response;
 use App\Services\ApiClient;
 use App\Services\TokenProvider;
 use App\Services\UserDataManager;
@@ -14,10 +15,10 @@ class UserDataManagerTest extends TestCase
     private ApiClient $apiClient;
     private UserDataManager $userDataManager;
 
-    private const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
-    private const ERROR_GET_USERS_FAILED = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
+    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
+    private const GET_USERS_ERROR_MESSAGE = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
     private const TWITCH_TOKEN = 'nrtovbe5h02os45krmjzvkt3hp74vf';
-    private const USERS_URL = 'https://api.twitch.tv/helix/users';
+    private const GET_USERS_URLS = 'https://api.twitch.tv/helix/users';
 
     protected function setUp(): void
     {
@@ -58,7 +59,7 @@ class UserDataManagerTest extends TestCase
                     ]
                 ]
             ]),
-            'http_code' => 200
+            'http_code' => Response::HTTP_OK
         ];
         $expectedGetUserDataResponse = [
             "data" => [
@@ -83,7 +84,7 @@ class UserDataManagerTest extends TestCase
             ->andReturn(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::USERS_URL . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(self::GET_USERS_URLS . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($getUserDataResponse);
 
@@ -103,9 +104,9 @@ class UserDataManagerTest extends TestCase
                 'expires_in' => 5089418,
                 'token_type' => 'bearer'
             ]),
-            'http_code' => 500
+            'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
         ];
-        $expectedResponse = ['error' => self::ERROR_GET_TOKEN_FAILED];
+        $expectedResponse = ['error' => self::GET_TOKEN_ERROR_MESSAGE];
 
         $this->tokenProvider
             ->expects('getToken')
@@ -139,9 +140,9 @@ class UserDataManagerTest extends TestCase
                     ]
                 ]
             ]),
-            'http_code' => 500
+            'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
         ];
-        $expectedResponse = ['error' => self::ERROR_GET_USERS_FAILED];
+        $expectedResponse = ['error' => self::GET_USERS_ERROR_MESSAGE];
 
         $this->tokenProvider
             ->expects('getToken')
@@ -149,7 +150,7 @@ class UserDataManagerTest extends TestCase
             ->andReturn(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::USERS_URL . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(self::GET_USERS_URLS . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($getUserDataResponse);
 

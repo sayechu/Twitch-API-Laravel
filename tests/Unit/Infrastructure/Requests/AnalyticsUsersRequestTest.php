@@ -9,6 +9,9 @@ use Tests\TestCase;
 
 class AnalyticsUsersRequestTest extends TestCase
 {
+    private const INVALID_ARGUMENT_MESSAGE = 'El Id dado no es válido';
+    private const REQUIRED_ARGUMENT_MESSAGE = 'El Id es obligatorio';
+
     /**
      * @test
      */
@@ -17,7 +20,7 @@ class AnalyticsUsersRequestTest extends TestCase
         $analyticsUsersRequest = new AnalyticsUsersRequest();
         $analyticsUsersRequest->merge(['id' => 'abc']);
         $expectedErrors = new MessageBag([
-            'id' => ['El Id dado no es válido'],
+            'id' => [self::INVALID_ARGUMENT_MESSAGE],
         ]);
 
         $validationErrors = Validator::make(
@@ -36,7 +39,7 @@ class AnalyticsUsersRequestTest extends TestCase
     {
         $analyticsUsersRequest = new AnalyticsUsersRequest();
         $expectedErrors = new MessageBag([
-            'id' => ['El Id es obligatorio'],
+            'id' => [self::REQUIRED_ARGUMENT_MESSAGE],
         ]);
 
         $validationErrors = Validator::make(
