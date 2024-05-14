@@ -6,11 +6,11 @@ grumphp:
         phpcs:
             standard: [PSR12]
             whitelist_patterns:
-                - /^app\/Http\/Controllers\/(.*)/
+                - /^app\/Infrastructure\/(.*)/
                 - /^app\/Services\/(.*)/
         phpmd:
             whitelist_patterns:
-                - /^app\/Http\/Controllers\/(.*)/
+                - /^app\/Infrastructure\/(.*)/
                 - /^app\/Services\/(.*)/
             ruleset: ['cleancode', 'codesize', 'naming']
         git_commit_message:
