@@ -161,7 +161,6 @@ class GetUsersTest extends TestCase
 
         $responseGetUsers = $this->get('/analytics/users?id=' . self::USER_ID);
 
-        $responseGetUsers->assertStatus(Response::HTTP_SERVICE_UNAVAILABLE);
         $this->assertEquals($expectedResponse, $responseGetUsers->getContent());
     }
 

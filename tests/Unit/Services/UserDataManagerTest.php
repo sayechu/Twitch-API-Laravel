@@ -106,16 +106,16 @@ class UserDataManagerTest extends TestCase
             ]),
             'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
         ];
-        $expectedResponse = ['error' => self::GET_TOKEN_ERROR_MESSAGE];
+        $expectedResponse = self::GET_TOKEN_ERROR_MESSAGE;
 
         $this->tokenProvider
             ->expects('getToken')
             ->once()
             ->andReturn($getTokenResponse);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage($expectedResponse);
 
-        $returnedUserInfo = $this->userDataManager->getUserData('1234');
-
-        $this->assertEquals($expectedResponse, $returnedUserInfo);
+        $this->userDataManager->getUserData('1234');
     }
 
     /**
@@ -142,7 +142,7 @@ class UserDataManagerTest extends TestCase
             ]),
             'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
         ];
-        $expectedResponse = ['error' => self::GET_USERS_ERROR_MESSAGE];
+        $expectedResponse = self::GET_USERS_ERROR_MESSAGE;
 
         $this->tokenProvider
             ->expects('getToken')
@@ -153,10 +153,10 @@ class UserDataManagerTest extends TestCase
             ->with(self::GET_USERS_URLS . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($getUserDataResponse);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage($expectedResponse);
 
-        $returnedUserInfo = $this->userDataManager->getUserData('1234');
-
-        $this->assertEquals($expectedResponse, $returnedUserInfo);
+        $this->userDataManager->getUserData('1234');
     }
 
     protected function tearDown(): void
