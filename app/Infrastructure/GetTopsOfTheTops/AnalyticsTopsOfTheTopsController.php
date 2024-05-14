@@ -4,6 +4,7 @@ namespace App\Infrastructure\GetTopsOfTheTops;
 
 use App\Infrastructure\Controllers\Controller;
 use App\Services\GetTopsOfTheTopsService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
