@@ -5,22 +5,26 @@ namespace App\Infrastructure\GetTopsOfTheTops;
 use App\Infrastructure\Controllers\Controller;
 use App\Services\GetTopsOfTheTopsService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class AnalyticsTopsOfTheTopsController extends Controller
 {
-    private GetTopsOfTheTopsService $getTopsOfTopsServ;
+    private GetTopsOfTheTopsService $getTopsOfTopsService;
 
-    public function __construct(GetTopsOfTheTopsService $getTopsOfTopsServ)
+    public function __construct(GetTopsOfTheTopsService $getTopsOfTopsService)
     {
-        $this->getTopsOfTopsServ = $getTopsOfTopsServ;
+        $this->getTopsOfTopsService = $getTopsOfTopsService;
     }
 
     public function __invoke(AnalyticsTopsOfTheTopsRequest $request): JsonResponse
     {
         $since = $request->input('since') ?? (10 * 60);
 
-        $topsOfTheTops = $this->getTopsOfTopsServ->getTopsOfTheTops($since);
-
-        return response()->json($topsOfTheTops);
+        try {
+            $topsOfTheTops = $this->getTopsOfTopsService->getTopsOfTheTops($since);
+            return response()->json($topsOfTheTops);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_SERVICE_UNAVAILABLE);
+        }
     }
 }
