@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\GetUsers;
 
+use Illuminate\Http\Response;
 use App\Infrastructure\Controllers\Controller;
 use App\Services\UserDataManager;
 use Illuminate\Http\JsonResponse;
@@ -9,7 +10,6 @@ use Illuminate\Http\JsonResponse;
 class AnalyticsUsersController extends Controller
 {
     private UserDataManager $userDataManager;
-    private const ERROR_STATUS = 503;
 
     public function __construct(UserDataManager $userDataManager)
     {
@@ -23,7 +23,7 @@ class AnalyticsUsersController extends Controller
         $userData = $this->userDataManager->getUserData($userId);
 
         if ($this->containsServerError($userData))
-            return response()->json($userData, self::ERROR_STATUS);
+            return response()->json($userData, Response::HTTP_SERVICE_UNAVAILABLE);
 
         return response()->json($userData);
     }
