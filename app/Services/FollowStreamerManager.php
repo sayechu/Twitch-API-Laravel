@@ -47,7 +47,7 @@ class FollowStreamerManager
         $streamerData = $this->checkIfStreamerExists($streamerId, $twitchToken);
         if (empty($streamerData) || !$this->databaseClient->checkIfUsernameExists($username)) {
             throw new NotFoundException("El usuario (" . $username . ") o el streamer ("
-                                                 . $streamerId . ") especificado no existe en la API");
+                . $streamerId . ") especificado no existe en la API");
         }
 
         $this->databaseClient->addUserFollowsStreamer($username, $streamerId);
