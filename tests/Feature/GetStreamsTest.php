@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Http\Response;
 use App\Services\ApiClient;
 use App\Services\DBClient;
 use App\Services\StreamsDataManager;
@@ -13,10 +14,9 @@ class GetStreamsTest extends TestCase
 {
     private ApiClient $apiClient;
     private DBClient $databaseClient;
-    const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
-    const ERROR_GET_STREAMS_FAILED = 'No se pueden devolver streams en este momento, inténtalo más tarde';
-    const ERROR_STATUS = 503;
-    const TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
+    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
+    private const GET_STREAMS_ERROR_MESSAGE = 'No se pueden devolver streams en este momento, inténtalo más tarde';
+    private const TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
 
     protected function setUp() : void
     {
@@ -64,7 +64,7 @@ class GetStreamsTest extends TestCase
                     ]
                 ]
             ]),
-            'http_code' => 200
+            'http_code' => Response::HTTP_OK
         ];
 
         $this->databaseClient
@@ -83,7 +83,7 @@ class GetStreamsTest extends TestCase
 
         $responseGetStreams = $this->get('/analytics/streams');
 
-        $responseGetStreams->assertStatus(200);
+        $responseGetStreams->assertStatus(Response::HTTP_OK);
         $responseGetStreams->assertContent('[{"title":"Stream Title","user_name":"User Name"}]');
     }
 
@@ -114,11 +114,11 @@ class GetStreamsTest extends TestCase
                     ]
                 ]
             ]),
-            'http_code' => 200
+            'http_code' => Response::HTTP_OK
         ];
         $getTokenExpectedResponse = [
             "response" => '{"access_token":"' . self::TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
-            "http_code" => 200
+            "http_code" => Response::HTTP_OK
         ];
 
         $this->databaseClient
@@ -151,9 +151,9 @@ class GetStreamsTest extends TestCase
     {
         $getTokenResponse = [
             "response" => null,
-            "http_code" => 500
+            "http_code" => Response::HTTP_INTERNAL_SERVER_ERROR
         ];
-        $expectedResponse = json_encode(['error' => self::ERROR_GET_TOKEN_FAILED]);
+        $expectedResponse = json_encode(['error' => self::GET_TOKEN_ERROR_MESSAGE]);
 
         $this->databaseClient
             ->expects('isTokenStoredInDatabase')
@@ -166,7 +166,7 @@ class GetStreamsTest extends TestCase
 
         $responseGetStreams = $this->get('/analytics/streams');
 
-        $responseGetStreams->assertStatus(self::ERROR_STATUS);
+        $responseGetStreams->assertStatus(Response::HTTP_SERVICE_UNAVAILABLE);
         $responseGetStreams->assertContent($expectedResponse);
     }
 
@@ -177,13 +177,13 @@ class GetStreamsTest extends TestCase
     {
         $getStreamsResponse = [
             'response' => null,
-            'http_code' => 500
+            'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
         ];
         $getTokenResponse = [
             "response" => '{"access_token":"' . self::TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
-            "http_code" => 200
+            "http_code" => Response::HTTP_OK
         ];
-        $expectedResponse = json_encode(['error' => self::ERROR_GET_STREAMS_FAILED]);
+        $expectedResponse = json_encode(['error' => self::GET_STREAMS_ERROR_MESSAGE]);
 
         $this->databaseClient
             ->expects('isTokenStoredInDatabase')
@@ -205,7 +205,7 @@ class GetStreamsTest extends TestCase
 
         $responseGetStreams = $this->get('/analytics/streams');
 
-        $responseGetStreams->assertStatus(self::ERROR_STATUS);
+        $responseGetStreams->assertStatus(Response::HTTP_SERVICE_UNAVAILABLE);
         $responseGetStreams->assertContent($expectedResponse);
     }
 
