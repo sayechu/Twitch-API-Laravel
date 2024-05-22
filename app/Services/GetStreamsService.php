@@ -15,6 +15,10 @@ class GetStreamsService
     {
         $streamsData = $this->streamsDataManager->getStreamsData();
 
+        if ($this->isResponseAnError($streamsData)) {
+            return $streamsData;
+        }
+
         $filteredStreams = [];
         foreach ($streamsData as $stream) {
             $filteredStreams[] = [
@@ -24,5 +28,10 @@ class GetStreamsService
         }
 
         return $filteredStreams;
+    }
+
+    private function isResponseAnError(array $streamsData): bool
+    {
+        return isset($streamsData['error']);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\GetTopsOfTheTops;
+namespace App\Infrastructure\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
