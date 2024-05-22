@@ -11,8 +11,8 @@ class StreamersDataManager
     private ApiClient $apiClient;
 
     private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
-    private const GET_USERS_ERROR_MESSAGE = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
-    private const GET_USERS_URL = 'https://api.twitch.tv/helix/users';
+    private const GET_STREAMERS_ERROR_MESSAGE = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
+    private const GET_STREAMERS_URL = 'https://api.twitch.tv/helix/users';
 
 
     public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient)
@@ -21,7 +21,7 @@ class StreamersDataManager
         $this->apiClient = $apiClient;
     }
 
-    public function getUserData(string $userId): array
+    public function getStreamerData(string $streamerId): array
     {
         $twitchToken = $this->tokenProvider->getToken();
 
@@ -29,16 +29,16 @@ class StreamersDataManager
             throw new Exception(self::GET_TOKEN_ERROR_MESSAGE);
         }
 
-        $apiUrl = self::GET_USERS_URL . "?id=" . urlencode($userId);
+        $apiUrl = self::GET_STREAMERS_URL . "?id=" . urlencode($streamerId);
         $apiHeaders = ['Authorization: Bearer ' . $twitchToken];
 
-        $userData = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
+        $streamerData = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
 
-        if ($this->requestHas500Code($userData)) {
-            throw new Exception(self::GET_USERS_ERROR_MESSAGE);
+        if ($this->requestHas500Code($streamerData)) {
+            throw new Exception(self::GET_STREAMERS_ERROR_MESSAGE);
         }
 
-        return json_decode($userData['response'], true);
+        return json_decode($streamerData['response'], true);
     }
 
     private function requestHas500Code(mixed $requestResponse): bool
