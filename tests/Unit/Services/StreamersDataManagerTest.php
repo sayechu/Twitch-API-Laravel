@@ -6,26 +6,30 @@ use Illuminate\Http\Response;
 use App\Services\ApiClient;
 use App\Services\TokenProvider;
 use App\Services\StreamersDataManager;
+use Tests\Builders\StreamerDTO;
+use Tests\Builders\StreamerDTOBuilder;
 use Mockery;
 use Tests\TestCase;
+
 
 class StreamersDataManagerTest extends TestCase
 {
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;
-    private StreamersDataManager $userDataManager;
+    private StreamersDataManager $streamerDataManager;
+    private StreamerDTO $expectedStreamerDTO;
 
     private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
-    private const GET_USERS_ERROR_MESSAGE = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
+    private const GET_STREAMERS_ERROR_MESSAGE = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
     private const TWITCH_TOKEN = 'nrtovbe5h02os45krmjzvkt3hp74vf';
-    private const GET_USERS_URLS = 'https://api.twitch.tv/helix/users';
+    private const GET_STREAMERS_URLS = 'https://api.twitch.tv/helix/users';
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->tokenProvider = Mockery::mock(TokenProvider::class);
         $this->apiClient = Mockery::mock(ApiClient::class);
-        $this->userDataManager = new StreamersDataManager($this->tokenProvider, $this->apiClient);
+        $this->streamerDataManager = new StreamersDataManager($this->tokenProvider, $this->apiClient);
 
         $this->app
             ->when(StreamersDataManager::class)
@@ -35,47 +39,33 @@ class StreamersDataManagerTest extends TestCase
             ->when(StreamersDataManager::class)
             ->needs(ApiClient::class)
             ->give(fn() => $this->apiClient);
+        $this->expectedStreamerDTO = (new StreamerDTOBuilder())
+            ->withId('UserId')
+            ->withLogin('userLogin')
+            ->withDisplayName('displayName')
+            ->withType('type')
+            ->withBroadcasterType('BroadcasterType')
+            ->withDescription('description')
+            ->withProfileImageUrl('profileImageUrl')
+            ->withOfflineImageUrl('offlineImageUrl')
+            ->withViewCount(0)
+            ->withCreatedAt('2024-05-08T07:35:07Z')
+            ->build();
     }
 
     /**
      * @test
      */
-    public function get_user_data(): void
+    public function get_streamer_data(): void
     {
-        $getUserDataResponse = [
+        $getStreamerDataResponse = [
             'response' => json_encode([
-                'data' => [
-                    [
-                        'id' => '1234',
-                        'login' => 'zdraste_vladkenov',
-                        'display_name' => 'zdraste_vladkenov',
-                        'type' => '',
-                        'broadcaster_type' => '',
-                        'description' => 'wasde876',
-                        'profile_image_url' => 'https://static-cdn.jtvnw.net/user-default-pictures-uv/ebe4cd89-b4f4-4cd9-adac-2f30151b4209-profile_image-300x300.png',
-                        'offline_image_url' => '',
-                        'view_count' => 0,
-                        'created_at' => '2018-09-04T15:23:04Z'
-                    ]
-                ]
+                'data' => [$this->expectedStreamerDTO->toArray()]
             ]),
             'http_code' => Response::HTTP_OK
         ];
-        $expectedGetUserDataResponse = [
-            "data" => [
-                [
-                    "id" => "1234",
-                    "login" => "zdraste_vladkenov",
-                    "display_name" => "zdraste_vladkenov",
-                    "type" => "",
-                    "broadcaster_type" => "",
-                    "description" => "wasde876",
-                    "profile_image_url" => "https://static-cdn.jtvnw.net/user-default-pictures-uv/ebe4cd89-b4f4-4cd9-adac-2f30151b4209-profile_image-300x300.png",
-                    "offline_image_url" => "",
-                    "view_count" => 0,
-                    "created_at" => "2018-09-04T15:23:04Z"
-                ]
-            ]
+        $expectedGetStreamerDataResponse = [
+            "data" => [$this->expectedStreamerDTO->toArray()]
         ];
 
         $this->tokenProvider
@@ -84,19 +74,19 @@ class StreamersDataManagerTest extends TestCase
             ->andReturn(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::GET_USERS_URLS . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(self::GET_STREAMERS_URLS . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
-            ->andReturn($getUserDataResponse);
+            ->andReturn($getStreamerDataResponse);
 
-        $returnedUserInfo = $this->userDataManager->getUserData('1234');
+        $returnedStreamerInfo = $this->streamerDataManager->getStreamerData('1234');
 
-        $this->assertEquals($expectedGetUserDataResponse, $returnedUserInfo);
+        $this->assertEquals($expectedGetStreamerDataResponse, $returnedStreamerInfo);
     }
 
     /**
      * @test
      */
-    public function get_user_data_token_failure(): void
+    public function get_streamer_data_token_failure(): void
     {
         $getTokenResponse = [
             'response' => json_encode([
@@ -115,7 +105,7 @@ class StreamersDataManagerTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage($expectedResponse);
 
-        $this->userDataManager->getUserData('1234');
+        $this->streamerDataManager->getStreamerData('1234');
     }
 
     /**
@@ -125,24 +115,11 @@ class StreamersDataManagerTest extends TestCase
     {
         $getUserDataResponse = [
             'response' => json_encode([
-                'data' => [
-                    [
-                        'id' => '1234',
-                        'login' => 'zdraste_vladkenov',
-                        'display_name' => 'zdraste_vladkenov',
-                        'type' => '',
-                        'broadcaster_type' => '',
-                        'description' => 'wasde876',
-                        'profile_image_url' => 'https://static-cdn.jtvnw.net/user-default-pictures-uv/ebe4cd89-b4f4-4cd9-adac-2f30151b4209-profile_image-300x300.png',
-                        'offline_image_url' => '',
-                        'view_count' => 0,
-                        'created_at' => '2018-09-04T15:23:04Z'
-                    ]
-                ]
+                'data' => [$this->expectedStreamerDTO->toArray()]
             ]),
             'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
         ];
-        $expectedResponse = self::GET_USERS_ERROR_MESSAGE;
+        $expectedResponse = self::GET_STREAMERS_ERROR_MESSAGE;
 
         $this->tokenProvider
             ->expects('getToken')
@@ -150,13 +127,13 @@ class StreamersDataManagerTest extends TestCase
             ->andReturn(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::GET_USERS_URLS . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(self::GET_STREAMERS_URLS . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($getUserDataResponse);
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage($expectedResponse);
 
-        $this->userDataManager->getUserData('1234');
+        $this->streamerDataManager->getStreamerData('1234');
     }
 
     protected function tearDown(): void
