@@ -1,9 +1,9 @@
 <?php
 
+use App\Infrastructure\Controllers\AnalyticsUsersController;
+use App\Infrastructure\Controllers\AnalyticsStreamsController;
+use App\Infrastructure\Controllers\AnalyticsTopsOfTheTopsController;
 use App\Infrastructure\FollowStreamer\AnalyticsFollowStreamerController;
-use App\Infrastructure\GetStreams\AnalyticsStreamsController;
-use App\Infrastructure\GetTopsOfTheTops\AnalyticsTopsOfTheTopsController;
-use App\Infrastructure\GetStreamers\AnalyticsStreamersController;
 use App\Infrastructure\UnfollowStreamer\AnalyticsUnfollowController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,9 +11,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/analytics/streamers', AnalyticsStreamersController::class);
+Route::get('/analytics/users', AnalyticsUsersController::class);
 Route::get('/analytics/streams', AnalyticsStreamsController::class);
 Route::get('/analytics/topsofthetops', AnalyticsTopsOfTheTopsController::class);
-Route::post('/analytics/follow', AnalyticsFollowStreamerController::class);
 Route::get('/analytics/follow', AnalyticsFollowStreamerController::class);
 Route::delete('/analytics/unfollow', AnalyticsUnfollowController::class);
