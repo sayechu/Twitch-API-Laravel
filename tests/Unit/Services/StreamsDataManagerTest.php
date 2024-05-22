@@ -7,7 +7,6 @@ use App\Services\ApiClient;
 use App\Services\StreamsDataManager;
 use App\Services\TokenProvider;
 use Mockery;
-use Tests\Builders\StreamsDataBuilder;
 use Tests\TestCase;
 
 class StreamsDataManagerTest extends TestCase
@@ -33,19 +32,94 @@ class StreamsDataManagerTest extends TestCase
      */
     public function get_streams_data_returns_streams_data(): void
     {
-        $responseBuilder = (new StreamsDataBuilder())->withTestValues();
-        $streamsResponse = $responseBuilder->build();
-        $expectedResponse = $responseBuilder->buildExpected();
+        $tokenResponse = self::TWITCH_TOKEN;
+        $curlCallResponse = [
+            'response' => json_encode([
+                'data' => [
+                    [
+                        'id' => '40627613557',
+                        'user_id' => '92038375',
+                        'user_login' => 'caedrel',
+                        'user_name' => 'User Name 1',
+                        'game_id' => '21779',
+                        'game_name' => 'League of Legends',
+                        'type' => 'live',
+                        'title' => 'Stream Title 1',
+                        'viewer_count' => 46181,
+                        'started_at' => '2024-05-08T07:35:07Z',
+                        'language' => 'en',
+                        'thumbnail_url' => 'https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg',
+                        'tag_ids' => [],
+                        'tags' => ['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'],
+                        'is_mature' => false
+                    ],
+                    [
+                        'id' => '40627613557',
+                        'user_id' => '92038375',
+                        'user_login' => 'caedrel',
+                        'user_name' => 'User Name 2',
+                        'game_id' => '21779',
+                        'game_name' => 'League of Legends',
+                        'type' => 'live',
+                        'title' => 'Stream Title 2',
+                        'viewer_count' => 46181,
+                        'started_at' => '2024-05-08T07:35:07Z',
+                        'language' => 'en',
+                        'thumbnail_url' => 'https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg',
+                        'tag_ids' => [],
+                        'tags' => ['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'],
+                        'is_mature' => false
+                    ]
+                ]
+            ]),
+            'http_code' => Response::HTTP_OK
+        ];
+        $expectedResponse = [
+            [
+                'id' => '40627613557',
+                'user_id' => '92038375',
+                'user_login' => 'caedrel',
+                'user_name' => 'User Name 1',
+                'game_id' => '21779',
+                'game_name' => 'League of Legends',
+                'type' => 'live',
+                'title' => 'Stream Title 1',
+                'viewer_count' => 46181,
+                'started_at' => '2024-05-08T07:35:07Z',
+                'language' => 'en',
+                'thumbnail_url' => 'https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg',
+                'tag_ids' => [],
+                'tags' => ['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'],
+                'is_mature' => false
+            ],
+            [
+                'id' => '40627613557',
+                'user_id' => '92038375',
+                'user_login' => 'caedrel',
+                'user_name' => 'User Name 2',
+                'game_id' => '21779',
+                'game_name' => 'League of Legends',
+                'type' => 'live',
+                'title' => 'Stream Title 2',
+                'viewer_count' => 46181,
+                'started_at' => '2024-05-08T07:35:07Z',
+                'language' => 'en',
+                'thumbnail_url' => 'https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg',
+                'tag_ids' => [],
+                'tags' => ['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'],
+                'is_mature' => false
+            ]
+        ];
 
         $this->tokenProvider
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn($tokenResponse);
         $this->apiClient
             ->expects('makeCurlCall')
             ->with(self::GET_STREAMS_URL, [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
-            ->andReturn($streamsResponse);
+            ->andReturn($curlCallResponse);
 
         $returnedStreams = $this->streamsDataManager->getStreamsData();
 
@@ -78,11 +152,49 @@ class StreamsDataManagerTest extends TestCase
      */
     public function get_streams_data_returns_streams_curl_error(): void
     {
-        $responseBuilder = (new StreamsDataBuilder())
-            ->withTestValues()
-            ->withHttpCode(Response::HTTP_INTERNAL_SERVER_ERROR);
-        $streamsResponse = $responseBuilder->build();
+        $streamsResponse = [
+            'response' => json_encode([
+                'data' => [
+                    [
+                        'id' => '40627613557',
+                        'user_id' => '92038375',
+                        'user_login' => 'caedrel',
+                        'user_name' => 'User Name 1',
+                        'game_id' => '21779',
+                        'game_name' => 'League of Legends',
+                        'type' => 'live',
+                        'title' => 'Stream Title 1',
+                        'viewer_count' => 46181,
+                        'started_at' => '2024-05-08T07:35:07Z',
+                        'language' => 'en',
+                        'thumbnail_url' => 'https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg',
+                        'tag_ids' => [],
+                        'tags' => ['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'],
+                        'is_mature' => false
+                    ],
+                    [
+                        'id' => '40627613557',
+                        'user_id' => '92038375',
+                        'user_login' => 'caedrel',
+                        'user_name' => 'User Name 2',
+                        'game_id' => '21779',
+                        'game_name' => 'League of Legends',
+                        'type' => 'live',
+                        'title' => 'Stream Title 2',
+                        'viewer_count' => 46181,
+                        'started_at' => '2024-05-08T07:35:07Z',
+                        'language' => 'en',
+                        'thumbnail_url' => 'https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg',
+                        'tag_ids' => [],
+                        'tags' => ['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'],
+                        'is_mature' => false
+                    ]
+                ]
+            ]),
+            'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
+        ];
         $expectedExceptionMessage = self::GET_STREAMS_ERROR_MESSAGE;
+
 
         $this->tokenProvider
             ->expects('getToken')
