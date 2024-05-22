@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Http\Response;
 use App\Services\ApiClient;
 use App\Services\DBClient;
 use App\Services\StreamsDataManager;
 use App\Services\TokenProvider;
-use Tests\StreamDTO;
-use Tests\StreamDTOBuilder;
-use Tests\TestCase;
+use Tests\Builders\StreamDTO;
+use Tests\Builders\StreamDTOBuilder;
+use Illuminate\Http\Response;
 use Mockery;
+use Tests\TestCase;
 
 class GetStreamsTest extends TestCase
 {
