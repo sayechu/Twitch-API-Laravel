@@ -1,6 +1,5 @@
 <?php
 
-use App\Infrastructure\Controllers\AnalyticsUsersController;
 use App\Infrastructure\Controllers\AnalyticsStreamsController;
 use App\Infrastructure\Controllers\AnalyticsTopsOfTheTopsController;
 use App\Infrastructure\FollowStreamer\AnalyticsFollowStreamerController;
@@ -11,7 +10,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/analytics/users', AnalyticsUsersController::class);
 Route::get('/analytics/streams', AnalyticsStreamsController::class);
 Route::get('/analytics/topsofthetops', AnalyticsTopsOfTheTopsController::class);
 Route::get('/analytics/follow', AnalyticsFollowStreamerController::class);
