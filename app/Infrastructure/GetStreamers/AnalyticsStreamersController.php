@@ -10,11 +10,11 @@ use Illuminate\Http\JsonResponse;
 
 class AnalyticsStreamersController extends Controller
 {
-    private StreamersDataManager $userDataManager;
+    private StreamersDataManager $streamerDataManager;
 
     public function __construct(StreamersDataManager $userDataManager)
     {
-        $this->userDataManager = $userDataManager;
+        $this->streamerDataManager = $userDataManager;
     }
 
     public function __invoke(AnalyticsStreamersRequest $request): JsonResponse
@@ -22,8 +22,8 @@ class AnalyticsStreamersController extends Controller
         $userId = $request->input('id');
 
         try {
-            $userData = $this->userDataManager->getUserData($userId);
-            return response()->json($userData);
+            $streamerData = $this->streamerDataManager->getStreamerData($userId);
+            return response()->json($streamerData);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_SERVICE_UNAVAILABLE);
         }
