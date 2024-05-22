@@ -1,14 +1,14 @@
 <?php
 
-use App\Infrastructure\GetStreams\AnalyticsStreamsController;
-use App\Infrastructure\GetTopsOfTheTops\AnalyticsTopsOfTheTopsController;
-use App\Infrastructure\GetStreamers\AnalyticsStreamersController;
 use Illuminate\Support\Facades\Route;
+use App\Infrastructure\Controllers\AnalyticsUsersController;
+use App\Infrastructure\Controllers\AnalyticsStreamsController;
+use App\Infrastructure\Controllers\AnalyticsTopsOfTheTopsController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/analytics/streamers', AnalyticsStreamersController::class);
+Route::get('/analytics/users', AnalyticsUsersController::class);
 Route::get('/analytics/streams', AnalyticsStreamsController::class);
 Route::get('/analytics/topsofthetops', AnalyticsTopsOfTheTopsController::class);

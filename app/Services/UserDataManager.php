@@ -3,16 +3,14 @@
 namespace App\Services;
 
 use Illuminate\Http\Response;
-use Mockery\Exception;
 
-class StreamersDataManager
+class UserDataManager
 {
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;
 
-    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
-    private const GET_USERS_ERROR_MESSAGE = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
-    private const GET_USERS_URL = 'https://api.twitch.tv/helix/users';
+    private const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
+    private const ERROR_GET_USERS_FAILED = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
 
 
     public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient)
@@ -26,16 +24,16 @@ class StreamersDataManager
         $twitchToken = $this->tokenProvider->getToken();
 
         if ($this->requestHas500Code($twitchToken)) {
-            throw new Exception(self::GET_TOKEN_ERROR_MESSAGE);
+            return ['error' => self::ERROR_GET_TOKEN_FAILED];
         }
 
-        $apiUrl = self::GET_USERS_URL . "?id=" . urlencode($userId);
+        $apiUrl = "https://api.twitch.tv/helix/users?id=" . urlencode($userId);
         $apiHeaders = ['Authorization: Bearer ' . $twitchToken];
 
         $userData = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
 
         if ($this->requestHas500Code($userData)) {
-            throw new Exception(self::GET_USERS_ERROR_MESSAGE);
+            return ['error' => self::ERROR_GET_USERS_FAILED];
         }
 
         return json_decode($userData['response'], true);

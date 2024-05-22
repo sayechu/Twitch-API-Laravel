@@ -2,37 +2,35 @@
 
 namespace Tests\Unit\Services;
 
-use Illuminate\Http\Response;
 use App\Services\ApiClient;
 use App\Services\TokenProvider;
-use App\Services\StreamersDataManager;
+use App\Services\UserDataManager;
 use Mockery;
 use Tests\TestCase;
 
-class StreamersDataManagerTest extends TestCase
+class UserDataManagerTest extends TestCase
 {
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;
-    private StreamersDataManager $userDataManager;
+    private UserDataManager $userDataManager;
 
-    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
-    private const GET_USERS_ERROR_MESSAGE = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
+    private const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
+    private const ERROR_GET_USERS_FAILED = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
     private const TWITCH_TOKEN = 'nrtovbe5h02os45krmjzvkt3hp74vf';
-    private const GET_USERS_URLS = 'https://api.twitch.tv/helix/users';
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->tokenProvider = Mockery::mock(TokenProvider::class);
         $this->apiClient = Mockery::mock(ApiClient::class);
-        $this->userDataManager = new StreamersDataManager($this->tokenProvider, $this->apiClient);
+        $this->userDataManager = new UserDataManager($this->tokenProvider, $this->apiClient);
 
         $this->app
-            ->when(StreamersDataManager::class)
+            ->when(UserDataManager::class)
             ->needs(TokenProvider::class)
             ->give(fn() => $this->tokenProvider);
         $this->app
-            ->when(StreamersDataManager::class)
+            ->when(UserDataManager::class)
             ->needs(ApiClient::class)
             ->give(fn() => $this->apiClient);
     }
@@ -59,7 +57,7 @@ class StreamersDataManagerTest extends TestCase
                     ]
                 ]
             ]),
-            'http_code' => Response::HTTP_OK
+            'http_code' => 200
         ];
         $expectedGetUserDataResponse = [
             "data" => [
@@ -84,7 +82,7 @@ class StreamersDataManagerTest extends TestCase
             ->andReturn(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::GET_USERS_URLS . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($getUserDataResponse);
 
@@ -104,18 +102,18 @@ class StreamersDataManagerTest extends TestCase
                 'expires_in' => 5089418,
                 'token_type' => 'bearer'
             ]),
-            'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
+            'http_code' => 500
         ];
-        $expectedResponse = self::GET_TOKEN_ERROR_MESSAGE;
+        $expectedResponse = ['error' => self::ERROR_GET_TOKEN_FAILED];
 
         $this->tokenProvider
             ->expects('getToken')
             ->once()
             ->andReturn($getTokenResponse);
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage($expectedResponse);
 
-        $this->userDataManager->getUserData('1234');
+        $returnedUserInfo = $this->userDataManager->getUserData('1234');
+
+        $this->assertEquals($expectedResponse, $returnedUserInfo);
     }
 
     /**
@@ -140,9 +138,9 @@ class StreamersDataManagerTest extends TestCase
                     ]
                 ]
             ]),
-            'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
+            'http_code' => 500
         ];
-        $expectedResponse = self::GET_USERS_ERROR_MESSAGE;
+        $expectedResponse = ['error' => self::ERROR_GET_USERS_FAILED];
 
         $this->tokenProvider
             ->expects('getToken')
@@ -150,13 +148,13 @@ class StreamersDataManagerTest extends TestCase
             ->andReturn(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::GET_USERS_URLS . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with('https://api.twitch.tv/helix/users?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($getUserDataResponse);
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage($expectedResponse);
 
-        $this->userDataManager->getUserData('1234');
+        $returnedUserInfo = $this->userDataManager->getUserData('1234');
+
+        $this->assertEquals($expectedResponse, $returnedUserInfo);
     }
 
     protected function tearDown(): void
