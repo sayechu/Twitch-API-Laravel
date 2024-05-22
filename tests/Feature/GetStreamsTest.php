@@ -7,6 +7,8 @@ use App\Services\ApiClient;
 use App\Services\DBClient;
 use App\Services\StreamsDataManager;
 use App\Services\TokenProvider;
+use Tests\StreamDTO;
+use Tests\StreamDTOBuilder;
 use Tests\TestCase;
 use Mockery;
 
@@ -14,6 +16,7 @@ class GetStreamsTest extends TestCase
 {
     private ApiClient $apiClient;
     private DBClient $databaseClient;
+    private StreamDTO $expectedStream;
     private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
     private const GET_STREAMS_ERROR_MESSAGE = 'No se pueden devolver streams en este momento, inténtalo más tarde';
     private const TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
@@ -35,6 +38,22 @@ class GetStreamsTest extends TestCase
             ->when(StreamsDataManager::class)
             ->needs(ApiClient::class)
             ->give(fn() => $this->apiClient);
+        $this->expectedStream = (new StreamDTOBuilder())
+            ->withId('40627613557')
+            ->withUserId('92038375')
+            ->withUserLogin('caedrel')
+            ->withUserName('User Name')
+            ->withGameId('21779')
+            ->withGameName('League of Legends')
+            ->withType('live')
+            ->withTitle('Stream Title')
+            ->withViewerCount(46181)
+            ->withStartedAt('2024-05-08T07:35:07Z')
+            ->withLanguage('en')
+            ->withThumbnailUrl('https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg')
+            ->withTags(['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'])
+            ->withIsMature(false)
+            ->build();
     }
 
     /**
@@ -43,27 +62,7 @@ class GetStreamsTest extends TestCase
     public function gets_streams_with_stored_token(): void
     {
         $getStreamsResponse = [
-            'response' => json_encode([
-                'data' => [
-                    [
-                        'id' => '40627613557',
-                        'user_id' => '92038375',
-                        'user_login' => 'caedrel',
-                        'user_name' => 'User Name',
-                        'game_id' => '21779',
-                        'game_name' => 'League of Legends',
-                        'type' => 'live',
-                        'title' => 'Stream Title',
-                        'viewer_count' => 46181,
-                        'started_at' => '2024-05-08T07:35:07Z',
-                        'language' => 'en',
-                        'thumbnail_url' => 'https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg',
-                        'tag_ids' => [],
-                        'tags' => ['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'],
-                        'is_mature' => false
-                    ]
-                ]
-            ]),
+            'response' => json_encode(['data' => [$this->expectedStream->toArray()]]),
             'http_code' => Response::HTTP_OK
         ];
 
@@ -93,29 +92,10 @@ class GetStreamsTest extends TestCase
     public function gets_streams_without_stored_token(): void
     {
         $getStreamsResponse = [
-            'response' => json_encode([
-                'data' => [
-                    [
-                        'id' => '40627613557',
-                        'user_id' => '92038375',
-                        'user_login' => 'caedrel',
-                        'user_name' => 'User Name',
-                        'game_id' => '21779',
-                        'game_name' => 'League of Legends',
-                        'type' => 'live',
-                        'title' => 'Stream Title',
-                        'viewer_count' => 46181,
-                        'started_at' => '2024-05-08T07:35:07Z',
-                        'language' => 'en',
-                        'thumbnail_url' => 'https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg',
-                        'tag_ids' => [],
-                        'tags' => ['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'],
-                        'is_mature' => false
-                    ]
-                ]
-            ]),
+            'response' => json_encode(['data' => [$this->expectedStream->toArray()]]),
             'http_code' => Response::HTTP_OK
         ];
+
         $getTokenExpectedResponse = [
             "response" => '{"access_token":"' . self::TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
             "http_code" => Response::HTTP_OK
