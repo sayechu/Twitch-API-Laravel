@@ -4,8 +4,6 @@ namespace Tests\Unit\Services;
 
 use App\Services\GetStreamsService;
 use App\Services\StreamsDataManager;
-use Tests\Builders\StreamDTO;
-use Tests\Builders\StreamDTOBuilder;
 use Mockery;
 use Tests\TestCase;
 
@@ -13,46 +11,12 @@ class GetStreamsServiceTest extends TestCase
 {
     private GetStreamsService $getStreamsService;
     private StreamsDataManager $streamsDataManager;
-    private StreamDTO $expectedStream1;
-    private StreamDTO $expectedStream2;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->streamsDataManager = Mockery::mock(StreamsDataManager::class);
         $this->getStreamsService = new GetStreamsService($this->streamsDataManager);
-        $this->expectedStream1 = (new StreamDTOBuilder())
-            ->withId('40627613557')
-            ->withUserId('92038375')
-            ->withUserLogin('caedrel')
-            ->withUserName('User Name 1')
-            ->withGameId('21779')
-            ->withGameName('League of Legends')
-            ->withType('live')
-            ->withTitle('Stream Title 1')
-            ->withViewerCount(46181)
-            ->withStartedAt('2024-05-08T07:35:07Z')
-            ->withLanguage('en')
-            ->withThumbnailUrl('https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg')
-            ->withTags(['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'])
-            ->withIsMature(false)
-            ->build();
-        $this->expectedStream2 = (new StreamDTOBuilder())
-            ->withId('40627613557')
-            ->withUserId('92038375')
-            ->withUserLogin('caedrel')
-            ->withUserName('User Name 2')
-            ->withGameId('21779')
-            ->withGameName('League of Legends')
-            ->withType('live')
-            ->withTitle('Stream Title 2')
-            ->withViewerCount(46181)
-            ->withStartedAt('2024-05-08T07:35:07Z')
-            ->withLanguage('en')
-            ->withThumbnailUrl('https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg')
-            ->withTags(['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'])
-            ->withIsMature(false)
-            ->build();
     }
 
     /**
@@ -60,8 +24,42 @@ class GetStreamsServiceTest extends TestCase
      */
     public function execute_returns_streams_data(): void
     {
-        $streamsResponse = [$this->expectedStream1->toArray(), $this->expectedStream2->toArray()];
-
+        $streamsResponse = [
+            [
+                'id' => '40627613557',
+                'user_id' => '92038375',
+                'user_login' => 'caedrel',
+                'user_name' => 'User Name 1',
+                'game_id' => '21779',
+                'game_name' => 'League of Legends',
+                'type' => 'live',
+                'title' => 'Stream Title 1',
+                'viewer_count' => 46181,
+                'started_at' => '2024-05-08T07:35:07Z',
+                'language' => 'en',
+                'thumbnail_url' => 'https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg',
+                'tag_ids' => [],
+                'tags' => ['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'],
+                'is_mature' => false
+            ],
+            [
+                'id' => '40627613557',
+                'user_id' => '92038375',
+                'user_login' => 'caedrel',
+                'user_name' => 'User Name 2',
+                'game_id' => '21779',
+                'game_name' => 'League of Legends',
+                'type' => 'live',
+                'title' => 'Stream Title 2',
+                'viewer_count' => 46181,
+                'started_at' => '2024-05-08T07:35:07Z',
+                'language' => 'en',
+                'thumbnail_url' => 'https://static-cdn.jtvnw.net/previews-ttv/live_user_caedrel-{width}x{height}.jpg',
+                'tag_ids' => [],
+                'tags' => ['xdd', 'Washed', 'degen', 'English', 'adhd', 'vtuber', 'Ratking', 'LPL', 'LCK', 'LEC'],
+                'is_mature' => false
+            ]
+        ];
         $expectedFilteredStreams = [
             [
                 'title' => 'Stream Title 1',
