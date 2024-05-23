@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         $sql = "
-            CREATE TABLE USUARIO(
+            CREATE TABLE STREAMER(
                 ID VARCHAR(255),
                 login VARCHAR(255),
                 displayName VARCHAR(255),
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("DROP TABLE IF EXISTS USUARIO");
+        DB::statement("DROP TABLE IF EXISTS STREAMER");
     }
 };
