@@ -12,12 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         $sql = "
-            CREATE TABLE user_streamers (
+            CREATE TABLE USUARIO_STREAMERS (
                 username VARCHAR(255),
+                password VARCHAR(255) NOT NULL,
                 streamerId INT,
-                PRIMARY KEY (username, streamerId),
-                FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
-                FOREIGN KEY (streamerId) REFERENCES streamers(streamerId) ON DELETE CASCADE
+                PRIMARY KEY (username, streamerId)
             );
         ";
 
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("DROP TABLE IF EXISTS user_streamers");
+        DB::statement("DROP TABLE IF EXISTS USUARIO_STREAMERS");
     }
 };
