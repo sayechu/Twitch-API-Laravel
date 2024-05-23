@@ -53,7 +53,7 @@ class DBClient
     public function checkIfUsernameExists(string $username): bool
     {
         try {
-            $selectStatement = $this->pdo->prepare('SELECT COUNT(*) FROM USUARIO_STREAMERS WHERE username = ?');
+            $selectStatement = $this->pdo->prepare('SELECT COUNT(*) FROM USUARIO WHERE username = ?');
             $selectStatement->execute([$username]);
             return $selectStatement->fetchColumn() > 0;
         } catch (PDOException $e) {
@@ -67,12 +67,10 @@ class DBClient
     public function createUser(string $username, string $password): void
     {
         try {
-            $insertStatement = $this->pdo->prepare('INSERT INTO USUARIO_STREAMERS
-                                                          (username, password, streamerId)
-                                                           VALUES (?, ?, null)');
+            $insertStatement = $this->pdo->prepare('INSERT INTO USUARIO (username, password) VALUES (?, ?)');
             $insertStatement->execute([$username, $password]);
         } catch (PDOException $e) {
-            throw new InternalServerErrorException("mazapan");
+            throw new InternalServerErrorException("Error del servidor al crear el usuario");
         }
     }
 }
