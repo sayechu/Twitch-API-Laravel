@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,10 +10,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        $sql = "
+            CREATE TABLE sessions (
+                id VARCHAR(255) PRIMARY KEY,
+                user_id BIGINT UNSIGNED NULL,
+                ip_address VARCHAR(45) NULL,
+                user_agent TEXT NULL,
+                payload LONGTEXT NOT NULL,
+                last_activity INT NOT NULL,
+                created_at TIMESTAMP NULL,
+                updated_at TIMESTAMP NULL
+            );
+        ";
+
+        DB::statement($sql);
     }
 
     /**
@@ -22,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sessions');
+        DB::statement('DROP TABLE IF EXISTS sessions');
     }
 };
