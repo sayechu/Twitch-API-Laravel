@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         $sql = "
-            CREATE TABLE USUARIO_STREAMERS (
+            CREATE TABLE IF NOT EXISTS USUARIO_STREAMERS (
                 username VARCHAR(255),
-                password VARCHAR(255) NOT NULL,
                 streamerId INT,
-                PRIMARY KEY (username, streamerId)
+                PRIMARY KEY (username, streamerId),
+                FOREIGN KEY (username) REFERENCES USUARIO (username) ON DELETE CASCADE
             );
         ";
 
