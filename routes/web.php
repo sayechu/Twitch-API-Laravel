@@ -1,5 +1,6 @@
 <?php
 
+use App\Infrastructure\CreateUser\AnalyticsCreateUserController;
 use App\Infrastructure\FollowStreamer\AnalyticsFollowStreamerController;
 use App\Infrastructure\GetStreams\AnalyticsStreamsController;
 use App\Infrastructure\GetTopsOfTheTops\AnalyticsTopsOfTheTopsController;
@@ -17,3 +18,4 @@ Route::get('/analytics/topsofthetops', AnalyticsTopsOfTheTopsController::class);
 Route::post('/analytics/follow', AnalyticsFollowStreamerController::class);
 Route::get('/analytics/follow', AnalyticsFollowStreamerController::class);
 Route::delete('/analytics/unfollow', AnalyticsUnfollowController::class);
+Route::get('/analytics/users', AnalyticsCreateUserController::class);
