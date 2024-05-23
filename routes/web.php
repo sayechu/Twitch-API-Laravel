@@ -16,5 +16,6 @@ Route::get('/analytics/streamers', AnalyticsStreamersController::class);
 Route::get('/analytics/streams', AnalyticsStreamsController::class);
 Route::get('/analytics/topsofthetops', AnalyticsTopsOfTheTopsController::class);
 Route::post('/analytics/follow', AnalyticsFollowStreamerController::class);
-Route::delete('/analytics/unfollow', AnalyticsUnfollowController::class);
 Route::post('/analytics/users', AnalyticsCreateUserController::class);
+Route::delete('/analytics/unfollow', AnalyticsUnfollowController::class);
+Route::get('/analytics/users', AnalyticsCreateUserController::class);
