@@ -15,7 +15,7 @@ class TopVideosProvider
         $this->databaseClient = $databaseClient;
     }
 
-    public function getTopFourtyVideo(string $topGameId, string $gameName, int $since, array $apiHeaders): array
+    public function getTopFourtyVideos(string $topGameId, string $gameName, int $since, array $apiHeaders): array
     {
         if ($this->databaseClient->isDataStoredRecentlyFromGame($topGameId, $since)) {
             return $this->databaseClient->getVideosOfAGivenGame($topGameId);
