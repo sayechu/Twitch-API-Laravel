@@ -13,16 +13,17 @@ return new class extends Migration
     {
         $sql = "
             CREATE TABLE VIDEO(
-                videoId INT PRIMARY KEY,
-                userId INT,
-                userName VARCHAR(255),
-                visitas INT,
-                duracion VARCHAR(255),
-                fecha VARCHAR(255),
-                titulo VARCHAR(255),
-                gameId INT,
-        
-                CONSTRAINT FK_GAME1 FOREIGN KEY (gameId) REFERENCES JUEGO(gameId)
+                id BIGINT PRIMARY KEY,
+                user_id INT,
+                user_name VARCHAR(255),
+                view_count VARCHAR(255),
+                duration VARCHAR(255),
+                created_at VARCHAR(255),
+                title VARCHAR(255),
+                game_id VARCHAR(255),
+                game_name VARCHAR(255),
+
+                CONSTRAINT FK_GAME1 FOREIGN KEY (game_id) REFERENCES JUEGO(gameId)
             );
         ";
 
