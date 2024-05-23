@@ -46,7 +46,7 @@ class DBClient
         $insertStatement = $this->pdo->prepare('INSERT INTO TOKEN (token) VALUES (?)');
         $insertStatement->execute([$twitchToken]);
     }
-    
+
     /**
      * @throws InternalServerErrorException
      */
