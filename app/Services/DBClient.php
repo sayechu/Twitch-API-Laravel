@@ -35,9 +35,9 @@ class DBClient
 
     public function getToken(): string
     {
-        $stmt = $this->pdo->prepare('SELECT token FROM TOKEN');
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC)['token'];
+        $selectStatement = $this->pdo->prepare('SELECT token FROM TOKEN');
+        $selectStatement->execute();
+        return $selectStatement->fetch(PDO::FETCH_ASSOC)['token'];
     }
 
     public function storeToken(string $twitchToken)
@@ -46,179 +46,85 @@ class DBClient
         $insertStatement->execute([$twitchToken]);
     }
 
-    public function addTopThreeGamesToDB(array $topThreeGames): void
+    public function isGameStored(mixed $gameId): bool
+    {
+        $selectStatement = $this->pdo->prepare('SELECT COUNT(*) FROM JUEGO WHERE gameId = ?');
+        $selectStatement->execute([$gameId]);
+        return $selectStatement->fetchColumn() > 0;
+    }
+
+    public function storeTopGame(array $topGame): void
     {
         $insertJuegoStatement = $this->pdo->prepare(
             'INSERT INTO JUEGO (gameId, gameName, idFecha) VALUES (?, ?, ?)'
         );
         $insertFechaStatement = $this->pdo->prepare(
-            'INSERT INTO FECHACONSULTA (fecha) VALUES (DEFAULT)'
+            'INSERT INTO FECHACONSULTA (fecha) VALUES (NULL)'
         );
-
-        foreach ($topThreeGames as $topGame) {
-            $insertFechaStatement->execute();
-            $idFecha = $this->pdo->lastInsertId();
-
-            $gameId = $topGame['id'];
-            $gameName = $topGame['name'];
-            $insertJuegoStatement->execute([$gameId, $gameName, $idFecha]);
-        }
+        $insertFechaStatement->execute();
+        $insertJuegoStatement->execute([$topGame['id'], $topGame['name'], $this->pdo->lastInsertId()]);
     }
 
-    public function addVideosToDB(array $topFourtyVideos, string $gameId): void
+    public function updateTopGameLastUpdateTime(string $gameId): void
     {
+        $updateStatement = $this->pdo->prepare('UPDATE FECHACONSULTA
+            SET fecha = CURRENT_TIMESTAMP
+            WHERE idFecha IN
+            (SELECT idFecha
+            FROM JUEGO
+            WHERE gameId = ?)');
+        $updateStatement->execute([$gameId]);
+    }
+
+    public function isDataStoredRecentlyFromGame(string $gameId, int $since): bool
+    {
+        $selectStatement = $this->pdo->prepare('SELECT 1
+            FROM JUEGO j
+            JOIN FECHACONSULTA fc ON j.idFecha = fc.idFecha
+            WHERE j.gameId = ? AND fc.fecha >= NOW() - INTERVAL ? SECOND
+            LIMIT 1');
+        $selectStatement->execute([$gameId, $since]);
+        return $selectStatement->fetch() !== false;
+    }
+
+    public function getVideosOfAGivenGame(string $gameId): array
+    {
+        $selectStatement = $this->pdo->prepare('SELECT * FROM VIDEO WHERE game_id = ?');
+        $selectStatement->execute([$gameId]);
+        return $selectStatement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function updateTopGameVideos(array $topFourtyVideos, string $topGameId, string $gameName): void
+    {
+        $deleteStatement = $this->pdo->prepare('DELETE FROM VIDEO WHERE game_id = ?');
+        $deleteStatement->execute([$topGameId]);
+
         $insertStatement = $this->pdo->prepare(
             'INSERT INTO VIDEO (
-                        videoId,
-                        userId,
-                        userName,
-                        visitas,
-                        duracion,
-                        fecha,
-                        titulo,
-                        gameId
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+                        id,
+                        user_id,
+                        user_name,
+                        view_count,
+                        duration,
+                        created_at,
+                        title,
+                        game_id,
+                        game_name
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
 
         foreach ($topFourtyVideos as $video) {
-            $videoId = $video['id'];
-            $userId = $video['user_id'];
-            $userName = $video['user_name'];
-            $viewCount = $video['view_count'];
-            $duration = $video['duration'];
-            $createdAt = $video['created_at'];
-            $title = $video['title'];
-
             $insertStatement->execute([
-                $videoId,
-                $userId,
-                $userName,
-                $viewCount,
-                $duration,
-                $createdAt,
-                $title,
-                $gameId
+                $video['id'],
+                $video['user_id'],
+                $video['user_name'],
+                $video['view_count'],
+                $video['duration'],
+                $video['created_at'],
+                $video['title'],
+                $topGameId,
+                $gameName
             ]);
         }
-    }
-
-    public function getOldestUpdateDatetime(): mixed
-    {
-        $stmt = $this->pdo->query("SELECT MIN(FC.fecha) AS fecha
-                                FROM JUEGO J
-                                INNER JOIN FECHACONSULTA FC ON J.idFecha = FC.idFecha");
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function getTopThreeGames(): array
-    {
-        $selectStatement = 'SELECT J.gameId, J.gameName, FC.fecha
-                            FROM JUEGO J
-                            INNER JOIN FECHACONSULTA FC ON J.idFecha = FC.idFecha';
-        $stmt = $this->pdo->prepare($selectStatement);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function deleteVideosOfAGivenGame(string $gameId): void
-    {
-        $deleteStatement = "DELETE FROM VIDEO WHERE gameId = :gameId";
-        $stmt = $this->pdo->prepare($deleteStatement);
-        $stmt->bindParam(':gameId', $gameId, PDO::PARAM_INT);
-        $stmt->execute();
-    }
-
-    public function updateDatetime(string $gameId): void
-    {
-        $updateStatement = "UPDATE FECHACONSULTA
-            SET fecha = CURRENT_TIMESTAMP
-            WHERE idFecha IN (SELECT idFecha FROM JUEGO WHERE gameId = :idGame)";
-        $stmt = $this->pdo->prepare($updateStatement);
-        $stmt->bindParam(':idGame', $gameId, PDO::PARAM_INT);
-        $stmt->execute();
-    }
-
-    public function getGameIdAtPosition(int $position): string
-    {
-        $selectStatement = "SELECT J.gameId
-                            FROM JUEGO J
-                            WHERE J.position = :pos";
-        $stmt = $this->pdo->prepare($selectStatement);
-        $stmt->bindParam(':pos', $position, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC)[0]['gameId'];
-    }
-
-    public function updateTopGame(int $position, string $gameId, string $gameName): void
-    {
-        $updateStatement = "UPDATE JUEGO SET gameId = ?, gameName = ? WHERE position = ?";
-
-        $stmt = $this->pdo->prepare($updateStatement);
-
-        $stmt->bindParam(1, $gameId, PDO::PARAM_INT);
-        $stmt->bindParam(2, $gameName, PDO::PARAM_STR);
-        $stmt->bindParam(3, $position, PDO::PARAM_INT);
-
-        $stmt->execute();
-        $this->updateDatetime($gameId);
-    }
-
-    public function getTopsOfTheTopsAttributes($gameId): array
-    {
-        $queryStatement = "WITH UserVideos AS (
-                    SELECT
-                        V.userId,
-                        V.userName AS user_name,
-                        COUNT(*) AS total_videos,
-                        SUM(V.visitas) AS total_views,
-                        MAX(V.visitas) AS MaxVisitas
-                    FROM VIDEO V
-                    WHERE V.gameId = $gameId
-                    GROUP BY V.userId, V.userName
-                )
-                SELECT
-                    UV.userId,
-                    UV.user_name,
-                    UV.total_videos,
-                    UV.total_views,
-                    (
-                        SELECT V.titulo
-                        FROM VIDEO V
-                        WHERE V.userId = UV.userId
-                            AND V.gameId = $gameId
-                            AND V.visitas = UV.MaxVisitas
-                        LIMIT 1
-                    ) AS most_viewed_title,
-                    UV.MaxVisitas AS most_viewed_views,
-                    (
-                        SELECT V.duracion
-                        FROM VIDEO V
-                        WHERE V.userId = UV.userId
-                            AND V.gameId = $gameId
-                            AND V.visitas = UV.MaxVisitas
-                        LIMIT 1
-                    ) AS most_viewed_duration,
-                    (
-                        SELECT V.fecha
-                        FROM VIDEO V
-                        WHERE V.userId = UV.userId
-                            AND V.gameId = $gameId
-                            AND V.visitas = UV.MaxVisitas
-                        LIMIT 1
-                    ) AS most_viewed_created_at
-                FROM UserVideos UV
-                ORDER BY UV.MaxVisitas DESC
-                LIMIT 1;
-            ";
-
-        $queryAttributes = $this->pdo->query($queryStatement);
-        return $queryAttributes->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function isLoadedDB(): bool
-    {
-        $selectStatement = $this->pdo->prepare("SELECT COUNT(*) FROM JUEGO");
-        $selectStatement->execute();
-        return $selectStatement->fetchColumn() > 0;
     }
 }
