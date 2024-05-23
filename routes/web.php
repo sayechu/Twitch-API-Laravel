@@ -1,5 +1,6 @@
 <?php
 
+use App\Infrastructure\FollowStreamer\AnalyticsFollowStreamerController;
 use App\Infrastructure\GetStreams\AnalyticsStreamsController;
 use App\Infrastructure\GetTopsOfTheTops\AnalyticsTopsOfTheTopsController;
 use App\Infrastructure\GetStreamers\AnalyticsStreamersController;
