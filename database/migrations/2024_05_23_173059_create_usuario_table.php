@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -12,11 +10,10 @@ return new class extends Migration
     public function up(): void
     {
         $sql = "
-            CREATE TABLE USUARIO_STREAMERS (
+            CREATE TABLE IF NOT EXISTS USUARIO (
                 username VARCHAR(255),
                 password VARCHAR(255) NOT NULL,
-                streamerId INT,
-                PRIMARY KEY (username, streamerId)
+                PRIMARY KEY (username)
             );
         ";
 
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("DROP TABLE IF EXISTS USUARIO_STREAMERS");
+        DB::statement("DROP TABLE IF EXISTS USUARIO");
     }
 };
