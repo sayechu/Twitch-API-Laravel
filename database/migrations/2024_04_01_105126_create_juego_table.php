@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -17,12 +15,12 @@ return new class extends Migration
                 gameId INT PRIMARY KEY,
                 gameName VARCHAR(255),
                 idFecha BIGINT UNSIGNED,
-                CONSTRAINT FK_FECHACONSULTA FOREIGN KEY (idFecha) REFERENCES FECHACONSULTA(idFecha) 
+                CONSTRAINT FK_FECHACONSULTA FOREIGN KEY (idFecha) REFERENCES FECHACONSULTA(idFecha)
             )
         ";
 
         DB::statement($sql);
-    } 
+    }
 
     /**
      * Reverse the migrations.

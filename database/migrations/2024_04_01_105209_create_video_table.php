@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -21,7 +19,7 @@ return new class extends Migration
                 fecha VARCHAR(255),
                 titulo VARCHAR(255),
                 gameId INT,
-        
+
                 CONSTRAINT FK_GAME1 FOREIGN KEY (gameId) REFERENCES JUEGO(gameId)
             );
         ";
