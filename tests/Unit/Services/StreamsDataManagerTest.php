@@ -34,7 +34,7 @@ class StreamsDataManagerTest extends TestCase
     {
         $tokenResponse = self::TWITCH_TOKEN;
         $curlCallResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => [
                     [
                         'id' => '40627613557',
@@ -71,7 +71,7 @@ class StreamsDataManagerTest extends TestCase
                         'is_mature' => false
                     ]
                 ]
-            ]),
+            ],
             'http_code' => Response::HTTP_OK
         ];
         $expectedResponse = [
