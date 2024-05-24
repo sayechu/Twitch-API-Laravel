@@ -54,7 +54,7 @@ class ApiClient
         curl_close($curl);
 
         return [
-            'response' => $apiResponse,
+            'response' => json_decode($apiResponse, true),
             'http_code' => $httpCode
         ];
     }
