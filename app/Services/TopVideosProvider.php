@@ -29,10 +29,8 @@ class TopVideosProvider
             return $top40VideosResponse;
         }
 
-        $topFourtyVideos = json_decode($top40VideosResponse['response'], true)['data'];
-
         $this->databaseClient->updateTopGameLastUpdateTime($topGameId);
-        $this->databaseClient->updateTopGameVideos($topFourtyVideos, $topGameId, $gameName);
+        $this->databaseClient->updateTopGameVideos($top40VideosResponse['response']['data'], $topGameId, $gameName);
 
         return $this->databaseClient->getVideosOfAGivenGame($topGameId);
     }
