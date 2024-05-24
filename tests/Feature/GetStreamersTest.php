@@ -46,7 +46,7 @@ class GetStreamersTest extends TestCase
     public function get_users_with_token_stored_returns_user_data(): void
     {
         $usersResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => [
                     [
                         'id' => 'userId',
@@ -61,7 +61,7 @@ class GetStreamersTest extends TestCase
                         'created_at' => 'createdAt'
                     ]
                 ]
-            ]),
+            ],
             'http_code' => Response::HTTP_OK
         ];
 
@@ -90,7 +90,7 @@ class GetStreamersTest extends TestCase
     public function get_users_with_token_from_api_returns_user_data()
     {
         $userResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => [
                     [
                         'id' => 'userId',
@@ -105,7 +105,7 @@ class GetStreamersTest extends TestCase
                         'created_at' => 'createdAt'
                     ]
                 ]
-            ]),
+            ],
             'http_code' => Response::HTTP_OK
         ];
         $getTokenResponse = [
