@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 class AnalyticsCreateUserController extends Controller
 {
     private CreateUserManager $createUserManager;
+    private const INTERNAL_SERVER_ERROR = "Error del servidor al crear el usuario";
+    private const CONFLICT_ERROR = "El nombre de usuario ya está en uso.";
+    private const PARAMETERS_ERROR = 'Los parámetros (username y password) no fueron proporcionados.';
 
     public function __construct(CreateUserManager $createUserManager)
     {
@@ -25,7 +28,7 @@ class AnalyticsCreateUserController extends Controller
 
         if (empty($username) || empty($password)) {
             return response()->json(
-                ['error' => 'Los parámetros (username y password) no fueron proporcionados.'],
+                ['error' => self::PARAMETERS_ERROR],
                 Response::HTTP_BAD_REQUEST
             );
         }
@@ -33,10 +36,10 @@ class AnalyticsCreateUserController extends Controller
         try {
             $createUserMessage = $this->createUserManager->getCreateUserMessage($username, $password);
             return response()->json($createUserMessage, Response::HTTP_CREATED);
-        } catch (ConflictException $e) {
-            return response()->json(['error' => $e->getMessage()], Response::HTTP_CONFLICT);
-        } catch (InternalServerErrorException $e) {
-            return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (ConflictException) {
+            return response()->json(['error' => self::CONFLICT_ERROR], Response::HTTP_CONFLICT);
+        } catch (InternalServerErrorException) {
+            return response()->json(['error' => self::INTERNAL_SERVER_ERROR], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

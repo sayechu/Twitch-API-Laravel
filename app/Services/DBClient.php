@@ -57,7 +57,7 @@ class DBClient
             $selectStatement->execute([$username]);
             return $selectStatement->fetchColumn() > 0;
         } catch (PDOException) {
-            throw new InternalServerErrorException("Error del servidor al crear el usuario");
+            throw new InternalServerErrorException();
         }
     }
 
@@ -70,7 +70,7 @@ class DBClient
             $insertStatement = $this->pdo->prepare('INSERT INTO USUARIO (username, password) VALUES (?, ?)');
             $insertStatement->execute([$username, $password]);
         } catch (PDOException) {
-            throw new InternalServerErrorException("Error del servidor al crear el usuario");
+            throw new InternalServerErrorException();
         }
     }
 

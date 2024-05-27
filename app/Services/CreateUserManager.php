@@ -23,7 +23,7 @@ class CreateUserManager
         $userExists = $this->dbClient->checkIfUsernameExists($username);
 
         if ($userExists) {
-            throw new ConflictException("El nombre de usuario ya está en uso.");
+            throw new ConflictException();
         }
 
         $this->dbClient->createUser($username, $password);
