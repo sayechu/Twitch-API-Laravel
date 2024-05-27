@@ -2,11 +2,17 @@
 
 namespace App\Services;
 
+use App\Exceptions\ForbiddenException;
+use App\Exceptions\UnauthorizedException;
+use Illuminate\Http\Response;
+
 class FollowStreamerManager
 {
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;
-    private const GET_ID_DATA_URL = 'https://api.twitch.tv/helix/users';
+    private const GET_STREAMER_DATA_URL = 'https://api.twitch.tv/helix/users';
+    private const GET_TOKEN_ERROR_MESSAGE = 'Acceso denegado debido a permisos insuficientes.';
+
 
     public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient)
     {
@@ -14,28 +20,33 @@ class FollowStreamerManager
         $this->apiClient = $apiClient;
     }
 
-    public function getFollowMessage($userId, $streamerId)
+    public function getFollowMessage($userId, $streamerId): string
     {
         $twitchToken = $this->tokenProvider->getToken();
 
-        $userIdNumeric = $this->getIdNumeric($userId, $twitchToken);
-        $streamerIdNumeric = $this->getIdNumeric($streamerId, $twitchToken);
+        if ($this->requestHas500Code($twitchToken)) {
+            throw new ForbiddenException(self::GET_TOKEN_ERROR_MESSAGE);
+        }
 
-        return $this->followStreamer($userIdNumeric, $streamerIdNumeric, $twitchToken);
+        if (!$this->checkIfStreamerExists($streamerId, $twitchToken)) {
+            return "Streamer no existe";
+        }
+        return "Streamer existe";
     }
 
-    private function getIdNumeric($twitchId, $twitchToken)
+    private function checkIfStreamerExists($streamerId, $twitchToken)
     {
-        $apiUrl = self::GET_ID_DATA_URL . '?login=' . urlencode($twitchId);
+        $apiUrl = self::GET_STREAMER_DATA_URL . '?id=' . urlencode($streamerId);
         $apiHeaders = ['Authorization: Bearer ' . $twitchToken];
 
-        $twitchIdResponse = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
+        $streamerResponse = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
 
-        return $this->extractIdNumeric($twitchIdResponse);
+        return $streamerResponse['http_code'] === 200;
     }
 
-    private function extractIdNumeric($twitchIdResponse)
+    private function requestHas500Code(mixed $requestResponse): bool
     {
-        return json_decode($twitchIdResponse['response'], true)['data'][0]['id'];
+        return isset($requestResponse['http_code']) &&
+            $requestResponse['http_code'] === Response::HTTP_INTERNAL_SERVER_ERROR;
     }
 }
