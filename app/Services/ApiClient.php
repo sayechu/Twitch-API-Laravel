@@ -80,6 +80,4 @@ class ApiClient
             'http_code' => $httpCode
         ];
     }
-
-
 }
