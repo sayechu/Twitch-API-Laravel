@@ -248,4 +248,27 @@ class DBClient
         $queryAttributes = $this->pdo->query($queryStatement);
         return $queryAttributes->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function getUsers(): array
+    {
+        try {
+            $stmt = $this->pdo->prepare('SELECT username FROM USUARIO');
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new InternalServerErrorException("Error del servidor al obtener la lista de usuarios.");
+        }
+    }
+
+    public function getStreamers(string $username): array
+    {
+        try {
+            $stmt = $this->pdo->prepare('SELECT streamerId FROM USUARIO_STREAMERS WHERE username = ?');
+            $stmt->execute([$username]);
+            $streamers = $stmt->fetchAll(PDO::FETCH_COLUMN);  // Devuelve solo los IDs de los streamers
+            return $streamers;
+        } catch (PDOException $e) {
+            throw new InternalServerErrorException("Error del servidor al obtener la lista de usuarios.");
+        }
+    }
 }

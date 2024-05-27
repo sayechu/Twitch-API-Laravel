@@ -5,6 +5,9 @@ use App\Infrastructure\FollowStreamer\AnalyticsFollowStreamerController;
 use App\Infrastructure\GetStreams\AnalyticsStreamsController;
 use App\Infrastructure\GetTopsOfTheTops\AnalyticsTopsOfTheTopsController;
 use App\Infrastructure\GetStreamers\AnalyticsStreamersController;
+//
+use App\Infrastructure\GetUsers\AnalyticsGetUsersController;
+//
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,3 +19,4 @@ Route::get('/analytics/streams', AnalyticsStreamsController::class);
 Route::get('/analytics/topsofthetops', AnalyticsTopsOfTheTopsController::class);
 Route::get('/analytics/follow', AnalyticsFollowStreamerController::class);
 Route::post('/analytics/users', AnalyticsCreateUserController::class);
+Route::get('/analytics/users', AnalyticsGetUsersController::class);
