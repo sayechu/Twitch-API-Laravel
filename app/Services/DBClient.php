@@ -155,7 +155,6 @@ class DBClient
         $deleteStatement = $this->pdo->prepare('DELETE FROM TIMELINE_STREAMS');
         $deleteStatement->execute();
     }
-
     public function isUserFollowingStreamer(string $username, string $streamerId): bool
     {
         try {
