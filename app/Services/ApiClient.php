@@ -59,4 +59,26 @@ class ApiClient
             'http_code' => $httpCode
         ];
     }
+
+    public function post(string $apiUrl, array $apiHeaders, $postData): array
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $apiUrl,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $postData,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => $apiHeaders
+        ]);
+
+        $apiResponse = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        curl_close($curl);
+
+        return [
+            'response' => $apiResponse,
+            'http_code' => $httpCode
+        ];
+    }
 }
