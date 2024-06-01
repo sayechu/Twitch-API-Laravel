@@ -19,6 +19,7 @@ class UnfollowManager
             $this->databaseClient->unfollowStreamer($username, $streamerId);
             return ['message' => 'Dejaste de seguir a ' . $streamerId];
         }
+
         throw new NotFoundException(
             "El usuario ({$username}) o el streamer ({$streamerId}) especificado no existe en la API."
         );
