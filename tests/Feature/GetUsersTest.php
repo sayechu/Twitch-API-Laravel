@@ -14,7 +14,6 @@ class GetUsersTest extends TestCase
     private DBClient $dbClient;
     private GetUsersManager $getUsersManager;
     private const GET_USERS_ERROR_MESSAGE = 'Error del servidor al obtener la lista de usuarios.';
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -22,7 +21,6 @@ class GetUsersTest extends TestCase
         $this->getUsersManager = new GetUsersManager($this->dbClient);
         $this->app->instance(GetUsersManager::class, $this->getUsersManager);
     }
-
     /**
      * @test
      */
@@ -55,7 +53,6 @@ class GetUsersTest extends TestCase
             ['username' => 'usuario2', 'followedStreamers' => $streamersUsuario2]
         ]);
     }
-
     /**
      * @test
      */
@@ -70,7 +67,6 @@ class GetUsersTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([]);
     }
-
     /**
      * @test
      */
@@ -85,7 +81,6 @@ class GetUsersTest extends TestCase
         $response->assertStatus(500);
         $response->assertJson(['error' => self::GET_USERS_ERROR_MESSAGE]);
     }
-
     protected function tearDown(): void
     {
         Mockery::close();
