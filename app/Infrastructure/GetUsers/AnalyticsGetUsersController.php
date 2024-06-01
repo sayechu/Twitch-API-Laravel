@@ -2,10 +2,8 @@
 
 namespace App\Infrastructure\GetUsers;
 
-use App\Exceptions\ConflictException;
 use App\Exceptions\InternalServerErrorException;
 use App\Infrastructure\Controllers\Controller;
-
 use App\Services\GetUsersManager;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +17,7 @@ class AnalyticsGetUsersController extends Controller
     {
         $this->getUsersManager = $getUsersManager;
     }
+
     public function __invoke(Request $request): JsonResponse
     {
         try {
