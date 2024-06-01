@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 class AnalyticsUnfollowController extends Controller
 {
     private UnfollowManager $unfollowManager;
-    private const ERROR_500_MESSAGE = 'Error del servidor al dejar de seguir al streamer.';
 
     public function __construct(UnfollowManager $unfollowManager)
     {
@@ -31,7 +30,7 @@ class AnalyticsUnfollowController extends Controller
         } catch (NotFoundException $e) {
             return response()->json($e->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (InternalServerErrorException $e) {
-            return response()->json(self::ERROR_500_MESSAGE, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
