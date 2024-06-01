@@ -12,7 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
-            'analytics/follow'
+            'analytics/follow',
+            '/analytics/users',
+            '/analytics/unfollow'
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
