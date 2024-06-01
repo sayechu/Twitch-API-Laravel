@@ -139,7 +139,7 @@ class DBClient
             $selectStatement->execute([$username, $streamerId]);
             return $selectStatement->fetchColumn() > 0;
         } catch (PDOException) {
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException('Error del servidor al dejar de seguir al streamer.');
         }
     }
 
@@ -150,7 +150,7 @@ class DBClient
                                                     WHERE username = ? AND streamerId = ?');
             $deleteStatement->execute([$username, $streamerId]);
         } catch (PDOException) {
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException('Error del servidor al dejar de seguir al streamer.');
         }
     }
 }
