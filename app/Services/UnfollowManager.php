@@ -17,7 +17,7 @@ class UnfollowManager
     {
         if ($this->databaseClient->isUserFollowingStreamer($username, $streamerId)) {
             $this->databaseClient->unfollowStreamer($username, $streamerId);
-            return ['message' => 'Dejaste de seguir a ' . $streamerId];
+            return ["message" => "Dejaste de seguir a {$streamerId}"];
         }
 
         throw new NotFoundException(
