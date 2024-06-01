@@ -136,7 +136,7 @@ class DBClient
             $stmt = $this->pdo->prepare('SELECT username FROM USUARIO');
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             throw new InternalServerErrorException("Error del servidor al obtener la lista de usuarios.");
         }
     }
@@ -146,9 +146,9 @@ class DBClient
         try {
             $stmt = $this->pdo->prepare('SELECT streamerId FROM USUARIO_STREAMERS WHERE username = ?');
             $stmt->execute([$username]);
-            $streamers = $stmt->fetchAll(PDO::FETCH_COLUMN);  // Devuelve solo los IDs de los streamers
+            $streamers = $stmt->fetchAll(PDO::FETCH_COLUMN);
             return $streamers;
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             throw new InternalServerErrorException("Error del servidor al obtener la lista de usuarios.");
         }
     }
