@@ -13,6 +13,10 @@ class GetUsersManager
     {
         $this->dbClient = $dbClient;
     }
+    /**
+     * @throws ConflictException
+     * @throws InternalServerErrorException
+     */
     public function getUsersAndStreamers(): array
     {
         $users = $this->dbClient->getUsers();

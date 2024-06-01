@@ -22,7 +22,7 @@ class AnalyticsGetUsersController extends Controller
     {
         try {
             $createUserMessage = $this->getUsersManager->getUsersAndStreamers();
-            return response()->json($createUserMessage, Response::HTTP_CREATED);
+            return response()->json($createUserMessage, Response::HTTP_OK);
         } catch (InternalServerErrorException $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
