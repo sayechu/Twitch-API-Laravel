@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Infrastructure\Requests;
 
-use App\Infrastructure\GetStreamers\AnalyticsStreamersRequest;
 use App\Infrastructure\UnfollowStreamer\AnalyticsUnfollowRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
@@ -14,6 +13,23 @@ class AnalyticsUnfollowRequestTest extends TestCase
     private const INVALID_USERNAME_MESSAGE = 'El nombre de usuario debe ser una cadena de caracteres';
     private const REQUIRED_STREAMERID_MESSAGE = 'El ID del streamer es obligatorio';
     private const INVALID_STREAMERID_MESSAGE = 'El ID del streamer debe ser un número entero';
+
+    /**
+     * @test
+     */
+    public function request_is_valid(): void
+    {
+        $unfollowRequest = new AnalyticsUnfollowRequest();
+        $unfollowRequest->merge(['username' => 'username', 'streamerId' => 1234]);
+
+        $validationErrors = Validator::make(
+            $unfollowRequest->all(),
+            $unfollowRequest->rules(),
+            $unfollowRequest->messages()
+        );
+
+        $this->assertTrue($validationErrors->passes());
+    }
 
     /**
      * @test
