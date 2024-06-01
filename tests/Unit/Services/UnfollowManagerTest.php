@@ -24,7 +24,7 @@ class UnfollowManagerTest extends TestCase
     /**
      * @test
      */
-    public function unfollow_streamer()
+    public function unfollow_streamer(): void
     {
         $username = 'username';
         $streamerId = 1234;
@@ -50,7 +50,7 @@ class UnfollowManagerTest extends TestCase
     /**
      * @test
      */
-    public function unfollow_streamer_not_stored_returns_not_found_exception()
+    public function unfollow_streamer_not_stored_returns_not_found_exception(): void
     {
         $username = 'username';
         $streamerId = 1234;
@@ -70,7 +70,7 @@ class UnfollowManagerTest extends TestCase
     /**
      * @test
      */
-    public function unfollow_streamer_returns_internal_server_error_exception_on_db_failure()
+    public function unfollow_streamer_returns_internal_server_error_exception_on_db_failure(): void
     {
         $username = 'username';
         $streamerId = 1234;
