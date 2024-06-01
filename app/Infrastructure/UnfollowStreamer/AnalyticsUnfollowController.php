@@ -22,11 +22,11 @@ class AnalyticsUnfollowController extends Controller
 
     public function __invoke(Request $request): JsonResponse
     {
-        $userId = $request->input('userId');
+        $username = $request->input('username');
         $streamerId = $request->input('streamerId');
 
         try {
-            $unfollowResponse = $this->unfollowManager->unfollowStreamer($userId, $streamerId);
+            $unfollowResponse = $this->unfollowManager->unfollowStreamer($username, $streamerId);
             return response()->json($unfollowResponse, Response::HTTP_OK);
         } catch (NotFoundException $e) {
             return response()->json($e->getMessage(), Response::HTTP_NOT_FOUND);
