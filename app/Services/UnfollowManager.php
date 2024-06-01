@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Exceptions\InternalServerErrorException;
 use App\Exceptions\NotFoundException;
 
 class UnfollowManager
@@ -14,13 +13,14 @@ class UnfollowManager
         $this->databaseClient = $databaseClient;
     }
 
-    public function unfollowStreamer(string $username, string $streamerId): void
+    public function unfollowStreamer(string $username, string $streamerId): array
     {
         if ($this->databaseClient->isUserFollowingStreamer($username, $streamerId)) {
             $this->databaseClient->unfollowStreamer($username, $streamerId);
-            return;
+            return ['message' => 'Dejaste de seguir a ' . $streamerId];
         }
-        throw new NotFoundException("El usuario ( userId ) o el streamer ( streamerId )
-                                            especificado no existe en la API.");
+        throw new NotFoundException(
+            "El usuario ({$username}) o el streamer ({$streamerId}) especificado no existe en la API."
+        );
     }
 }
