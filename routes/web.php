@@ -14,5 +14,5 @@ Route::get('/', function () {
 Route::get('/analytics/streamers', AnalyticsStreamersController::class);
 Route::get('/analytics/streams', AnalyticsStreamsController::class);
 Route::get('/analytics/topsofthetops', AnalyticsTopsOfTheTopsController::class);
-Route::get('/analytics/follow', AnalyticsFollowStreamerController::class);
+Route::post('/analytics/follow', AnalyticsFollowStreamerController::class);
 Route::post('/analytics/users', AnalyticsCreateUserController::class);
