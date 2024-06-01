@@ -62,11 +62,11 @@ class GetUsersManagerTest extends TestCase
     public function get_users_and_streamers_throws_internal_server_error_exception_on_db_failure(): void
     {
         $exceptionMessage = 'Error del servidor al obtener la lista de usuarios.';
+
         $this->databaseClient
             ->expects('getUsers')
             ->once()
             ->andThrow(new InternalServerErrorException($exceptionMessage));
-
         $this->expectException(InternalServerErrorException::class);
         $this->expectExceptionMessage($exceptionMessage);
 
