@@ -17,7 +17,7 @@ return new class extends Migration
 
         DB::statement($sql);
     }
-    
+
     public function down(): void
     {
         DB::statement("DROP TABLE IF EXISTS USUARIO_STREAMERS");
