@@ -202,4 +202,28 @@ class DBClient
         $deleteStatement = $this->pdo->prepare('DELETE FROM TIMELINE_STREAMS');
         $deleteStatement->execute();
     }
+
+    public function isUserFollowingStreamer(string $username, string $streamerId): bool
+    {
+        try {
+            $selectStatement = $this->pdo->prepare('SELECT COUNT(*)
+                                                    FROM USUARIO_STREAMERS
+                                                    WHERE username = ? AND streamerId = ?');
+            $selectStatement->execute([$username, $streamerId]);
+            return $selectStatement->fetchColumn() > 0;
+        } catch (PDOException) {
+            throw new InternalServerErrorException();
+        }
+    }
+
+    public function unfollowStreamer(string $username, string $streamerId): void
+    {
+        try {
+            $deleteStatement = $this->pdo->prepare('DELETE FROM USUARIO_STREAMERS
+                                                    WHERE username = ? AND streamerId = ?');
+            $deleteStatement->execute([$username, $streamerId]);
+        } catch (PDOException) {
+            throw new InternalServerErrorException();
+        }
+    }
 }
