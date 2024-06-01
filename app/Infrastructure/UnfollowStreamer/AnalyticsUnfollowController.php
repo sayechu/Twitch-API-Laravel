@@ -2,11 +2,9 @@
 
 namespace App\Infrastructure\UnfollowStreamer;
 
-use App\Exceptions\ForbiddenException;
 use App\Exceptions\InternalServerErrorException;
 use App\Exceptions\NotFoundException;
 use App\Services\UnfollowManager;
-use Exception;
 use Illuminate\Http\Response;
 use App\Infrastructure\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +13,7 @@ use Illuminate\Http\Request;
 class AnalyticsUnfollowController extends Controller
 {
     private UnfollowManager $unfollowManager;
+    private const ERROR_500_MESSAGE = 'Error del servidor al dejar de seguir al streamer.';
 
     public function __construct(UnfollowManager $unfollowManager)
     {
@@ -29,12 +28,10 @@ class AnalyticsUnfollowController extends Controller
         try {
             $unfollowResponse = $this->unfollowManager->unfollowStreamer($userId, $streamerId);
             return response()->json($unfollowResponse, Response::HTTP_OK);
-        } catch (ForbiddenException $e) {
-            return response()->json($e->getMessage(), Response::HTTP_FORBIDDEN);
         } catch (NotFoundException $e) {
             return response()->json($e->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (InternalServerErrorException $e) {
-            return response()->json($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(self::ERROR_500_MESSAGE, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
