@@ -3,11 +3,11 @@
 namespace App\Infrastructure\UnfollowStreamer;
 
 use App\Exceptions\InternalServerErrorException;
+use App\Infrastructure\Controllers\Controller;
 use App\Exceptions\NotFoundException;
+use Illuminate\Http\JsonResponse;
 use App\Services\UnfollowManager;
 use Illuminate\Http\Response;
-use App\Infrastructure\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AnalyticsUnfollowController extends Controller
