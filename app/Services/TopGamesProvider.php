@@ -25,9 +25,10 @@ class TopGamesProvider
             return $topGamesResponse;
         }
 
-        $this->storeTopGames($topGamesResponse['response']['data']);
+        $topThreeGames = json_decode($topGamesResponse['response'], true)['data'];
+        $this->storeTopGames($topThreeGames);
 
-        return $topGamesResponse['response']['data'];
+        return $topThreeGames;
     }
 
     private function requestHas500Code(mixed $requestResponse): bool

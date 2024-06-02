@@ -36,7 +36,7 @@ class StreamsDataManager
             throw new Exception(self::GET_STREAMS_ERROR_MESSAGE);
         }
 
-        return $streamsResponse['response']['data'];
+        return json_decode($streamsResponse['response'], true)['data'];
     }
 
     private function requestHas500Code(mixed $requestResponse): bool
