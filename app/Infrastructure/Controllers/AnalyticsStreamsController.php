@@ -20,14 +20,13 @@ class AnalyticsStreamsController extends Controller
     {
         $streamsData = $this->getStreamsService->execute();
 
-        if ($this->containsServerError($streamsData)) {
+        if ($this->containsServerError($streamsData))
             return response()->json($streamsData, self::ERROR_STATUS_CODE);
-        }
 
         return response()->json($streamsData);
     }
 
-    private function containsServerError(array $streamsData): bool
+    private function containsServerError(array $streamsData) : bool
     {
         return isset($streamsData['error']);
     }
