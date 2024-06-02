@@ -24,7 +24,7 @@ class GetUsersManagerTest extends TestCase
     /**
      * @test
      */
-    public function get_users_and_streamers_returns_users_and_streamers(): void
+    public function get_users_and_streamers(): void
     {
         $users = [
             ['username' => 'user1'],
@@ -60,7 +60,7 @@ class GetUsersManagerTest extends TestCase
     /**
      * @test
      */
-    public function get_users_and_streamers_throws_internal_server_error_exception_on_db_failure(): void
+    public function get_users_and_streamers_returns_database_error(): void
     {
         $this->databaseClient
             ->expects('getUsers')
