@@ -14,6 +14,14 @@ class CreateUserTest extends TestCase
 {
     private DBClient $dbClient;
     private CreateUserManager $createUserManager;
+    private const USERNAME = 'username';
+    private const PASSWORD = 'password';
+    private const ENDPOINT = '/analytics/users';
+    private const INTERNAL_SERVER_ERROR_MESSAGE = 'Error del servidor al crear el usuario.';
+    private const CONFLICT_ERROR_MESSAGE = 'El nombre de usuario ya está en uso.';
+    private const CREATE_USER_MESSAGE = 'Usuario creado correctamente';
+    private const BAD_REQUEST_ERROR_MESSAGE = 'Los parámetros (' . self::USERNAME . ' y ' . self::PASSWORD .
+                                              ') no fueron proporcionados.';
 
     protected function setUp(): void
     {
@@ -26,77 +34,105 @@ class CreateUserTest extends TestCase
     /**
      * @test
      */
-    public function create_user_successfully()
+    public function get_create_user_message()
     {
-        $username = 'newuser';
-        $password = 'password123';
-
         $this->dbClient->shouldReceive('checkIfUsernameExists')
             ->once()
-            ->with($username)
+            ->with(self::USERNAME)
             ->andReturn(false);
         $this->dbClient->shouldReceive('createUser')
             ->once()
-            ->with($username, $password);
+            ->with(self::USERNAME, self::PASSWORD);
 
-        $response = $this->postJson('/analytics/users', [
-            'username' => $username,
-            'password' => $password
+        $response = $this->postJson(self::ENDPOINT, [
+            'username' => self::USERNAME,
+            'password' => self::PASSWORD
         ]);
 
-        $response->assertStatus(201);
+        $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson([
-            'username' => $username,
-            'message' => 'Usuario creado correctamente'
+            'username' => self::USERNAME,
+            'message' => self::CREATE_USER_MESSAGE
         ]);
     }
 
     /**
      * @test
      */
-    public function conflict_exception_if_username_exists()
+    public function get_create_user_message_when_user_exists_returns_conflict_error()
     {
-        $username = 'existingUser';
-        $password = 'password123';
-
         $this->dbClient->shouldReceive('checkIfUsernameExists')
             ->once()
-            ->with($username)
+            ->with(self::USERNAME)
             ->andReturn(true);
 
-        $response = $this->postJson('/analytics/users', [
-            'username' => $username,
-            'password' => $password
+        $response = $this->postJson(self::ENDPOINT, [
+            'username' => self::USERNAME,
+            'password' => self::PASSWORD
         ]);
 
-        $response->assertStatus(409);
-        $response->assertJson(['error' => 'El nombre de usuario ya está en uso.']);
+        $response->assertStatus(Response::HTTP_CONFLICT);
+        $response->assertJson(['error' => self::CONFLICT_ERROR_MESSAGE]);
     }
 
     /**
      * @test
      */
-    public function internal_server_error_exception_if_database_error()
+    public function get_create_user_message_returns_internal_server_error()
     {
-        $username = 'newuser';
-        $password = 'password123';
-
         $this->dbClient->shouldReceive('checkIfUsernameExists')
             ->once()
-            ->with($username)
+            ->with(self::USERNAME)
             ->andReturn(false);
         $this->dbClient->shouldReceive('createUser')
             ->once()
-            ->with($username, $password)
-            ->andThrow(new InternalServerErrorException('Error del servidor al crear el usuario.'));
+            ->with(self::USERNAME, self::PASSWORD)
+            ->andThrow(new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE));
 
-        $response = $this->postJson('/analytics/users', [
-            'username' => $username,
-            'password' => $password
+        $response = $this->postJson(self::ENDPOINT, [
+            'username' => self::USERNAME,
+            'password' => self::PASSWORD
         ]);
 
-        $response->assertStatus(500);
-        $response->assertJson(['error' => 'Error del servidor al crear el usuario.']);
+        $response->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
+        $response->assertJson(['error' => self::INTERNAL_SERVER_ERROR_MESSAGE]);
+    }
+
+    /**
+     * @test
+     */
+    public function get_create_user_message_with_empty_username_returns_bad_request()
+    {
+        $response = $this->postJson(self::ENDPOINT, [
+            'password' => self::PASSWORD
+        ]);
+
+        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+        $response->assertJson(['error' => self::BAD_REQUEST_ERROR_MESSAGE]);
+    }
+
+    /**
+     * @test
+     */
+    public function get_create_user_message_with_empty_password_returns_bad_request()
+    {
+        $response = $this->postJson(self::ENDPOINT, [
+            'username' => self::USERNAME
+        ]);
+
+        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+        $response->assertJson(['error' => self::BAD_REQUEST_ERROR_MESSAGE]);
+    }
+
+    /**
+     * @test
+     */
+    public function get_create_user_message_with_empty_username_and_password_returns_bad_request()
+    {
+        $response = $this->postJson(self::ENDPOINT, []);
+
+        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+        $response->assertJson(['error' => self::BAD_REQUEST_ERROR_MESSAGE]);
     }
     protected function tearDown(): void
     {
