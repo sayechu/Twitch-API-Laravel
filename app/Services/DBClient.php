@@ -16,6 +16,8 @@ class DBClient
     private string $dataSourceName;
     protected PDO $pdo;
 
+    private const INTERNAL_SERVER_ERROR_MESSAGE = "Error del servidor al obtener la lista de usuarios.";
+
     public function __construct()
     {
         $this->dataSourceName = "mysql:host=$this->host;port=$this->port;dbname=$this->dbName";
@@ -256,7 +258,7 @@ class DBClient
             $selectStatement->execute();
             return $selectStatement->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException) {
-            throw new InternalServerErrorException("Error del servidor al obtener la lista de usuarios.");
+            throw new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE);
         }
     }
 
@@ -267,7 +269,7 @@ class DBClient
             $selectStatement->execute([$username]);
             return $selectStatement->fetchAll(PDO::FETCH_COLUMN);
         } catch (PDOException) {
-            throw new InternalServerErrorException("Error del servidor al obtener la lista de usuarios.");
+            throw new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE);
         }
     }
 }

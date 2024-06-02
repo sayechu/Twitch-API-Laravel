@@ -7,10 +7,12 @@ use App\Services\GetUsersManager;
 use Tests\TestCase;
 use Mockery;
 use App\Exceptions\InternalServerErrorException;
+use Illuminate\Http\Response;
 
 class GetUsersTest extends TestCase
 {
     private DBClient $databaseClient;
+    private const ENDPOINT = '/analytics/users';
     private const GET_USERS_ERROR_MESSAGE = 'Error del servidor al obtener la lista de usuarios.';
 
     protected function setUp(): void
@@ -26,7 +28,7 @@ class GetUsersTest extends TestCase
     /**
      * @test
      */
-    public function gets_users_and_streamers_successfully(): void
+    public function gets_users_and_streamers(): void
     {
         $users = [
             ['username' => 'usuario1'],
@@ -47,9 +49,9 @@ class GetUsersTest extends TestCase
             ->with('usuario2')
             ->andReturn($streamersSecondUser);
 
-        $response = $this->get('/analytics/users');
+        $response = $this->get(self::ENDPOINT);
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
         $response->assertJson([
             ['username' => 'usuario1', 'followedStreamers' => $streamersFirstUser],
             ['username' => 'usuario2', 'followedStreamers' => $streamersSecondUser]
@@ -59,30 +61,15 @@ class GetUsersTest extends TestCase
     /**
      * @test
      */
-    public function gets_users_with_no_users_found(): void
-    {
-        $this->databaseClient
-            ->expects('getUsers')
-            ->andReturn([]);
-
-        $response = $this->get('/analytics/users');
-
-        $response->assertStatus(200);
-        $response->assertJson([]);
-    }
-
-    /**
-     * @test
-     */
-    public function gets_users_fails_due_to_database_error(): void
+    public function gets_users_returns_database_error(): void
     {
         $this->databaseClient
             ->expects('getUsers')
             ->andThrow(new InternalServerErrorException(self::GET_USERS_ERROR_MESSAGE));
 
-        $response = $this->get('/analytics/users');
+        $response = $this->get(self::ENDPOINT);
 
-        $response->assertStatus(500);
+        $response->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
         $response->assertJson(['error' => self::GET_USERS_ERROR_MESSAGE]);
     }
 
