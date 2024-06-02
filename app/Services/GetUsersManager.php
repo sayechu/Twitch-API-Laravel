@@ -7,24 +7,25 @@ use App\Exceptions\InternalServerErrorException;
 
 class GetUsersManager
 {
-    private DBClient $dbClient;
+    private DBClient $databaseClient;
 
-    public function __construct(DBClient $dbClient)
+    public function __construct(DBClient $databaseClient)
     {
-        $this->dbClient = $dbClient;
+        $this->databaseClient = $databaseClient;
     }
+
     /**
      * @throws ConflictException
      * @throws InternalServerErrorException
      */
     public function getUsersAndStreamers(): array
     {
-        $users = $this->dbClient->getUsers();
+        $users = $this->databaseClient->getUsers();
         $result = [];
 
         foreach ($users as $user) {
             $username = $user['username'];
-            $streamers = $this->dbClient->getStreamers($username);
+            $streamers = $this->databaseClient->getStreamers($username);
 
             $result[] = [
                 "username" => $username,
