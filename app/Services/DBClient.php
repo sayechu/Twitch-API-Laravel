@@ -248,4 +248,54 @@ class DBClient
         $queryAttributes = $this->pdo->query($queryStatement);
         return $queryAttributes->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function isUserStored(string $username): bool
+    {
+        $selectStatement = $this->pdo->prepare("SELECT COUNT(*) FROM USUARIO_STREAMERS WHERE username = ?");
+        $selectStatement->execute([$username]);
+        return $selectStatement->fetchColumn() > 0;
+    }
+
+    public function getStreamers(string $username): array
+    {
+        $selectStatement = $this->pdo->prepare('SELECT streamerId FROM USUARIO_STREAMERS WHERE username = ?');
+        $selectStatement->execute([$username]);
+        return $selectStatement->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function storeStreams(mixed $streamerStreams): void
+    {
+        $insertStatement = $this->pdo->prepare('INSERT INTO TIMELINE_STREAMS
+                                                    (streamerId,
+                                                     streamerName,
+                                                     title,
+                                                     game,
+                                                     viewerCount,
+                                                     startedAt)
+                                                    VALUES (?, ?, ?, ?, ?, ?)
+                                                ');
+        foreach ($streamerStreams as $stream) {
+            $insertStatement->execute([$stream['user_id'],
+                $stream['user_name'],
+                $stream['title'],
+                $stream['game_name'],
+                $stream['viewer_count'],
+                $stream['started_at']
+            ]);
+        }
+    }
+
+    public function getTimelineStreams(): array
+    {
+        $selectStatement = $this->pdo->prepare('SELECT * FROM TIMELINE_STREAMS ORDER BY startedAt DESC LIMIT 5;');
+        $selectStatement->execute();
+        $this->clearTable();
+        return $selectStatement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function clearTable(): void
+    {
+        $deleteStatement = $this->pdo->prepare('DELETE FROM TIMELINE_STREAMS');
+        $deleteStatement->execute();
+    }
 }
