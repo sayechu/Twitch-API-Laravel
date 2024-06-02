@@ -9,7 +9,7 @@ return new class extends Migration
         $sql = "
             CREATE TABLE JUEGO (
                 position SERIAL,
-                gameId VARCHAR(255) PRIMARY KEY,
+                gameId INT PRIMARY KEY,
                 gameName VARCHAR(255),
                 idFecha BIGINT UNSIGNED,
                 CONSTRAINT FK_FECHACONSULTA FOREIGN KEY (idFecha) REFERENCES FECHACONSULTA(idFecha)
