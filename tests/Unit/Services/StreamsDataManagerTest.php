@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use Illuminate\Http\Response;
 use App\Services\ApiClient;
 use App\Services\StreamsDataManager;
 use App\Services\TokenProvider;
@@ -13,9 +14,10 @@ class StreamsDataManagerTest extends TestCase
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;
     private StreamsDataManager $streamsDataManager;
-    private const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
-    private const ERROR_GET_STREAMS_FAILED = 'No se pueden devolver streams en este momento, inténtalo más tarde';
+    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
+    private const GET_STREAMS_ERROR_MESSAGE = 'No se pueden devolver streams en este momento, inténtalo más tarde';
     private const TWITCH_TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
+    private const GET_STREAMS_URL = 'https://api.twitch.tv/helix/streams';
 
     protected function setUp(): void
     {
@@ -28,7 +30,7 @@ class StreamsDataManagerTest extends TestCase
     /**
      * @test
      */
-    public function test_get_streams_data(): void
+    public function get_streams_data_returns_streams_data(): void
     {
         $tokenResponse = self::TWITCH_TOKEN;
         $curlCallResponse = [
@@ -115,6 +117,7 @@ class StreamsDataManagerTest extends TestCase
             ->andReturn($tokenResponse);
         $this->apiClient
             ->expects('makeCurlCall')
+            ->with(self::GET_STREAMS_URL, [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($curlCallResponse);
 
@@ -126,28 +129,28 @@ class StreamsDataManagerTest extends TestCase
     /**
      * @test
      */
-    public function test_get_streams_data_with_token_error(): void
+    public function get_streams_data_returns_token_error(): void
     {
-        $expectedResponse = ['error' => self::ERROR_GET_TOKEN_FAILED];
+        $expectedExceptionMessage = self::GET_TOKEN_ERROR_MESSAGE;
         $tokenResponse = [
             "response" => null,
-            "http_code" => 500
+            "http_code" => Response::HTTP_INTERNAL_SERVER_ERROR
         ];
 
         $this->tokenProvider
             ->expects('getToken')
             ->once()
             ->andReturn($tokenResponse);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
-        $returnedStreams = $this->streamsDataManager->getStreamsData();
-
-        $this->assertEquals($expectedResponse, $returnedStreams);
+        $this->streamsDataManager->getStreamsData();
     }
 
     /**
      * @test
      */
-    public function test_get_streams_data_with_correct_token_but_curl_error(): void
+    public function get_streams_data_returns_streams_curl_error(): void
     {
         $streamsResponse = [
             'response' => json_encode([
@@ -196,15 +199,16 @@ class StreamsDataManagerTest extends TestCase
         $this->tokenProvider
             ->expects('getToken')
             ->once()
-            ->andReturn($tokenResponse);
+            ->andReturn(self::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
+            ->with(self::GET_STREAMS_URL, [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
             ->once()
             ->andReturn($streamsResponse);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
-        $returnedStreams = $this->streamsDataManager->getStreamsData();
-
-        $this->assertEquals($expectedResponse, $returnedStreams);
+        $this->streamsDataManager->getStreamsData();
     }
 
     protected function tearDown(): void

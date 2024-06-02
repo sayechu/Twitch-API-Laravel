@@ -11,8 +11,6 @@ class GetStreamsServiceTest extends TestCase
 {
     private GetStreamsService $getStreamsService;
     private StreamsDataManager $streamsDataManager;
-    const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
-    const ERROR_GET_STREAMS_FAILED = 'No se pueden devolver streams en este momento, inténtalo más tarde';
 
     protected function setUp(): void
     {
@@ -24,7 +22,7 @@ class GetStreamsServiceTest extends TestCase
     /**
      * @test
      */
-    public function test_execute(): void
+    public function execute_returns_streams_data(): void
     {
         $streamsResponse = [
             [
@@ -81,40 +79,6 @@ class GetStreamsServiceTest extends TestCase
         $returnedStreams = $this->getStreamsService->execute();
 
         $this->assertEquals($expectedFilteredStreams, $returnedStreams);
-    }
-
-    /**
-     * @test
-     */
-    public function test_execute_with_token_error(): void
-    {
-        $streamsResponse = ['error' => self::ERROR_GET_TOKEN_FAILED];
-
-        $this->streamsDataManager
-            ->expects('getStreamsData')
-            ->once()
-            ->andReturn($streamsResponse);
-
-        $returnedStreams = $this->getStreamsService->execute();
-
-        $this->assertEquals($streamsResponse, $returnedStreams);
-    }
-
-    /**
-     * @test
-     */
-    public function test_execute_token_correct_curl_error(): void
-    {
-        $streamsResponse = ['error' => self::ERROR_GET_STREAMS_FAILED];
-
-        $this->streamsDataManager
-            ->expects('getStreamsData')
-            ->once()
-            ->andReturn($streamsResponse);
-
-        $returnedStreams = $this->getStreamsService->execute();
-
-        $this->assertEquals($streamsResponse, $returnedStreams);
     }
 
     protected function tearDown(): void
