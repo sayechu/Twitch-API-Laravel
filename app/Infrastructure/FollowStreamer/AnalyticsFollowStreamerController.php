@@ -22,7 +22,7 @@ class AnalyticsFollowStreamerController extends Controller
         $this->followManager = $followManager;
     }
 
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(AnalyticsFollowStreamerRequest $request): JsonResponse
     {
         $username = $request->input('username');
         $streamerId = $request->input('streamerId');
