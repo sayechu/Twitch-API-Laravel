@@ -15,6 +15,7 @@ class DBClient
     private string $password = 'password';
     private string $dataSourceName;
     protected PDO $pdo;
+    private const INTERNAL_SERVER_ERROR_MESSAGE = "Error del servidor al seguir al streamer";
 
     public function __construct()
     {
@@ -57,7 +58,7 @@ class DBClient
             $selectStatement->execute([$username]);
             return $selectStatement->fetchColumn() > 0;
         } catch (PDOException) {
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE);
         }
     }
 
@@ -87,7 +88,7 @@ class DBClient
 
             return $count > 0;
         } catch (PDOException) {
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE);
         }
     }
 
@@ -100,8 +101,8 @@ class DBClient
             $insertStatement = $this->pdo->prepare('INSERT INTO USUARIO_STREAMERS
                                                           (username, streamerId) VALUES (?, ?)');
             $insertStatement->execute([$username, $streamerId]);
-        } catch (PDOException $e) {
-            throw new InternalServerErrorException("Error al insertar el registro: " . $e->getMessage());
+        } catch (PDOException) {
+            throw new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE);
         }
     }
 }
