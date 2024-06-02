@@ -15,8 +15,8 @@ class FollowStreamerManager
     private ApiClient $apiClient;
     private DBClient $databaseClient;
     private const GET_STREAMER_DATA_URL = 'https://api.twitch.tv/helix/users';
-    private const GET_TOKEN_ERROR_MESSAGE = 'Acceso denegado debido a permisos insuficientes.';
-    private const GET_STREAMER_ERROR_MESSAGE = 'Token denegado debido a permisos insuficientes';
+    private const GET_TOKEN_ERROR_MESSAGE = 'Acceso denegado debido a permisos insuficientes';
+    private const GET_STREAMER_ERROR_MESSAGE = 'Token de autenticación no proporcionado o inválido';
     private const CONFLICT_EXCEPTION_MESSAGE = 'El usuario ya está siguiendo al streamer';
 
     public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient, DBClient $databaseClient)
