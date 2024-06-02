@@ -43,7 +43,7 @@ class StreamersDataManagerTest extends TestCase
     public function get_user_data(): void
     {
         $getUserDataResponse = [
-            'response' => [
+            'response' => json_encode([
                 'data' => [
                     [
                         'id' => '1234',
@@ -58,7 +58,7 @@ class StreamersDataManagerTest extends TestCase
                         'created_at' => '2018-09-04T15:23:04Z'
                     ]
                 ]
-            ],
+            ]),
             'http_code' => Response::HTTP_OK
         ];
         $expectedGetUserDataResponse = [
