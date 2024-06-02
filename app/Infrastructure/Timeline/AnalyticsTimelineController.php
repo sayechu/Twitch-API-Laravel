@@ -21,10 +21,9 @@ class AnalyticsTimelineController extends Controller
 
     public function __invoke(Request $request): JsonResponse
     {
-        $username = $request->input('username');
-
-        $streamersTimeline = $this->timelineManager->getStreamersTimeline($username);
         try {
+            $username = $request->input('username');
+            $streamersTimeline = $this->timelineManager->getStreamersTimeline($username);
             return response()->json($streamersTimeline, Response::HTTP_OK);
         } catch (NotFoundException $exception) {
             return response()->json(['error' => $exception->getMessage()], Response::HTTP_NOT_FOUND);
@@ -32,4 +31,5 @@ class AnalyticsTimelineController extends Controller
             return response()->json(['error' => $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 }
