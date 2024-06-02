@@ -42,18 +42,16 @@ class TopsOfTheTopsManager
         }
 
         foreach ($topGamesResponse as $topGame) {
-            $responseTopVideos = $this->topVideosProvider->getTopFourtyVideos(
+            $topVideos[] = $this->topVideosProvider->getTopFourtyVideos(
                 $topGame['id'],
                 $topGame['name'],
                 $since,
                 $apiHeaders
             );
 
-            if ($this->requestHas500Code($responseTopVideos)) {
+            if ($this->requestHas500Code($topGamesResponse)) {
                 throw new Exception(self::GET_TOP_VIDEOS_ERROR_MESSAGE);
             }
-
-            $topVideos[] = $responseTopVideos;
         }
 
         return $topVideos;
