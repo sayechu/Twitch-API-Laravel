@@ -2,56 +2,86 @@
 
 namespace App\Services;
 
+use App\Exceptions\ConflictException;
+use App\Exceptions\ForbiddenException;
+use App\Exceptions\InternalServerErrorException;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\UnauthorizedException;
+use Illuminate\Http\Response;
+
 class FollowStreamerManager
 {
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;
-    private const GET_ID_DATA_URL = 'https://api.twitch.tv/helix/users';
+    private DBClient $databaseClient;
+    private const GET_STREAMER_DATA_URL = 'https://api.twitch.tv/helix/users';
+    private const GET_TOKEN_ERROR_MESSAGE = 'Acceso denegado debido a permisos insuficientes';
+    private const GET_STREAMER_ERROR_MESSAGE = 'Token de autenticación no proporcionado o inválido';
+    private const CONFLICT_EXCEPTION_MESSAGE = 'El usuario ya está siguiendo al streamer';
 
-    public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient)
+    public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient, DBClient $databaseClient)
     {
         $this->tokenProvider = $tokenProvider;
         $this->apiClient = $apiClient;
+        $this->databaseClient = $databaseClient;
     }
 
-    public function getFollowMessage($userId, $streamerId)
+    /**
+     * @throws ConflictException
+     * @throws ForbiddenException
+     * @throws InternalServerErrorException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     */
+    public function getFollowMessage($username, $streamerId): array
     {
+        if ($this->databaseClient->userFollowsStreamer($username, $streamerId)) {
+            throw new ConflictException(self::CONFLICT_EXCEPTION_MESSAGE);
+        }
+
         $twitchToken = $this->tokenProvider->getToken();
+        if ($this->requestHas500Code($twitchToken)) {
+            throw new ForbiddenException(self::GET_TOKEN_ERROR_MESSAGE);
+        }
 
-        $userIdNumeric = $this->getIdNumeric($userId, $twitchToken);
-        $streamerIdNumeric = $this->getIdNumeric($streamerId, $twitchToken);
+        $streamerData = $this->checkIfStreamerExists($streamerId, $twitchToken);
+        if (empty($streamerData) || !$this->databaseClient->checkIfUsernameExists($username)) {
+            throw new NotFoundException("El usuario (" . $username . ") o el streamer ("
+                                                 . $streamerId . ") especificado no existe en la API");
+        }
 
-        return $this->followStreamer($userIdNumeric, $streamerIdNumeric, $twitchToken);
+        $this->databaseClient->addUserFollowsStreamer($username, $streamerId);
+        return [
+            "message" => "Ahora sigues a " . $streamerId
+        ];
     }
 
-    private function getIdNumeric($twitchId, $twitchToken)
+    /**
+     * @throws UnauthorizedException
+     */
+    private function checkIfStreamerExists($streamerId, $twitchToken): array
     {
-        $apiUrl = self::GET_ID_DATA_URL . '?login=' . urlencode($twitchId);
+        $apiUrl = self::GET_STREAMER_DATA_URL . '?id=' . urlencode($streamerId);
         $apiHeaders = ['Authorization: Bearer ' . $twitchToken];
 
-        $twitchIdResponse = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
+        $streamerResponse = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
 
-        return $this->extractIdNumeric($twitchIdResponse);
+        if ($this->requestHas401Code($streamerResponse)) {
+            throw new UnauthorizedException(self::GET_STREAMER_ERROR_MESSAGE);
+        }
+
+        return json_decode($streamerResponse['response'], true)['data'];
     }
 
-    private function extractIdNumeric($twitchIdResponse)
+    private function requestHas500Code(mixed $requestResponse): bool
     {
-        return json_decode($twitchIdResponse['response'], true)['data'][0]['id'];
+        return isset($requestResponse['http_code']) &&
+            $requestResponse['http_code'] === Response::HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    public function followStreamer($userIdNumeric, $streamerIdNumeric, $twitchToken)
+    private function requestHas401Code(mixed $requestResponse): bool
     {
-        $followUrl = "https://api.twitch.tv/helix/users/follows";
-
-        $postData = json_encode(['from_id' => $userIdNumeric, 'to_id' => $streamerIdNumeric]);
-        $apiHeaders = [
-            'Authorization: Bearer ' . $twitchToken,
-            'Client-ID: YOUR_CLIENT_ID',
-            'Content-Type: application/json'
-        ];
-
-        $followResponse = $this->apiClient->post($followUrl, $apiHeaders, $postData);
-
-        return json_decode($followResponse['response'], true);
+        return isset($requestResponse['http_code']) &&
+            $requestResponse['http_code'] === Response::HTTP_UNAUTHORIZED;
     }
 }
