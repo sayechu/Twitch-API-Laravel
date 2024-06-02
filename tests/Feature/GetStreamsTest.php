@@ -43,7 +43,7 @@ class GetStreamsTest extends TestCase
     public function gets_streams_with_stored_token(): void
     {
         $getStreamsResponse = [
-            'response' => [
+            'response' => json_encode([
                 'data' => [
                     [
                         'id' => '40627613557',
@@ -63,7 +63,7 @@ class GetStreamsTest extends TestCase
                         'is_mature' => false
                     ]
                 ]
-            ],
+            ]),
             'http_code' => Response::HTTP_OK
         ];
 
@@ -93,7 +93,7 @@ class GetStreamsTest extends TestCase
     public function gets_streams_without_stored_token(): void
     {
         $getStreamsResponse = [
-            'response' => [
+            'response' => json_encode([
                 'data' => [
                     [
                         'id' => '40627613557',
@@ -113,7 +113,7 @@ class GetStreamsTest extends TestCase
                         'is_mature' => false
                     ]
                 ]
-            ],
+            ]),
             'http_code' => Response::HTTP_OK
         ];
         $getTokenExpectedResponse = [
