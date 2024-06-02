@@ -13,6 +13,13 @@ class CreateUserManagerTest extends TestCase
 {
     private DBClient $dbClient;
     private CreateUserManager $createUserManager;
+    private const USERNAME = 'username';
+    private const PASSWORD = 'password';
+    private const INTERNAL_SERVER_ERROR_MESSAGE = 'Error del servidor al crear el usuario.';
+    private const CONFLICT_ERROR_MESSAGE = 'El nombre de usuario ya está en uso.';
+    private const CREATE_USER_MESSAGE = 'Usuario creado correctamente';
+    private const BAD_REQUEST_ERROR_MESSAGE = 'Los parámetros (' . self::USERNAME . ' y ' . self::PASSWORD .
+                                               ') no fueron proporcionados.';
 
     protected function setUp(): void
     {
@@ -26,21 +33,18 @@ class CreateUserManagerTest extends TestCase
      */
     public function create_user_successfully()
     {
-        $username = 'newuser';
-        $password = 'password123';
-
         $this->dbClient->shouldReceive('checkIfUsernameExists')
             ->once()
-            ->with($username)
+            ->with(self::USERNAME)
             ->andReturn(false);
         $this->dbClient->shouldReceive('createUser')
             ->once()
-            ->with($username, $password)
+            ->with(self::USERNAME, self::PASSWORD)
             ->andReturn(true);
 
-        $result = $this->createUserManager->getCreateUserMessage($username, $password);
+        $result = $this->createUserManager->getCreateUserMessage(self::USERNAME, self::PASSWORD);
 
-        $this->assertEquals(['username' => $username, 'message' => 'Usuario creado correctamente'], $result);
+        $this->assertEquals(['username' => self::USERNAME, 'message' => self::CREATE_USER_MESSAGE], $result);
     }
 
     /**
@@ -48,18 +52,15 @@ class CreateUserManagerTest extends TestCase
      */
     public function throws_conflict_exception_if_username_exists()
     {
-        $username = 'existingUser';
-        $password = 'password123';
-
         $this->dbClient->shouldReceive('checkIfUsernameExists')
             ->once()
-            ->with($username)
+            ->with(self::USERNAME)
             ->andReturn(true);
 
         $this->expectException(ConflictException::class);
-        $this->expectExceptionMessage("El nombre de usuario ya está en uso.");
+        $this->expectExceptionMessage(self::CONFLICT_ERROR_MESSAGE);
 
-        $this->createUserManager->getCreateUserMessage($username, $password);
+        $this->createUserManager->getCreateUserMessage(self::USERNAME, self::PASSWORD);
     }
 
     /**
@@ -67,22 +68,19 @@ class CreateUserManagerTest extends TestCase
      */
     public function throws_internal_server_error_exception_on_database_error()
     {
-        $username = 'newuser';
-        $password = 'password123';
-
         $this->dbClient->shouldReceive('checkIfUsernameExists')
             ->once()
-            ->with($username)
+            ->with(self::USERNAME)
             ->andReturn(false);
         $this->dbClient->shouldReceive('createUser')
             ->once()
-            ->with($username, $password)
-            ->andThrow(new InternalServerErrorException("Database error during user creation"));
+            ->with(self::USERNAME, self::PASSWORD)
+            ->andThrow(new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE));
 
         $this->expectException(InternalServerErrorException::class);
-        $this->expectExceptionMessage("Database error during user creation");
+        $this->expectExceptionMessage(self::INTERNAL_SERVER_ERROR_MESSAGE);
 
-        $this->createUserManager->getCreateUserMessage($username, $password);
+        $this->createUserManager->getCreateUserMessage(self::USERNAME, self::PASSWORD);
     }
 
     protected function tearDown(): void
