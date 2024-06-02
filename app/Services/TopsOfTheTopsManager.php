@@ -2,50 +2,38 @@
 
 namespace App\Services;
 
-use Exception;
-use Illuminate\Http\Response;
-
 class TopsOfTheTopsManager
 {
-    private TokenProvider $tokenProvider;
-    private TopsOfTheTopsDataProvider $topsOfTopsDataProv;
-    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
-    private const GET_TOP_GAMES_ERROR_MESSAGE = 'No se pueden devolver top games en este momento, inténtalo más tarde';
+    private ApiClient $apiClient;
+    private DBClient $dbClient;
 
-    public function __construct(TokenProvider $tokenProvider, TopsOfTheTopsDataProvider $topsOfTopsDataProv)
+    public function __construct(ApiClient $apiClient, DBClient $dbClient)
     {
-        $this->tokenProvider = $tokenProvider;
-        $this->topsOfTopsDataProv = $topsOfTopsDataProv;
+        $this->apiClient = $apiClient;
+        $this->dbClient = $dbClient;
     }
 
     public function getTopsOfTheTops(int $since): array
     {
         $results = [];
-        $twitchTokenResponse = $this->tokenProvider->getToken();
+        $responseGetToken = $this->apiClient->getToken();
+        $twitchToken = json_decode($responseGetToken, true)['access_token'];
 
-        if ($this->requestHas500Code($twitchTokenResponse)) {
-            throw new Exception(self::GET_TOKEN_ERROR_MESSAGE);
-        }
+        $api_headers = array('Authorization: Bearer ' . $twitchToken);
 
-        $apiHeaders = ['Authorization: Bearer ' . $twitchTokenResponse];
+        $topThreeGames = $this->apiClient->getTopThreeGames($api_headers);
 
-        $topThreeGames = $this->topsOfTopsDataProv->getTopThreeGames($apiHeaders);
-
-        if ($this->requestHas500Code($topThreeGames)) {
-            throw new Exception(self::GET_TOP_GAMES_ERROR_MESSAGE);
-        }
-
-        if (!$this->topsOfTopsDataProv->isThereAnyStoredGame()) {
+        if (!$this->dbClient->isLoadedDB()) {
             $this->dbClient->addTopThreeGamesToDB($topThreeGames);
             foreach ($topThreeGames as $topGame) {
-                $topFourtyVideos = $this->topsOfTopsDataProv->getTopFourtyVideos($topGame['id'], $apiHeaders);
+                $topFourtyVideos = $this->apiClient->getTopFourtyVideos($topGame['id']);
                 $this->dbClient->addVideosToDB($topFourtyVideos, $topGame['id']);
                 $results = $this->getTopsOfTheTopsAttributes($topGame, $results);
             }
             return $results;
         }
         if ($this->shouldReviewEachTopGame($since)) {
-            $this->reviewEachTopGame($topThreeGames, $since, $apiHeaders);
+            $this->reviewEachTopGame($topThreeGames, $since);
         }
 
         return $this->fetchTopGamesData($topThreeGames);
@@ -60,7 +48,7 @@ class TopsOfTheTopsManager
         return $maxTimeDifference > $since;
     }
 
-    private function reviewEachTopGame(array $topThreeGames, int $since, array $api_headers): void
+    private function reviewEachTopGame(array $topThreeGames, int $since): void
     {
         $gamesArray = [];
 
@@ -75,7 +63,7 @@ class TopsOfTheTopsManager
             if ((in_array($twitchGame['name'], $gamesArray)) && (time() - strtotime($date) > $since)) {
                 $this->dbClient->deleteVideosOfAGivenGame($twitchGame['id']);
                 $this->dbClient->addVideosToDB(
-                    $this->topsOfTopsDataProv->getTopFourtyVideos($twitchGame['id'], $api_headers),
+                    $this->apiClient->getTopFourtyVideos($twitchGame['id']),
                     $twitchGame['id']
                 );
                 $this->dbClient->updateDatetime($twitchGame['id']);
@@ -84,7 +72,7 @@ class TopsOfTheTopsManager
                 $this->dbClient->deleteVideosOfAGivenGame($gameId);
                 $this->dbClient->updateTopGame($index + 1, $twitchGame['id'], $twitchGame['name']);
                 $this->dbClient->addVideosToDB(
-                    $this->topsOfTopsDataProv->getTopFourtyVideos($twitchGame['id'], $api_headers),
+                    $this->apiClient->getTopFourtyVideos($twitchGame['id']),
                     $twitchGame['id']
                 );
             }
@@ -129,11 +117,5 @@ class TopsOfTheTopsManager
             }
         }
         return '';
-    }
-
-    private function requestHas500Code(mixed $requestResponse): bool
-    {
-        return isset($requestResponse['http_code']) &&
-            $requestResponse['http_code'] === Response::HTTP_INTERNAL_SERVER_ERROR;
     }
 }
