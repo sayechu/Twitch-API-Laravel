@@ -13,6 +13,7 @@ use App\Services\FollowStreamerManager;
 use App\Services\TokenProvider;
 use Illuminate\Http\Response;
 use Mockery;
+use Tests\Builders\StreamerDataBuilder;
 use Tests\TestCase;
 
 class FollowStreamerManagerTest extends TestCase
@@ -135,25 +136,9 @@ class FollowStreamerManagerTest extends TestCase
      */
     public function get_follow_message_returns_curl_streamer_error()
     {
-        $streamerResponse = [
-            'response' => json_encode([
-                'data' => [
-                    [
-                        'id' => self::STREAMER_ID,
-                        'login' => 'userLogin',
-                        'display_name' => 'displayName',
-                        'type' => 'type',
-                        'broadcaster_type' => 'broadcasterType',
-                        'description' => 'description',
-                        'profile_image_url' => 'profileImageUrl',
-                        'offline_image_url' => 'offlineImageUrl',
-                        'view_count' => 0,
-                        'created_at' => 'createdAt'
-                    ]
-                ]
-            ]),
-            'http_code' => Response::HTTP_UNAUTHORIZED
-        ];
+        $responseBuilder = (new StreamerDataBuilder())->withTestValues();
+        $responseBuilder->withHttpCode(Response::HTTP_UNAUTHORIZED);
+        $streamerResponse = $responseBuilder->build();
 
         $this->databaseClient
             ->expects('userFollowsStreamer')
@@ -220,25 +205,8 @@ class FollowStreamerManagerTest extends TestCase
      */
     public function get_follow_message_returns_not_found_error()
     {
-        $streamerResponse = [
-            'response' => json_encode([
-                'data' => [
-                    [
-                        'id' => self::STREAMER_ID,
-                        'login' => 'userLogin',
-                        'display_name' => 'displayName',
-                        'type' => 'type',
-                        'broadcaster_type' => 'broadcasterType',
-                        'description' => 'description',
-                        'profile_image_url' => 'profileImageUrl',
-                        'offline_image_url' => 'offlineImageUrl',
-                        'view_count' => 0,
-                        'created_at' => 'createdAt'
-                    ]
-                ]
-            ]),
-            'http_code' => Response::HTTP_OK
-        ];
+        $responseBuilder = (new StreamerDataBuilder())->withTestValues();
+        $streamerResponse = $responseBuilder->build();
 
         $this->databaseClient
             ->expects('userFollowsStreamer')
@@ -276,25 +244,8 @@ class FollowStreamerManagerTest extends TestCase
         $expectedResponse = [
             "message" => "Ahora sigues a " . self::STREAMER_ID
         ];
-        $streamerResponse = [
-            'response' => json_encode([
-                'data' => [
-                    [
-                        'id' => self::STREAMER_ID,
-                        'login' => 'userLogin',
-                        'display_name' => 'displayName',
-                        'type' => 'type',
-                        'broadcaster_type' => 'broadcasterType',
-                        'description' => 'description',
-                        'profile_image_url' => 'profileImageUrl',
-                        'offline_image_url' => 'offlineImageUrl',
-                        'view_count' => 0,
-                        'created_at' => 'createdAt'
-                    ]
-                ]
-            ]),
-            'http_code' => Response::HTTP_OK
-        ];
+        $responseBuilder = (new StreamerDataBuilder())->withTestValues();
+        $streamerResponse = $responseBuilder->build();
 
         $this->databaseClient
             ->expects('userFollowsStreamer')
