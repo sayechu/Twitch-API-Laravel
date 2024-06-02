@@ -42,7 +42,7 @@ class TopsOfTheTopsManager
         }
 
         foreach ($topGamesResponse as $topGame) {
-            $topVideos[] = $this->topVideosProvider->getTopFourtyVideos(
+            $topVideos[] = $this->topVideosProvider->getTopFourtyVideo(
                 $topGame['id'],
                 $topGame['name'],
                 $since,
