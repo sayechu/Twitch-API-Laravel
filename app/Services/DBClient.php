@@ -252,9 +252,9 @@ class DBClient
     public function getUsers(): array
     {
         try {
-            $stmt = $this->pdo->prepare('SELECT username FROM USUARIO');
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $selectStatement = $this->pdo->prepare('SELECT username FROM USUARIO');
+            $selectStatement->execute();
+            return $selectStatement->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException) {
             throw new InternalServerErrorException("Error del servidor al obtener la lista de usuarios.");
         }
@@ -263,9 +263,9 @@ class DBClient
     public function getStreamers(string $username): array
     {
         try {
-            $stmt = $this->pdo->prepare('SELECT streamerId FROM USUARIO_STREAMERS WHERE username = ?');
-            $stmt->execute([$username]);
-            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+            $selectStatement = $this->pdo->prepare('SELECT streamerId FROM USUARIO_STREAMERS WHERE username = ?');
+            $selectStatement->execute([$username]);
+            return $selectStatement->fetchAll(PDO::FETCH_COLUMN);
         } catch (PDOException) {
             throw new InternalServerErrorException("Error del servidor al obtener la lista de usuarios.");
         }
