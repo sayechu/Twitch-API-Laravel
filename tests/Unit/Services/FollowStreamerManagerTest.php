@@ -32,7 +32,7 @@ class FollowStreamerManagerTest extends TestCase
     private const CONFLICT_EXCEPTION_MESSAGE = 'El usuario ya está siguiendo al streamer';
     private const INTERNAL_SERVER_ERROR_MESSAGE = "Error del servidor al seguir al streamer";
     private const NOT_FOUND_ERROR_MESSAGE = "El usuario (" . self::USERNAME . ") o el streamer ("
-                                             . self::STREAMER_ID . ") especificado no existe en la API";
+    . self::STREAMER_ID . ") especificado no existe en la API";
 
     protected function setUp(): void
     {
