@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use Illuminate\Http\Response;
 use Exception;
+use Illuminate\Http\Response;
 
 class TopsOfTheTopsManager
 {
