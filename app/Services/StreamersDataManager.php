@@ -38,7 +38,7 @@ class StreamersDataManager
             throw new Exception(self::GET_USERS_ERROR_MESSAGE);
         }
 
-        return $userData['response'];
+        return json_decode($userData['response'], true);
     }
 
     private function requestHas500Code(mixed $requestResponse): bool
