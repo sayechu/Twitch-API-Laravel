@@ -8,4 +8,3 @@ class ConflictException extends Exception
 {
 
 }
-

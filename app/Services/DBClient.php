@@ -23,8 +23,8 @@ class DBClient
         try {
             $this->pdo = new PDO($this->dataSourceName, $this->username, $this->password);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            echo "Error de conexión: " . $e->getMessage();
+        } catch (PDOException) {
+            throw new InternalServerErrorException();
         }
     }
 
@@ -103,6 +103,30 @@ class DBClient
             $insertStatement->execute([$username, $streamerId]);
         } catch (PDOException) {
             throw new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE);
+        }
+    }
+
+    public function isUserFollowingStreamer(string $username, string $streamerId): bool
+    {
+        try {
+            $selectStatement = $this->pdo->prepare('SELECT COUNT(*)
+                                                    FROM USUARIO_STREAMERS
+                                                    WHERE username = ? AND streamerId = ?');
+            $selectStatement->execute([$username, $streamerId]);
+            return $selectStatement->fetchColumn() > 0;
+        } catch (PDOException) {
+            throw new InternalServerErrorException('Error del servidor al dejar de seguir al streamer.');
+        }
+    }
+
+    public function unfollowStreamer(string $username, string $streamerId): void
+    {
+        try {
+            $deleteStatement = $this->pdo->prepare('DELETE FROM USUARIO_STREAMERS
+                                                    WHERE username = ? AND streamerId = ?');
+            $deleteStatement->execute([$username, $streamerId]);
+        } catch (PDOException) {
+            throw new InternalServerErrorException('Error del servidor al dejar de seguir al streamer.');
         }
     }
 }

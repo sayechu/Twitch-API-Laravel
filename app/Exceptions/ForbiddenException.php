@@ -8,4 +8,3 @@ class ForbiddenException extends Exception
 {
 
 }
-
