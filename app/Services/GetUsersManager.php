@@ -28,8 +28,8 @@ class GetUsersManager
             $streamers = $this->databaseClient->getStreamers($username);
 
             $result[] = [
-                "username" => $username,
-                "followedStreamers" => $streamers
+                'username' => $username,
+                'followedStreamers' => $streamers
             ];
         }
 
