@@ -14,7 +14,7 @@ return new class extends Migration
         $sql = "
             CREATE TABLE IF NOT EXISTS USUARIO_STREAMERS (
                 username VARCHAR(255),
-                streamerId INT,
+                streamerId VARCHAR(255),
                 PRIMARY KEY (username, streamerId),
                 FOREIGN KEY (username) REFERENCES USUARIO (username) ON DELETE CASCADE
             );
