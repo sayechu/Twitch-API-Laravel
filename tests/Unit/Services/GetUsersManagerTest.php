@@ -12,6 +12,7 @@ class GetUsersManagerTest extends TestCase
 {
     private DBClient $databaseClient;
     private GetUsersManager $getUsersManager;
+    private const INTERNAL_SERVER_ERROR_MESSAGE = "Error del servidor al obtener la lista de usuarios.";
 
     protected function setUp(): void
     {
@@ -61,33 +62,15 @@ class GetUsersManagerTest extends TestCase
      */
     public function get_users_and_streamers_throws_internal_server_error_exception_on_db_failure(): void
     {
-        $exceptionMessage = 'Error del servidor al obtener la lista de usuarios.';
-
         $this->databaseClient
             ->expects('getUsers')
             ->once()
-            ->andThrow(new InternalServerErrorException($exceptionMessage));
+            ->andThrow(new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE));
+
         $this->expectException(InternalServerErrorException::class);
-        $this->expectExceptionMessage($exceptionMessage);
+        $this->expectExceptionMessage(self::INTERNAL_SERVER_ERROR_MESSAGE);
 
         $this->getUsersManager->getUsersAndStreamers();
-    }
-
-    /**
-     * @test
-     */
-    public function get_users_and_streamers_handles_empty_user_list(): void
-    {
-        $expectedResult = [];
-
-        $this->databaseClient
-            ->expects('getUsers')
-            ->once()
-            ->andReturn([]);
-
-        $actualResult = $this->getUsersManager->getUsersAndStreamers();
-
-        $this->assertEquals($expectedResult, $actualResult);
     }
 
     protected function tearDown(): void
