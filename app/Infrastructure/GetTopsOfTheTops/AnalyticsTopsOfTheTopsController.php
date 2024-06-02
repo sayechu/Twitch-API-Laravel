@@ -22,7 +22,7 @@ class AnalyticsTopsOfTheTopsController extends Controller
         $since = $request->input('since') ?? (10 * 60);
 
         try {
-            $topsOfTheTops = $this->getTopsOfTopsService->getTopsOfTheTops($since);
+            $topsOfTheTops = $this->getTopsOfTopsService->execute($since);
             return response()->json($topsOfTheTops);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_SERVICE_UNAVAILABLE);
