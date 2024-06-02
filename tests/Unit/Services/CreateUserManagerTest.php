@@ -18,8 +18,6 @@ class CreateUserManagerTest extends TestCase
     private const INTERNAL_SERVER_ERROR_MESSAGE = 'Error del servidor al crear el usuario.';
     private const CONFLICT_ERROR_MESSAGE = 'El nombre de usuario ya está en uso.';
     private const CREATE_USER_MESSAGE = 'Usuario creado correctamente';
-    private const BAD_REQUEST_ERROR_MESSAGE = 'Los parámetros (' . self::USERNAME . ' y ' . self::PASSWORD .
-                                               ') no fueron proporcionados.';
 
     protected function setUp(): void
     {
