@@ -11,7 +11,6 @@ class UserDataManager
 
     private const ERROR_GET_TOKEN_FAILED = 'No se puede establecer conexión con Twitch en este momento';
     private const ERROR_GET_USERS_FAILED = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
-    private const USERS_URL = 'https://api.twitch.tv/helix/users';
 
 
     public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient)
@@ -28,7 +27,7 @@ class UserDataManager
             return ['error' => self::ERROR_GET_TOKEN_FAILED];
         }
 
-        $apiUrl = self::USERS_URL . "?id=" . urlencode($userId);
+        $apiUrl = "https://api.twitch.tv/helix/users?id=" . urlencode($userId);
         $apiHeaders = ['Authorization: Bearer ' . $twitchToken];
 
         $userData = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
