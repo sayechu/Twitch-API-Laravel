@@ -155,7 +155,7 @@ class DBClient
 
     public function isUserStored(string $username): bool
     {
-        $selectStatement = $this->pdo->prepare("SELECT COUNT(*) FROM USUARIO_STREAMERS WHERE username = ?");
+        $selectStatement = $this->pdo->prepare("SELECT COUNT(*) FROM USUARIO WHERE username = ?");
         $selectStatement->execute([$username]);
         return $selectStatement->fetchColumn() > 0;
     }
