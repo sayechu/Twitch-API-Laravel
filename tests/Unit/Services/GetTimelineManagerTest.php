@@ -15,12 +15,15 @@ use Illuminate\Http\Response;
 
 class GetTimelineManagerTest extends TestCase
 {
-    private $tokenProvider;
-    private $streamersProvider;
-    private $streamsProvider;
-    private $apiClient;
-    private $dbClient;
-    private $getTimelineManager;
+    private TokenProvider$tokenProvider;
+    private TimelineStreamersProvider $streamersProvider;
+    private TimelineStreamsProvider $streamsProvider;
+    private ApiClient $apiClient;
+    private DBClient $dbClient;
+    private GetTimelineManager $getTimelineManager;
+    private const USERNAME = "username";
+    private const NOT_FOUND_ERROR_MESSAGE = "El usuario especificado ( " . self::USERNAME . " ) no existe.";
+    private const INTERNAL_SERVER_ERROR_MESSAGE = "Error del servidor al obtener el timeline.";
 
     protected function setUp(): void
     {
@@ -28,7 +31,6 @@ class GetTimelineManagerTest extends TestCase
         $this->apiClient = Mockery::mock(ApiClient::class);
         $this->dbClient = Mockery::mock(DBClient::class);
 
-        // Mock the TokenProvider instead of creating a new instance
         $this->tokenProvider = Mockery::mock(TokenProvider::class, [$this->apiClient, $this->dbClient])->makePartial();
 
         $this->streamersProvider = Mockery::mock(TimelineStreamersProvider::class);
@@ -41,49 +43,51 @@ class GetTimelineManagerTest extends TestCase
         );
     }
 
-
-    public function testGetStreamersTimelineThrowsInternalServerError()
+    /**
+     * @test
+     */
+    public function get_streamers_timeline_returns_internal_server_error()
     {
-        $username = 'ibai';
         $followingStreamers = ['streamer1', 'streamer2'];
 
         $this->streamersProvider
             ->shouldReceive('getTimelineStreamers')
-            ->with($username)
+            ->with(self::USERNAME)
             ->andReturn($followingStreamers);
 
         $this->tokenProvider
             ->shouldReceive('getToken')
             ->once()
-            ->andThrow(new InternalServerErrorException(" Error del servidor al obtener el timeline."));
+            ->andThrow(new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE));
 
         $this->expectException(InternalServerErrorException::class);
-        $this->expectExceptionMessage("Error del servidor al obtener el timeline.");
+        $this->expectExceptionMessage(self::INTERNAL_SERVER_ERROR_MESSAGE);
 
-        $this->getTimelineManager->getStreamersTimeline($username);
+        $this->getTimelineManager->getStreamersTimeline(self::USERNAME);
     }
 
-    public function testGetStreamersTimelineThrowsNotFoundException()
+    /**
+     * @test
+     */
+    public function get_streamers_timeline_returns_not_found_exception()
     {
-        $username = 'nonexistentuser';
-
         $this->streamersProvider
             ->shouldReceive('getTimelineStreamers')
-            ->with($username)
+            ->with(self::USERNAME)
             ->once()
-            ->andThrow(new NotFoundException("El usuario especificado ( {$username} ) no existe."));
+            ->andThrow(new NotFoundException(self::NOT_FOUND_ERROR_MESSAGE));
 
         $this->expectException(NotFoundException::class);
-        $this->expectExceptionMessage("El usuario especificado ( {$username} ) no existe.");
+        $this->expectExceptionMessage(self::NOT_FOUND_ERROR_MESSAGE);
 
-        $this->getTimelineManager->getStreamersTimeline($username);
+        $this->getTimelineManager->getStreamersTimeline(self::USERNAME);
     }
 
-
-
-    public function testGetStreamersTimelineSuccess()
+    /**
+     * @test
+     */
+    public function get_streamers_timeline()
     {
-        $username = 'validuser';
         $followingStreamers = ['streamer1', 'streamer2'];
         $twitchTokenResponse = ['response' => json_encode(['access_token' => 'validToken'])];
         $expectedStreams = [
@@ -105,7 +109,7 @@ class GetTimelineManagerTest extends TestCase
 
         $this->streamersProvider
             ->shouldReceive('getTimelineStreamers')
-            ->with($username)
+            ->with(self::USERNAME)
             ->andReturn($followingStreamers);
 
         $this->streamsProvider
@@ -113,7 +117,7 @@ class GetTimelineManagerTest extends TestCase
             ->with('validToken', $followingStreamers)
             ->andReturn($expectedStreams);
 
-        $result = $this->getTimelineManager->getStreamersTimeline($username);
+        $result = $this->getTimelineManager->getStreamersTimeline(self::USERNAME);
 
         $this->assertEquals($expectedStreams, $result);
     }
