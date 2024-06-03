@@ -5,7 +5,6 @@ namespace App\Infrastructure\FollowStreamer;
 use App\Services\FollowStreamerManager;
 use App\Infrastructure\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use App\Exceptions\ConflictException;
 use App\Exceptions\ForbiddenException;
 use App\Exceptions\InternalServerErrorException;
