@@ -8,7 +8,6 @@ use App\Infrastructure\Controllers\Controller;
 use App\Services\CreateUserManager;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class AnalyticsCreateUserController extends Controller
 {
@@ -18,7 +17,7 @@ class AnalyticsCreateUserController extends Controller
     {
         $this->createUserManager = $createUserManager;
     }
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(AnalyticsCreateUserRequest $request): JsonResponse
     {
         $username = $request->input('username');
         $password = $request->input('password');
