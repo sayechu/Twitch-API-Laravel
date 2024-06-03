@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Infrastructure\Requests;
+namespace Tests\Unit\Infrastructure\Requests\UnfollowStreamer;
 
 use App\Infrastructure\UnfollowStreamer\AnalyticsUnfollowRequest;
 use Illuminate\Support\Facades\Validator;

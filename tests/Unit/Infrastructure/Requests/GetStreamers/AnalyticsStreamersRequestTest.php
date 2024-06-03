@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Infrastructure\Requests;
+namespace Tests\Unit\Infrastructure\Requests\GetStreamers;
 
 use App\Infrastructure\GetStreamers\AnalyticsStreamersRequest;
 use Illuminate\Support\Facades\Validator;

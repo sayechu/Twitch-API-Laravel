@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Infrastructure\Requests;
+namespace Tests\Unit\Infrastructure\Requests\CreateUser;
 
 use App\Infrastructure\CreateUser\AnalyticsCreateUserRequest;
 use Illuminate\Support\Facades\Validator;

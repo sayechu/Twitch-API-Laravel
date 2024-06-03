@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Infrastructure\Requests;
+namespace Tests\Unit\Infrastructure\Requests\FollowStreamer;
 
 use App\Infrastructure\FollowStreamer\AnalyticsFollowStreamerRequest;
 use Illuminate\Support\Facades\Validator;

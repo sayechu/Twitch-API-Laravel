@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Infrastructure\Requests;
+namespace Tests\Unit\Infrastructure\Requests\GetTopsOfTheTops;
 
 use App\Infrastructure\GetTopsOfTheTops\AnalyticsTopsOfTheTopsRequest;
 use Illuminate\Support\Facades\Validator;
