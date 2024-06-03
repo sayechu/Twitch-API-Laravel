@@ -82,7 +82,7 @@ class GetFollowMessageTest extends TestCase
             "message" => "Ahora sigues a " . self::STREAMER_ID
         ];
         $streamerResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => [
                     [
                         'id' => self::STREAMER_ID,
@@ -97,7 +97,7 @@ class GetFollowMessageTest extends TestCase
                         'created_at' => 'createdAt'
                     ]
                 ]
-            ]),
+            ],
             'http_code' => Response::HTTP_OK
         ];
 
@@ -143,7 +143,7 @@ class GetFollowMessageTest extends TestCase
             "message" => "Ahora sigues a " . self::STREAMER_ID
         ];
         $streamerResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => [
                     [
                         'id' => self::STREAMER_ID,
@@ -158,7 +158,7 @@ class GetFollowMessageTest extends TestCase
                         'created_at' => 'createdAt'
                     ]
                 ]
-            ]),
+            ],
             'http_code' => Response::HTTP_OK
         ];
         $getTokenResponse = [
@@ -216,7 +216,7 @@ class GetFollowMessageTest extends TestCase
             "error" => self::GET_TOKEN_ERROR_MESSAGE
         ];
         $streamerResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => [
                     [
                         'id' => self::STREAMER_ID,
@@ -231,7 +231,7 @@ class GetFollowMessageTest extends TestCase
                         'created_at' => 'createdAt'
                     ]
                 ]
-            ]),
+            ],
             'http_code' => Response::HTTP_UNAUTHORIZED
         ];
 
@@ -270,9 +270,9 @@ class GetFollowMessageTest extends TestCase
                 . self::STREAMER_ID . ") especificado no existe en la API"
         ];
         $streamerResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => []
-            ]),
+            ],
             'http_code' => Response::HTTP_OK
         ];
         $getTokenResponse = [
@@ -323,7 +323,7 @@ class GetFollowMessageTest extends TestCase
                 . self::STREAMER_ID . ") especificado no existe en la API"
         ];
         $streamerResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => [
                     [
                         'id' => self::STREAMER_ID,
@@ -338,7 +338,7 @@ class GetFollowMessageTest extends TestCase
                         'created_at' => 'createdAt'
                     ]
                 ]
-            ]),
+            ],
             'http_code' => Response::HTTP_OK
         ];
         $getTokenResponse = [
@@ -413,7 +413,7 @@ class GetFollowMessageTest extends TestCase
             "error" => self::INTERNAL_SERVER_ERROR_MESSAGE
         ];
         $streamerResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => [
                     [
                         'id' => self::STREAMER_ID,
@@ -428,7 +428,7 @@ class GetFollowMessageTest extends TestCase
                         'created_at' => 'createdAt'
                     ]
                 ]
-            ]),
+            ],
             'http_code' => Response::HTTP_OK
         ];
         $getTokenResponse = [
@@ -482,7 +482,7 @@ class GetFollowMessageTest extends TestCase
             "error" => self::INTERNAL_SERVER_ERROR_MESSAGE
         ];
         $streamerResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => [
                     [
                         'id' => self::STREAMER_ID,
@@ -497,7 +497,7 @@ class GetFollowMessageTest extends TestCase
                         'created_at' => 'createdAt'
                     ]
                 ]
-            ]),
+            ],
             'http_code' => Response::HTTP_OK
         ];
 
