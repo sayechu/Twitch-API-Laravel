@@ -9,7 +9,7 @@ class TimelineStreamsProvider
 {
     private ApiClient $apiClient;
     private DBClient $databaseClient;
-    private const STREAMS_URL = 'https://api.twitch.tv/helix/streams';
+    private const STREAMS_URL = 'https://api.twitch.tv/helix/videos';
 
     public function __construct(ApiClient $apiClient, DBClient $databaseClient)
     {
