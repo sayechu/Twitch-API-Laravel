@@ -5,6 +5,7 @@ namespace App\Infrastructure\Timeline;
 use App\Exceptions\InternalServerErrorException;
 use App\Exceptions\NotFoundException;
 use App\Infrastructure\Controllers\Controller;
+use App\Infrastructure\FollowStreamer\AnalyticsTimelineRequest;
 use App\Services\GetTimelineManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class AnalyticsTimelineController extends Controller
         $this->timelineManager = $timelineManager;
     }
 
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(AnalyticsTimelineRequest $request): JsonResponse
     {
         try {
             $username = $request->input('username');
@@ -31,5 +32,4 @@ class AnalyticsTimelineController extends Controller
             return response()->json(['error' => $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 }
