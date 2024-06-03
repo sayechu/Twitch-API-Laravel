@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Exceptions\ConflictException;
 use App\Exceptions\ForbiddenException;
-use App\Exceptions\InternalServerErrorException;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\UnauthorizedException;
 use Illuminate\Http\Response;
@@ -26,13 +25,6 @@ class FollowStreamerManager
         $this->databaseClient = $databaseClient;
     }
 
-    /**
-     * @throws ConflictException
-     * @throws ForbiddenException
-     * @throws InternalServerErrorException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     */
     public function getFollowMessage($username, $streamerId): array
     {
         if ($this->databaseClient->userFollowsStreamer($username, $streamerId)) {
@@ -56,9 +48,6 @@ class FollowStreamerManager
         ];
     }
 
-    /**
-     * @throws UnauthorizedException
-     */
     private function checkIfStreamerExists($streamerId, $twitchToken): array
     {
         $apiUrl = self::GET_STREAMER_DATA_URL . '?id=' . urlencode($streamerId);

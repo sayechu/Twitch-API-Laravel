@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Exceptions\ConflictException;
-use App\Exceptions\InternalServerErrorException;
 
 class CreateUserManager
 {
@@ -16,10 +15,6 @@ class CreateUserManager
         $this->dbClient = $dbClient;
     }
 
-    /**
-     * @throws ConflictException
-     * @throws InternalServerErrorException
-     */
     public function getCreateUserMessage($username, $password): array
     {
         $userExists = $this->dbClient->checkIfUsernameExists($username);

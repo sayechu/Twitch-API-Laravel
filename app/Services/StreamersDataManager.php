@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Http\Response;
-use Mockery\Exception;
 
 class StreamersDataManager
 {
@@ -13,7 +13,6 @@ class StreamersDataManager
     private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
     private const GET_USERS_ERROR_MESSAGE = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
     private const GET_USERS_URL = 'https://api.twitch.tv/helix/users';
-
 
     public function __construct(TokenProvider $tokenProvider, ApiClient $apiClient)
     {
