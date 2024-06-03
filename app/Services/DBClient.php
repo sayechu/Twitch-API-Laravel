@@ -15,6 +15,7 @@ class DBClient
     private string $password = 'password';
     private string $dataSourceName;
     protected PDO $pdo;
+    private const INTERNAL_SERVER_ERROR_FOLLOW_MESSAGE = "Error del servidor al seguir al streamer";
     private const INTERNAL_SERVER_ERROR_MESSAGE = "Error del servidor al seguir al streamer";
 
     public function __construct()
@@ -94,6 +95,17 @@ class DBClient
         }
     }
 
+    public function getUsers(): array
+    {
+        try {
+            $selectStatement = $this->pdo->prepare('SELECT username FROM USUARIO');
+            $selectStatement->execute();
+            return $selectStatement->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException) {
+            throw new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_FOLLOW_MESSAGE);
+        }
+    }
+
     public function isUserStored(string $username): bool
     {
         $selectStatement = $this->pdo->prepare("SELECT COUNT(*) FROM USUARIO WHERE username = ?");
@@ -124,7 +136,7 @@ class DBClient
                 $stream['user_name'],
                 $stream['title'],
                 null,
-                $stream['viewer_count'],
+                $stream['view_count'],
                 $stream['created_at']
             ]);
         }

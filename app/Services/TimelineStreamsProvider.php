@@ -30,8 +30,7 @@ class TimelineStreamsProvider
                 throw new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE);
             }
 
-            $streamerStreams = json_decode($streamsResponse['response'], true)['data'];
-            $this->databaseClient->storeStreams($streamerStreams);
+            $this->databaseClient->storeStreams($streamsResponse['response']['data']);
         }
         return $this->databaseClient->getTimelineStreams();
     }
