@@ -17,8 +17,6 @@ class DBClient
     protected PDO $pdo;
     private const INTERNAL_SERVER_ERROR_MESSAGE = "Error del servidor al seguir al streamer";
 
-    private const INTERNAL_SERVER_ERROR_MESSAGE = "Error del servidor al obtener la lista de usuarios.";
-
     public function __construct()
     {
         $this->dataSourceName = "mysql:host=$this->host;port=$this->port;dbname=$this->dbName";
