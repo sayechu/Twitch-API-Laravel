@@ -2,9 +2,6 @@
 
 namespace App\Services;
 
-use App\Exceptions\ConflictException;
-use App\Exceptions\InternalServerErrorException;
-
 class GetUsersManager
 {
     private DBClient $databaseClient;
@@ -14,10 +11,6 @@ class GetUsersManager
         $this->databaseClient = $databaseClient;
     }
 
-    /**
-     * @throws ConflictException
-     * @throws InternalServerErrorException
-     */
     public function getUsersAndStreamers(): array
     {
         $users = $this->databaseClient->getUsers();
