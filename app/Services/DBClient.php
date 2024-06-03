@@ -48,9 +48,6 @@ class DBClient
         $insertStatement->execute([$twitchToken]);
     }
 
-    /**
-     * @throws InternalServerErrorException
-     */
     public function checkIfUsernameExists(string $username): bool
     {
         try {
@@ -62,9 +59,6 @@ class DBClient
         }
     }
 
-    /**
-     * @throws InternalServerErrorException
-     */
     public function createUser(string $username, string $password): void
     {
         try {
@@ -75,9 +69,6 @@ class DBClient
         }
     }
 
-    /**
-     * @throws InternalServerErrorException
-     */
     public function userFollowsStreamer(string $username, string $streamerId): bool
     {
         try {
@@ -92,9 +83,6 @@ class DBClient
         }
     }
 
-    /**
-     * @throws InternalServerErrorException
-     */
     public function addUserFollowsStreamer(string $username, string $streamerId): void
     {
         try {
