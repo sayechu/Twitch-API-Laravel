@@ -170,9 +170,9 @@ class FollowStreamerManagerTest extends TestCase
     public function get_follow_message_with_empty_streamer_data_returns_not_found_error()
     {
         $streamerResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => []
-            ]),
+            ],
             'http_code' => Response::HTTP_OK
         ];
 

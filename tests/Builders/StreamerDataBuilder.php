@@ -92,7 +92,7 @@ class StreamerDataBuilder
 
     public function build(): array
     {
-        $this->response['response'] = json_encode(['data' => [$this->userData]]);
+        $this->response['response'] = ['data' => [$this->userData]];
         return $this->response;
     }
 
