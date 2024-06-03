@@ -10,6 +10,7 @@ class TimelineStreamsProvider
     private ApiClient $apiClient;
     private DBClient $databaseClient;
     private const STREAMS_URL = 'https://api.twitch.tv/helix/videos';
+    private const INTERNAL_SERVER_ERROR_MESSAGE = 'Error del servidor al obtener el timeline.';
 
     public function __construct(ApiClient $apiClient, DBClient $databaseClient)
     {
@@ -25,8 +26,8 @@ class TimelineStreamsProvider
 
             $streamsResponse = $this->apiClient->makeCurlCall($apiUrl, $apiHeaders);
 
-            if ($this->requestHas500Code($twitchToken)) {
-                throw new InternalServerErrorException('Error del servidor al obtener el timeline.');
+            if ($this->requestHas500Code($streamsResponse)) {
+                throw new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE);
             }
 
             $streamerStreams = json_decode($streamsResponse['response'], true)['data'];
