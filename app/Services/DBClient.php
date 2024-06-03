@@ -177,14 +177,14 @@ class DBClient
                                                      viewerCount,
                                                      startedAt)
                                                     VALUES (?, ?, ?, ?, ?, ?)
-                                                ');
+                                                    ');
         foreach ($streamerStreams as $stream) {
             $insertStatement->execute([$stream['user_id'],
                 $stream['user_name'],
                 $stream['title'],
-                $stream['game_name'],
+                null,
                 $stream['viewer_count'],
-                $stream['started_at']
+                $stream['created_at']
             ]);
         }
     }
