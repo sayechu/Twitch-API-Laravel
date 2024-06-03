@@ -8,10 +8,10 @@ use Illuminate\Http\Response;
 
 class GetTimelineManager
 {
-    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
     private TokenProvider $tokenProvider;
     private TimelineStreamersProvider $streamersProvider;
     private TimelineStreamsProvider $streamsProvider;
+    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
 
     public function __construct(
         TokenProvider $tokenProvider,
