@@ -2,90 +2,234 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Services\ApiClient;
+use App\Services\TimelineStreamersProvider;
+use App\Services\TimelineStreamsProvider;
+use App\Services\TokenProvider;
 use Tests\TestCase;
-use App\Models\User;
 use App\Services\DBClient;
-use App\Services\GetTimelineManager;
+use Illuminate\Http\Response;
 use Mockery;
-use Illuminate\Support\Facades\Http;
 
 class TimelineStreamsTest extends TestCase
 {
-    use RefreshDatabase;
+    private ApiClient $apiClient;
+    private DBClient $databaseClient;
+    private const USERNAME = "username";
+    private const TWITCH_TOKEN = 'nrtovbe5h02os45krmjzvkt3hp74vf';
+    private const ENDPOINT = "/analytics/timeline";
+    private const NOT_FOUND_ERROR_MESSAGE = "El usuario especificado ( " . self::USERNAME . " ) no existe.";
+    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
+    private const INTERNAL_SERVER_ERROR_MESSAGE = 'Error del servidor al obtener el timeline.';
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->mockDBClient = Mockery::mock(DBClient::class);
-        $this->app->instance(DBClient::class, $this->mockDBClient);
-        $this->app->bind(GetTimelineManager::class, function ($app) {
-            return new GetTimelineManager(
-                $app->make('App\Services\TokenProvider'),
-                $app->make('App\Services\TimelineStreamersProvider'),
-                $app->make('App\Services\TimelineStreamsProvider')
-            );
-        });
+        $this->apiClient = Mockery::mock(ApiClient::class);
+        $this->databaseClient = Mockery::mock(DBClient::class);
+        $this->app
+            ->when(TokenProvider::class)
+            ->needs(ApiClient::class)
+            ->give(fn() => $this->apiClient);
+        $this->app
+            ->when(TokenProvider::class)
+            ->needs(DBClient::class)
+            ->give(fn() => $this->databaseClient);
+        $this->app
+            ->when(TimelineStreamersProvider::class)
+            ->needs(DBClient::class)
+            ->give(fn() => $this->databaseClient);
+        $this->app
+            ->when(TimelineStreamsProvider::class)
+            ->needs(ApiClient::class)
+            ->give(fn() => $this->apiClient);
+        $this->app
+            ->when(TimelineStreamsProvider::class)
+            ->needs(DBClient::class)
+            ->give(fn() => $this->databaseClient);
     }
 
     /**
      * @test
      */
-    public function returns_a_timeline_for_a_valid_user()
+    public function get_streamers_timeline_returns_not_found_error()
     {
-        $user = User::factory()->create(['username' => 'validUser']);
-        $this->mockDBClient->shouldReceive('isUserStored')->andReturn(true);
-        $this->mockDBClient->shouldReceive('getStreamers')->andReturn(['streamer1', 'streamer2']);
-        $this->mockDBClient->shouldReceive('getTimelineStreams')->andReturn([
-            ['streamerName' => 'streamer1', 'streamDetails' => []],
-            ['streamerName' => 'streamer2', 'streamDetails' => []]
-        ]);
+        $this->databaseClient
+            ->expects('isUserStored')
+            ->once()
+            ->with(self::USERNAME)
+            ->andReturn(false);
+        $responseGetTimeline = $this->get(self::ENDPOINT . '?username=' . self::USERNAME);
 
-        Http::fake([
-            'https://api.twitch.tv/helix/videos' => Http::response(['data' => []], 200)
-        ]);
-
-        $response = $this->getJson("/api/timeline?username={$user->username}");
-
-        $response->assertOk();
-        $response->assertJson([
-            ['streamerName' => 'streamer1', 'streamDetails' => []],
-            ['streamerName' => 'streamer2', 'streamDetails' => []]
+        $responseGetTimeline->assertStatus(Response::HTTP_NOT_FOUND);
+        $responseGetTimeline->assertJson([
+            'error' => self::NOT_FOUND_ERROR_MESSAGE
         ]);
     }
 
     /**
      * @test
      */
-    public function returns_not_found_for_an_invalid_user()
+    public function get_streamers_timeline_returns_token_error()
     {
-        Http::fake();
-        $username = 'nonExistentUser';
-        $this->mockDBClient->shouldReceive('isUserStored')->with($username)->andReturn(false);
+        $followingStreamers = ['streamer1', 'streamer2'];
+        $getTokenResponse = [
+            'response' => null,
+            'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
+        ];
 
-        $response = $this->getJson("/api/timeline?username={$username}");
+        $this->databaseClient
+            ->expects('isUserStored')
+            ->once()
+            ->with(self::USERNAME)
+            ->andReturn(true);
+        $this->databaseClient
+            ->expects('getStreamers')
+            ->once()
+            ->with(self::USERNAME)
+            ->andReturn($followingStreamers);
+        $this->databaseClient
+            ->expects('isTokenStoredInDatabase')
+            ->once()
+            ->andReturn(false);
+        $this->apiClient
+            ->expects('getToken')
+            ->once()
+            ->andReturn($getTokenResponse);
 
-        $response->assertStatus(Response::HTTP_NOT_FOUND);
-        $response->assertJson(['error' => "El usuario especificado ({$username}) no existe."]);
+        $responseGetTimeline = $this->get(self::ENDPOINT . '?username=' . self::USERNAME);
+
+        $responseGetTimeline->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
+        $responseGetTimeline->assertJson([
+            'error' => self::GET_TOKEN_ERROR_MESSAGE
+        ]);
     }
 
     /**
      * @test
      */
-    public function returns_internal_server_error_if_api_fails()
+    public function get_streamers_timeline_with_stored_token_returns_stream_curl_error()
     {
-        $user = User::factory()->create(['username' => 'apiFailUser']);
-        $this->mockDBClient->shouldReceive('isUserStored')->andReturn(true);
-        $this->mockDBClient->shouldReceive('getStreamers')->andReturn(['streamer1']);
+        $followingStreamers = ['streamer1', 'streamer2'];
+        $streamsResponse = [
+            'response' => json_encode([
+                'data' => [
+                    [
+                        'id' => 'userId',
+                        'login' => 'userLogin',
+                        'display_name' => 'displayName',
+                        'type' => 'type',
+                        'broadcaster_type' => 'broadcasterType',
+                        'description' => 'description',
+                        'profile_image_url' => 'profileImageUrl',
+                        'offline_image_url' => 'offlineImageUrl',
+                        'view_count' => 0,
+                        'created_at' => 'createdAt'
+                    ]
+                ]
+            ]),
+            'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
+        ];
 
-        Http::fake([
-            'https://api.twitch.tv/helix/videos*' => Http::response(null, 500)
+        $this->databaseClient
+            ->expects('isUserStored')
+            ->once()
+            ->with(self::USERNAME)
+            ->andReturn(true);
+        $this->databaseClient
+            ->expects('getStreamers')
+            ->once()
+            ->with(self::USERNAME)
+            ->andReturn($followingStreamers);
+        $this->databaseClient
+            ->expects('isTokenStoredInDatabase')
+            ->once()
+            ->andReturn(true);
+        $this->databaseClient
+            ->expects('getToken')
+            ->once()
+            ->andReturn(self::TWITCH_TOKEN);
+        $this->apiClient
+            ->expects('makeCurlCall')
+            ->once()
+            ->andReturn($streamsResponse);
+
+        $responseGetTimeline = $this->get(self::ENDPOINT . '?username=' . self::USERNAME);
+
+        $responseGetTimeline->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
+        $responseGetTimeline->assertJson([
+            'error' => self::INTERNAL_SERVER_ERROR_MESSAGE
         ]);
+    }
 
-        $response = $this->getJson("/api/timeline?username={$user->username}");
+    /**
+     * @test
+     */
+    public function get_streamers_timeline()
+    {
+        $followingStreamers = ['streamer1'];
+        $streamsResponse = [
+            'response' => json_encode([
+                'data' => [
+                    [
+                        'id' => 'userId',
+                        'login' => 'userLogin',
+                        'display_name' => 'displayName',
+                        'type' => 'type',
+                        'broadcaster_type' => 'broadcasterType',
+                        'description' => 'description',
+                        'profile_image_url' => 'profileImageUrl',
+                        'offline_image_url' => 'offlineImageUrl',
+                        'view_count' => 0,
+                        'created_at' => 'createdAt'
+                    ]
+                ]
+            ]),
+            'http_code' => Response::HTTP_OK
+        ];
+        $expectedResponse = [
+            "streamerId" => "streamer1",
+            "streamerName" => "Streamer 1",
+            "title" => "Stream 1",
+            "game" => "Game 1",
+            "viewerCount" => 100,
+            "startedAt" => "2024-05-10T12:00:00Z"
+        ];
 
-        $response->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
-        $response->assertJson(['error' => 'No se puede establecer conexión con Twitch en este momento']);
+        $this->databaseClient
+            ->expects('isUserStored')
+            ->once()
+            ->with(self::USERNAME)
+            ->andReturn(true);
+        $this->databaseClient
+            ->expects('getStreamers')
+            ->once()
+            ->with(self::USERNAME)
+            ->andReturn($followingStreamers);
+        $this->databaseClient
+            ->expects('isTokenStoredInDatabase')
+            ->once()
+            ->andReturn(true);
+        $this->databaseClient
+            ->expects('getToken')
+            ->once()
+            ->andReturn(self::TWITCH_TOKEN);
+        $this->apiClient
+            ->shouldReceive('makeCurlCall')
+            ->andReturn($streamsResponse);
+        $this->databaseClient
+            ->shouldReceive('storeStreams');
+        $this->databaseClient
+            ->expects('getTimelineStreams')
+            ->once()
+            ->andReturn([$expectedResponse]);
+
+        $responseGetTimeline = $this->get(self::ENDPOINT . '?username=' . self::USERNAME);
+
+        $responseGetTimeline->assertStatus(Response::HTTP_OK);
+        $responseGetTimeline->assertJson([
+            $expectedResponse
+        ]);
     }
 
     protected function tearDown(): void
