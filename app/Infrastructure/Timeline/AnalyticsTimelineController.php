@@ -5,10 +5,8 @@ namespace App\Infrastructure\Timeline;
 use App\Exceptions\InternalServerErrorException;
 use App\Exceptions\NotFoundException;
 use App\Infrastructure\Controllers\Controller;
-use App\Infrastructure\FollowStreamer\AnalyticsTimelineRequest;
 use App\Services\GetTimelineManager;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class AnalyticsTimelineController extends Controller
