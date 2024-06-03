@@ -7,17 +7,14 @@ use App\Exceptions\InternalServerErrorException;
 use App\Services\CreateUserManager;
 use App\Services\DBClient;
 use Mockery;
+use Tests\Builders\AnalyticsParameters;
+use Tests\Feature\CreateUserTest;
 use Tests\TestCase;
 
 class CreateUserManagerTest extends TestCase
 {
     private DBClient $dbClient;
     private CreateUserManager $createUserManager;
-    private const USERNAME = 'username';
-    private const PASSWORD = 'password';
-    private const INTERNAL_SERVER_ERROR_MESSAGE = 'Error del servidor al crear el usuario.';
-    private const CONFLICT_ERROR_MESSAGE = 'El nombre de usuario ya está en uso.';
-    private const CREATE_USER_MESSAGE = 'Usuario creado correctamente';
 
     protected function setUp(): void
     {
@@ -33,16 +30,16 @@ class CreateUserManagerTest extends TestCase
     {
         $this->dbClient->shouldReceive('checkIfUsernameExists')
             ->once()
-            ->with(self::USERNAME)
+            ->with(AnalyticsParameters::USERNAME)
             ->andReturn(false);
         $this->dbClient->shouldReceive('createUser')
             ->once()
-            ->with(self::USERNAME, self::PASSWORD)
+            ->with(AnalyticsParameters::USERNAME, AnalyticsParameters::PASSWORD)
             ->andReturn(true);
 
-        $result = $this->createUserManager->getCreateUserMessage(self::USERNAME, self::PASSWORD);
+        $result = $this->createUserManager->getCreateUserMessage(AnalyticsParameters::USERNAME, AnalyticsParameters::PASSWORD);
 
-        $this->assertEquals(['username' => self::USERNAME, 'message' => self::CREATE_USER_MESSAGE], $result);
+        $this->assertEquals(['username' => AnalyticsParameters::USERNAME, 'message' => CreateUserTest::CREATE_USER_MESSAGE], $result);
     }
 
     /**
@@ -52,13 +49,13 @@ class CreateUserManagerTest extends TestCase
     {
         $this->dbClient->shouldReceive('checkIfUsernameExists')
             ->once()
-            ->with(self::USERNAME)
+            ->with(AnalyticsParameters::USERNAME)
             ->andReturn(true);
 
         $this->expectException(ConflictException::class);
-        $this->expectExceptionMessage(self::CONFLICT_ERROR_MESSAGE);
+        $this->expectExceptionMessage(CreateUserTest::CONFLICT_ERROR_MESSAGE);
 
-        $this->createUserManager->getCreateUserMessage(self::USERNAME, self::PASSWORD);
+        $this->createUserManager->getCreateUserMessage(AnalyticsParameters::USERNAME, AnalyticsParameters::PASSWORD);
     }
 
     /**
@@ -68,17 +65,17 @@ class CreateUserManagerTest extends TestCase
     {
         $this->dbClient->shouldReceive('checkIfUsernameExists')
             ->once()
-            ->with(self::USERNAME)
+            ->with(AnalyticsParameters::USERNAME)
             ->andReturn(false);
         $this->dbClient->shouldReceive('createUser')
             ->once()
-            ->with(self::USERNAME, self::PASSWORD)
-            ->andThrow(new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE));
+            ->with(AnalyticsParameters::USERNAME, AnalyticsParameters::PASSWORD)
+            ->andThrow(new InternalServerErrorException(CreateUserTest::INTERNAL_SERVER_ERROR_MESSAGE));
 
         $this->expectException(InternalServerErrorException::class);
-        $this->expectExceptionMessage(self::INTERNAL_SERVER_ERROR_MESSAGE);
+        $this->expectExceptionMessage(CreateUserTest::INTERNAL_SERVER_ERROR_MESSAGE);
 
-        $this->createUserManager->getCreateUserMessage(self::USERNAME, self::PASSWORD);
+        $this->createUserManager->getCreateUserMessage(AnalyticsParameters::USERNAME, AnalyticsParameters::PASSWORD);
     }
 
     protected function tearDown(): void

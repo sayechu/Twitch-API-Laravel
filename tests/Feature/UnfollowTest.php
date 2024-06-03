@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature;
+namespace Tests\Feature;
 
 use App\Exceptions\InternalServerErrorException;
 use Illuminate\Foundation\Testing\TestCase;

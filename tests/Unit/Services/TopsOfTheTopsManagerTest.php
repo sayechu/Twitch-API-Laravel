@@ -7,18 +7,17 @@ use App\Services\TopVideosProvider;
 use App\Services\TopGamesProvider;
 use App\Services\TokenProvider;
 use Illuminate\Http\Response;
+use Tests\Builders\AnalyticsParameters;
+use Tests\Feature\GetStreamsTest;
 use Tests\TestCase;
 use Exception;
 use Mockery;
 
 class TopsOfTheTopsManagerTest extends TestCase
 {
-    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
     private const GET_TOP_GAMES_ERROR_MESSAGE = 'No se pueden devolver top games en este momento, inténtalo más tarde';
     private const GET_TOP_VIDEOS_ERROR_MESSAGE =
         'No se pueden devolver top 40 videos en este momento, inténtalo más tarde';
-    private const TWITCH_TOKEN = 'nrtovbe5h02os45krmjzvkt3hp74vf';
-    private const SINCE_TIME = 600;
     private TopsOfTheTopsManager $topsOfTheTopsManager;
     private TokenProvider $tokenProvider;
     private TopGamesProvider $topGamesProvider;
@@ -48,9 +47,9 @@ class TopsOfTheTopsManagerTest extends TestCase
             ->once()
             ->andReturn($getTokenResponse);
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage(self::GET_TOKEN_ERROR_MESSAGE);
+        $this->expectExceptionMessage(GetStreamsTest::GET_TOKEN_ERROR_MESSAGE);
 
-        $this->topsOfTheTopsManager->getTopVideosOfTopGames(self::SINCE_TIME);
+        $this->topsOfTheTopsManager->getTopVideosOfTopGames(AnalyticsParameters::SINCE_TIME);
     }
 
     /**
@@ -66,17 +65,17 @@ class TopsOfTheTopsManagerTest extends TestCase
         $this->tokenProvider
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->topGamesProvider
             ->expects('getTopThreeGames')
             ->once()
-            ->with([0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with([0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->andReturn($topGamesResponse);
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage(self::GET_TOP_GAMES_ERROR_MESSAGE);
 
-        $this->topsOfTheTopsManager->getTopVideosOfTopGames(self::SINCE_TIME);
+        $this->topsOfTheTopsManager->getTopVideosOfTopGames(AnalyticsParameters::SINCE_TIME);
     }
 
     /**
@@ -112,11 +111,11 @@ class TopsOfTheTopsManagerTest extends TestCase
         $this->tokenProvider
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->topGamesProvider
             ->expects('getTopThreeGames')
             ->once()
-            ->with([0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with([0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->andReturn($topGamesResponse);
         $this->topVideosProvider
             ->expects('getTopFourtyVideos')
@@ -126,7 +125,7 @@ class TopsOfTheTopsManagerTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage(self::GET_TOP_VIDEOS_ERROR_MESSAGE);
 
-        $this->topsOfTheTopsManager->getTopVideosOfTopGames(self::SINCE_TIME);
+        $this->topsOfTheTopsManager->getTopVideosOfTopGames(AnalyticsParameters::SINCE_TIME);
     }
 
     /**
@@ -212,17 +211,17 @@ class TopsOfTheTopsManagerTest extends TestCase
         $this->tokenProvider
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->topGamesProvider
             ->expects('getTopThreeGames')
             ->once()
-            ->with([0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with([0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->andReturn($topGamesResponse);
         $this->topVideosProvider
             ->shouldReceive('getTopFourtyVideos')
             ->andReturn($topVideosResponse);
 
-        $topVideosOfTopGames = $this->topsOfTheTopsManager->getTopVideosOfTopGames(self::SINCE_TIME);
+        $topVideosOfTopGames = $this->topsOfTheTopsManager->getTopVideosOfTopGames(AnalyticsParameters::SINCE_TIME);
 
         $this->assertEquals($expectedResponse, $topVideosOfTopGames);
     }

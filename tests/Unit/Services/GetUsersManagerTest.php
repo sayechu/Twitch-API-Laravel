@@ -6,13 +6,13 @@ use App\Exceptions\InternalServerErrorException;
 use App\Services\DBClient;
 use App\Services\GetUsersManager;
 use Mockery;
+use Tests\Feature\GetUsersTest;
 use Tests\TestCase;
 
 class GetUsersManagerTest extends TestCase
 {
     private DBClient $databaseClient;
     private GetUsersManager $getUsersManager;
-    private const INTERNAL_SERVER_ERROR_MESSAGE = "Error del servidor al obtener la lista de usuarios.";
 
     protected function setUp(): void
     {
@@ -65,10 +65,10 @@ class GetUsersManagerTest extends TestCase
         $this->databaseClient
             ->expects('getUsers')
             ->once()
-            ->andThrow(new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE));
+            ->andThrow(new InternalServerErrorException(GetUsersTest::INTERNAL_SERVER_ERROR_MESSAGE));
 
         $this->expectException(InternalServerErrorException::class);
-        $this->expectExceptionMessage(self::INTERNAL_SERVER_ERROR_MESSAGE);
+        $this->expectExceptionMessage(GetUsersTest::INTERNAL_SERVER_ERROR_MESSAGE);
 
         $this->getUsersManager->getUsersAndStreamers();
     }

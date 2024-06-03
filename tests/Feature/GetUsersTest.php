@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Services\DBClient;
 use App\Services\GetUsersManager;
+use Tests\Builders\AnalyticsParameters;
 use Tests\TestCase;
 use Mockery;
 use App\Exceptions\InternalServerErrorException;
@@ -12,8 +13,7 @@ use Illuminate\Http\Response;
 class GetUsersTest extends TestCase
 {
     private DBClient $databaseClient;
-    private const ENDPOINT = '/analytics/users';
-    private const GET_USERS_ERROR_MESSAGE = 'Error del servidor al obtener la lista de usuarios.';
+    public const INTERNAL_SERVER_ERROR_MESSAGE = 'Error del servidor al obtener la lista de usuarios.';
 
     protected function setUp(): void
     {
@@ -49,7 +49,7 @@ class GetUsersTest extends TestCase
             ->with('usuario2')
             ->andReturn($streamersSecondUser);
 
-        $response = $this->get(self::ENDPOINT);
+        $response = $this->get(AnalyticsParameters::ANALYTICS_USERS_ENDPOINT);
 
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJson([
@@ -65,12 +65,12 @@ class GetUsersTest extends TestCase
     {
         $this->databaseClient
             ->expects('getUsers')
-            ->andThrow(new InternalServerErrorException(self::GET_USERS_ERROR_MESSAGE));
+            ->andThrow(new InternalServerErrorException(self::INTERNAL_SERVER_ERROR_MESSAGE));
 
-        $response = $this->get(self::ENDPOINT);
+        $response = $this->get(AnalyticsParameters::ANALYTICS_USERS_ENDPOINT);
 
         $response->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
-        $response->assertJson(['error' => self::GET_USERS_ERROR_MESSAGE]);
+        $response->assertJson(['error' => self::INTERNAL_SERVER_ERROR_MESSAGE]);
     }
 
     protected function tearDown(): void

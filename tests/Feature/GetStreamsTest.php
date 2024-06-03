@@ -7,6 +7,7 @@ use App\Services\ApiClient;
 use App\Services\DBClient;
 use App\Services\StreamsDataManager;
 use App\Services\TokenProvider;
+use Tests\Builders\AnalyticsParameters;
 use Tests\TestCase;
 use Mockery;
 
@@ -14,9 +15,8 @@ class GetStreamsTest extends TestCase
 {
     private ApiClient $apiClient;
     private DBClient $databaseClient;
-    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
-    private const GET_STREAMS_ERROR_MESSAGE = 'No se pueden devolver streams en este momento, inténtalo más tarde';
-    private const TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
+    public const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
+    public const GET_STREAMS_ERROR_MESSAGE = 'No se pueden devolver streams en este momento, inténtalo más tarde';
 
     protected function setUp() : void
     {
@@ -74,10 +74,10 @@ class GetStreamsTest extends TestCase
         $this->databaseClient
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer ' . self::TOKEN])
+            ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->once()
             ->andReturn($getStreamsResponse);
 
@@ -117,7 +117,7 @@ class GetStreamsTest extends TestCase
             'http_code' => Response::HTTP_OK
         ];
         $getTokenExpectedResponse = [
-            "response" => '{"access_token":"' . self::TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
+            "response" => '{"access_token":"' . AnalyticsParameters::TWITCH_TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
             "http_code" => Response::HTTP_OK
         ];
 
@@ -131,11 +131,11 @@ class GetStreamsTest extends TestCase
             ->andReturn($getTokenExpectedResponse);
         $this->databaseClient
             ->expects('storeToken')
-            ->with(self::TOKEN)
+            ->with(AnalyticsParameters::TWITCH_TOKEN)
             ->once();
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer ' . self::TOKEN])
+            ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->once()
             ->andReturn($getStreamsResponse);
 
@@ -180,7 +180,7 @@ class GetStreamsTest extends TestCase
             'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
         ];
         $getTokenResponse = [
-            "response" => '{"access_token":"' . self::TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
+            "response" => '{"access_token":"' . AnalyticsParameters::TWITCH_TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
             "http_code" => Response::HTTP_OK
         ];
         $expectedResponse = json_encode(['error' => self::GET_STREAMS_ERROR_MESSAGE]);
@@ -195,11 +195,11 @@ class GetStreamsTest extends TestCase
             ->andReturn($getTokenResponse);
         $this->databaseClient
             ->expects('storeToken')
-            ->with(self::TOKEN)
+            ->with(AnalyticsParameters::TWITCH_TOKEN)
             ->once();
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer ' . self::TOKEN])
+            ->with("https://api.twitch.tv/helix/streams", [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->once()
             ->andReturn($getStreamsResponse);
 

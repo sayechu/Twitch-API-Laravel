@@ -6,16 +6,13 @@ use App\Services\TopVideosProvider;
 use Illuminate\Http\Response;
 use App\Services\ApiClient;
 use App\Services\DBClient;
+use Tests\Builders\AnalyticsParameters;
 use Tests\TestCase;
 use Mockery;
 
 class TopVideosProviderTest extends TestCase
 {
-    private const TWITCH_TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
-    private const API_HEADERS = [0 => 'Bearer ' . self::TWITCH_TOKEN];
-    private const GAME_ID = 509658;
-    private const GAME_NAME = 'Just Chatting';
-    private const SINCE = 600;
+    private const API_HEADERS = [0 => 'Bearer ' . AnalyticsParameters::TWITCH_TOKEN];
     private TopVideosProvider $topVideosProvider;
     private DBClient $databaseClient;
     private ApiClient $apiClient;
@@ -49,17 +46,17 @@ class TopVideosProviderTest extends TestCase
 
         $this->databaseClient
             ->expects('isDataStoredRecentlyFromGame')
-            ->with(self::GAME_ID, self::SINCE)
+            ->with(AnalyticsParameters::GAME_ID, AnalyticsParameters::SINCE_TIME)
             ->andReturn(true);
         $this->databaseClient
             ->expects('getVideosOfAGivenGame')
-            ->with(self::GAME_ID)
+            ->with(AnalyticsParameters::GAME_ID)
             ->andReturn($getVideosResponse);
 
         $topVideosResponse = $this->topVideosProvider->getTopFourtyVideos(
-            self::GAME_ID,
-            self::GAME_NAME,
-            self::SINCE,
+            AnalyticsParameters::GAME_ID,
+            AnalyticsParameters::GAME_NAME,
+            AnalyticsParameters::SINCE_TIME,
             self::API_HEADERS);
 
         $this->assertEquals($getVideosResponse, $topVideosResponse);
@@ -77,17 +74,17 @@ class TopVideosProviderTest extends TestCase
 
         $this->databaseClient
             ->expects('isDataStoredRecentlyFromGame')
-            ->with(self::GAME_ID, self::SINCE)
+            ->with(AnalyticsParameters::GAME_ID, AnalyticsParameters::SINCE_TIME)
             ->andReturn(false);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with('https://api.twitch.tv/helix/videos?game_id=' . self::GAME_ID . '&sort=views&first=40', self::API_HEADERS)
+            ->with('https://api.twitch.tv/helix/videos?game_id=' . AnalyticsParameters::GAME_ID . '&sort=views&first=40', self::API_HEADERS)
             ->andReturn($topVideosResponse);
 
         $getTopFourtyResponse = $this->topVideosProvider->getTopFourtyVideos(
-            self::GAME_ID,
-            self::GAME_NAME,
-            self::SINCE,
+            AnalyticsParameters::GAME_ID,
+            AnalyticsParameters::GAME_NAME,
+            AnalyticsParameters::SINCE_TIME,
             self::API_HEADERS);
 
         $this->assertEquals($topVideosResponse, $getTopFourtyResponse);
@@ -136,34 +133,34 @@ class TopVideosProviderTest extends TestCase
                 'duration' => '26h33m41s',
                 'created_at' => '2024-05-16T18:54:23Z',
                 'title' => '⚔️100+ HR STREAM⚔️ELDEN RING⚔️CLICK HERE⚔️GAMER⚔️BIGGEST DWARF⚔️ELITE⚔️PRAY 4 ME⚔️',
-                'game_id' => self::GAME_ID,
-                'game_name' => self::GAME_NAME
+                'game_id' => AnalyticsParameters::GAME_ID,
+                'game_name' => AnalyticsParameters::GAME_NAME
             ]
         ];
 
         $this->databaseClient
             ->expects('isDataStoredRecentlyFromGame')
-            ->with(self::GAME_ID, self::SINCE)
+            ->with(AnalyticsParameters::GAME_ID, AnalyticsParameters::SINCE_TIME)
             ->andReturn(false);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with('https://api.twitch.tv/helix/videos?game_id=' . self::GAME_ID . '&sort=views&first=40', self::API_HEADERS)
+            ->with('https://api.twitch.tv/helix/videos?game_id=' . AnalyticsParameters::GAME_ID . '&sort=views&first=40', self::API_HEADERS)
             ->andReturn($topVideosResponse);
         $this->databaseClient
             ->expects('updateTopGameLastUpdateTime')
-            ->with(self::GAME_ID);
+            ->with(AnalyticsParameters::GAME_ID);
         $this->databaseClient
             ->expects('updateTopGameVideos')
-            ->with($topVideosResponse['response']['data'], self::GAME_ID, self::GAME_NAME);
+            ->with($topVideosResponse['response']['data'], AnalyticsParameters::GAME_ID, AnalyticsParameters::GAME_NAME);
         $this->databaseClient
             ->expects('getVideosOfAGivenGame')
-            ->with(self::GAME_ID)
+            ->with(AnalyticsParameters::GAME_ID)
             ->andReturn($gameVideosResponse);
 
         $getTopFourtyResponse = $this->topVideosProvider->getTopFourtyVideos(
-            self::GAME_ID,
-            self::GAME_NAME,
-            self::SINCE,
+            AnalyticsParameters::GAME_ID,
+            AnalyticsParameters::GAME_NAME,
+            AnalyticsParameters::SINCE_TIME,
             self::API_HEADERS);
 
         $this->assertEquals($gameVideosResponse, $getTopFourtyResponse);

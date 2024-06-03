@@ -7,6 +7,8 @@ use App\Services\ApiClient;
 use App\Services\StreamsDataManager;
 use App\Services\TokenProvider;
 use Mockery;
+use Tests\Builders\AnalyticsParameters;
+use Tests\Feature\GetStreamersTest;
 use Tests\TestCase;
 
 class StreamsDataManagerTest extends TestCase
@@ -14,10 +16,7 @@ class StreamsDataManagerTest extends TestCase
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;
     private StreamsDataManager $streamsDataManager;
-    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
     private const GET_STREAMS_ERROR_MESSAGE = 'No se pueden devolver streams en este momento, inténtalo más tarde';
-    private const TWITCH_TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
-    private const GET_STREAMS_URL = 'https://api.twitch.tv/helix/streams';
 
     protected function setUp(): void
     {
@@ -32,7 +31,7 @@ class StreamsDataManagerTest extends TestCase
      */
     public function get_streams_data_returns_streams_data(): void
     {
-        $tokenResponse = self::TWITCH_TOKEN;
+        $tokenResponse = AnalyticsParameters::TWITCH_TOKEN;
         $curlCallResponse = [
             'response' => [
                 'data' => [
@@ -117,7 +116,7 @@ class StreamsDataManagerTest extends TestCase
             ->andReturn($tokenResponse);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::GET_STREAMS_URL, [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(AnalyticsParameters::ANALYTICS_GET_STREAMS_URL, [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->once()
             ->andReturn($curlCallResponse);
 
@@ -131,7 +130,7 @@ class StreamsDataManagerTest extends TestCase
      */
     public function get_streams_data_returns_token_error(): void
     {
-        $expectedExceptionMessage = self::GET_TOKEN_ERROR_MESSAGE;
+        $expectedExceptionMessage = GetStreamersTest::GET_TOKEN_ERROR_MESSAGE;
         $tokenResponse = [
             "response" => null,
             "http_code" => Response::HTTP_INTERNAL_SERVER_ERROR
@@ -199,10 +198,10 @@ class StreamsDataManagerTest extends TestCase
         $this->tokenProvider
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::GET_STREAMS_URL, [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(AnalyticsParameters::ANALYTICS_GET_STREAMS_URL, [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->once()
             ->andReturn($streamsResponse);
         $this->expectException(\Exception::class);

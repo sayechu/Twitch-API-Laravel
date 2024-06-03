@@ -13,7 +13,9 @@ use App\Services\FollowStreamerManager;
 use App\Services\TokenProvider;
 use Illuminate\Http\Response;
 use Mockery;
+use Tests\Builders\AnalyticsParameters;
 use Tests\Builders\StreamerDataBuilder;
+use Tests\Feature\GetFollowMessageTest;
 use Tests\TestCase;
 
 class FollowStreamerManagerTest extends TestCase
@@ -24,15 +26,9 @@ class FollowStreamerManagerTest extends TestCase
     private TokenProvider $tokenProvider;
     private array $headers;
     private array $body;
-    private const TWITCH_TOKEN = 'nrtovbe5h02os45krmjzvkt3hp74vf';
-    private const USERNAME = "username";
-    private const STREAMER_ID = '1234';
     private const GET_TOKEN_ERROR_MESSAGE = 'Acceso denegado debido a permisos insuficientes';
-    private const GET_STREAMER_ERROR_MESSAGE = 'Token de autenticación no proporcionado o inválido';
-    private const CONFLICT_EXCEPTION_MESSAGE = 'El usuario ya está siguiendo al streamer';
-    private const INTERNAL_SERVER_ERROR_MESSAGE = "Error del servidor al seguir al streamer";
-    private const NOT_FOUND_ERROR_MESSAGE = "El usuario (" . self::USERNAME . ") o el streamer ("
-    . self::STREAMER_ID . ") especificado no existe en la API";
+    private const NOT_FOUND_ERROR_MESSAGE = "El usuario (" . AnalyticsParameters::USERNAME . ") o el streamer ("
+    . AnalyticsParameters::STREAMER_ID . ") especificado no existe en la API";
 
     protected function setUp(): void
     {
@@ -59,8 +55,8 @@ class FollowStreamerManagerTest extends TestCase
             ->give(fn() => $this->apiClient);
         $this->headers = ['Content-Type' => 'application/json'];
         $this->body = [
-            'username' => self::USERNAME,
-            'streamerId' => self::STREAMER_ID
+            'username' => AnalyticsParameters::USERNAME,
+            'streamerId' => AnalyticsParameters::STREAMER_ID
         ];
     }
 
@@ -72,13 +68,13 @@ class FollowStreamerManagerTest extends TestCase
         $this->databaseClient
             ->expects('userFollowsStreamer')
             ->once()
-            ->with(self::USERNAME, self::STREAMER_ID)
-            ->andThrows(InternalServerErrorException::class, self::INTERNAL_SERVER_ERROR_MESSAGE);
+            ->with(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID)
+            ->andThrows(InternalServerErrorException::class, GetFollowMessageTest::INTERNAL_SERVER_ERROR_MESSAGE);
 
         $this->expectException(InternalServerErrorException::class);
-        $this->expectExceptionMessage(self::INTERNAL_SERVER_ERROR_MESSAGE);
+        $this->expectExceptionMessage(GetFollowMessageTest::INTERNAL_SERVER_ERROR_MESSAGE);
 
-        $this->followStreamerManager->getFollowMessage(self::USERNAME, self::STREAMER_ID);
+        $this->followStreamerManager->getFollowMessage(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID);
     }
 
     /**
@@ -92,9 +88,9 @@ class FollowStreamerManagerTest extends TestCase
             ->andReturn(true);
 
         $this->expectException(ConflictException::class);
-        $this->expectExceptionMessage(self::CONFLICT_EXCEPTION_MESSAGE);
+        $this->expectExceptionMessage(GetFollowMessageTest::CONFLICT_EXCEPTION_MESSAGE);
 
-        $this->followStreamerManager->getFollowMessage(self::USERNAME, self::STREAMER_ID);
+        $this->followStreamerManager->getFollowMessage(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID);
     }
 
     /**
@@ -104,7 +100,7 @@ class FollowStreamerManagerTest extends TestCase
     {
         $getTokenResponse = [
             'response' => json_encode([
-                'access_token' => self::TWITCH_TOKEN,
+                'access_token' => AnalyticsParameters::TWITCH_TOKEN,
                 'expires_in' => 5089418,
                 'token_type' => 'bearer'
             ]),
@@ -114,7 +110,7 @@ class FollowStreamerManagerTest extends TestCase
         $this->databaseClient
             ->expects('userFollowsStreamer')
             ->once()
-            ->with(self::USERNAME, self::STREAMER_ID)
+            ->with(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID)
             ->andReturn(false);
         $this->databaseClient
             ->expects('isTokenStoredInDatabase')
@@ -128,7 +124,7 @@ class FollowStreamerManagerTest extends TestCase
         $this->expectException(ForbiddenException::class);
         $this->expectExceptionMessage(self::GET_TOKEN_ERROR_MESSAGE);
 
-        $this->followStreamerManager->getFollowMessage(self::USERNAME, self::STREAMER_ID);
+        $this->followStreamerManager->getFollowMessage(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID);
     }
 
     /**
@@ -143,7 +139,7 @@ class FollowStreamerManagerTest extends TestCase
         $this->databaseClient
             ->expects('userFollowsStreamer')
             ->once()
-            ->with(self::USERNAME, self::STREAMER_ID)
+            ->with(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID)
             ->andReturn(false);
         $this->databaseClient
             ->expects('isTokenStoredInDatabase')
@@ -152,16 +148,16 @@ class FollowStreamerManagerTest extends TestCase
         $this->databaseClient
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
             ->once()
             ->andReturn($streamerResponse);
 
         $this->expectException(UnauthorizedException::class);
-        $this->expectExceptionMessage(self::GET_STREAMER_ERROR_MESSAGE);
+        $this->expectExceptionMessage(GetFollowMessageTest::GET_TOKEN_ERROR_MESSAGE);
 
-        $this->followStreamerManager->getFollowMessage(self::USERNAME, self::STREAMER_ID);
+        $this->followStreamerManager->getFollowMessage(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID);
     }
 
     /**
@@ -179,7 +175,7 @@ class FollowStreamerManagerTest extends TestCase
         $this->databaseClient
             ->expects('userFollowsStreamer')
             ->once()
-            ->with(self::USERNAME, self::STREAMER_ID)
+            ->with(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID)
             ->andReturn(false);
         $this->databaseClient
             ->expects('isTokenStoredInDatabase')
@@ -188,7 +184,7 @@ class FollowStreamerManagerTest extends TestCase
         $this->databaseClient
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
             ->once()
@@ -197,7 +193,7 @@ class FollowStreamerManagerTest extends TestCase
         $this->expectException(NotFoundException::class);
         $this->expectExceptionMessage(self::NOT_FOUND_ERROR_MESSAGE);
 
-        $this->followStreamerManager->getFollowMessage(self::USERNAME, self::STREAMER_ID);
+        $this->followStreamerManager->getFollowMessage(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID);
     }
 
     /**
@@ -211,7 +207,7 @@ class FollowStreamerManagerTest extends TestCase
         $this->databaseClient
             ->expects('userFollowsStreamer')
             ->once()
-            ->with(self::USERNAME, self::STREAMER_ID)
+            ->with(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID)
             ->andReturn(false);
         $this->databaseClient
             ->expects('isTokenStoredInDatabase')
@@ -220,7 +216,7 @@ class FollowStreamerManagerTest extends TestCase
         $this->databaseClient
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
             ->once()
@@ -233,7 +229,7 @@ class FollowStreamerManagerTest extends TestCase
         $this->expectException(NotFoundException::class);
         $this->expectExceptionMessage(self::NOT_FOUND_ERROR_MESSAGE);
 
-        $this->followStreamerManager->getFollowMessage(self::USERNAME, self::STREAMER_ID);
+        $this->followStreamerManager->getFollowMessage(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID);
     }
 
     /**
@@ -242,7 +238,7 @@ class FollowStreamerManagerTest extends TestCase
     public function get_follow_message()
     {
         $expectedResponse = [
-            "message" => "Ahora sigues a " . self::STREAMER_ID
+            "message" => "Ahora sigues a " . AnalyticsParameters::STREAMER_ID
         ];
         $responseBuilder = (new StreamerDataBuilder())->withTestValues();
         $streamerResponse = $responseBuilder->build();
@@ -250,7 +246,7 @@ class FollowStreamerManagerTest extends TestCase
         $this->databaseClient
             ->expects('userFollowsStreamer')
             ->once()
-            ->with(self::USERNAME, self::STREAMER_ID)
+            ->with(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID)
             ->andReturn(false);
         $this->databaseClient
             ->expects('isTokenStoredInDatabase')
@@ -259,7 +255,7 @@ class FollowStreamerManagerTest extends TestCase
         $this->databaseClient
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
             ->once()
@@ -271,9 +267,9 @@ class FollowStreamerManagerTest extends TestCase
         $this->databaseClient
             ->expects('addUserFollowsStreamer')
             ->once()
-            ->with(self::USERNAME, self::STREAMER_ID);
+            ->with(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID);
 
-        $returnedFollowMessage = $this->followStreamerManager->getFollowMessage(self::USERNAME, self::STREAMER_ID);
+        $returnedFollowMessage = $this->followStreamerManager->getFollowMessage(AnalyticsParameters::USERNAME, AnalyticsParameters::STREAMER_ID);
         $this->assertEquals($expectedResponse, $returnedFollowMessage);
     }
 }

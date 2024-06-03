@@ -7,6 +7,7 @@ use App\Services\ApiClient;
 use App\Services\DBClient;
 use App\Services\TokenProvider;
 use Mockery;
+use Tests\Builders\AnalyticsParameters;
 use Tests\TestCase;
 
 class TokenProviderTest extends TestCase
@@ -14,7 +15,6 @@ class TokenProviderTest extends TestCase
     private DBClient $databaseClient;
     private ApiClient $apiClient;
     private TokenProvider $tokenProvider;
-    private const TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
 
     protected function setUp(): void
     {
@@ -75,7 +75,7 @@ class TokenProviderTest extends TestCase
     public function get_token_returns_token_response(): void
     {
         $apiResponse = [
-            "response" => '{"access_token":"' . self::TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
+            "response" => '{"access_token":"' . AnalyticsParameters::TWITCH_TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
             "http_code" => Response::HTTP_OK
         ];
 
@@ -90,11 +90,11 @@ class TokenProviderTest extends TestCase
         $this->databaseClient
             ->expects('storeToken')
             ->once()
-            ->with(self::TOKEN);
+            ->with(AnalyticsParameters::TWITCH_TOKEN);
 
         $getTokenResponse = $this->tokenProvider->getToken();
 
-        $this->assertEquals(self::TOKEN, $getTokenResponse);
+        $this->assertEquals(AnalyticsParameters::TWITCH_TOKEN, $getTokenResponse);
     }
 
     protected function tearDown(): void

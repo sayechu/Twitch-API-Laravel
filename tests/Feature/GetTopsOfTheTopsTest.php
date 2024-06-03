@@ -10,11 +10,10 @@ use Illuminate\Http\Response;
 use App\Services\ApiClient;
 use App\Services\DBClient;
 use Mockery;
+use Tests\Builders\AnalyticsParameters;
 
 class GetTopsOfTheTopsTest extends TestCase
 {
-    private const TOP_GAMES_URL= 'https://api.twitch.tv/helix/games/top?first=3';
-    private const TWITCH_TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
     private ApiClient $apiClient;
     private DBClient $databaseClient;
 
@@ -138,10 +137,10 @@ class GetTopsOfTheTopsTest extends TestCase
             ->andReturn(true);
         $this->databaseClient
             ->expects('getToken')
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::TOP_GAMES_URL, [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(AnalyticsParameters::TOP_GAMES_URL, [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->andReturn($topGamesResponse);
         $this->databaseClient
             ->shouldReceive('isGameStored')
@@ -168,7 +167,7 @@ class GetTopsOfTheTopsTest extends TestCase
     {
         $tokenResponse = [
             "response" => json_encode([
-                'access_token' => self::TWITCH_TOKEN,
+                'access_token' => AnalyticsParameters::TWITCH_TOKEN,
                 'expires_in' => 5590782,
                 'token_type' => 'bearer'
             ]),
@@ -261,10 +260,10 @@ class GetTopsOfTheTopsTest extends TestCase
             ->andReturn($tokenResponse);
         $this->databaseClient
             ->expects('storeToken')
-            ->with(self::TWITCH_TOKEN);
+            ->with(AnalyticsParameters::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::TOP_GAMES_URL, [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(AnalyticsParameters::TOP_GAMES_URL, [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->andReturn($topGamesResponse);
         $this->databaseClient
             ->shouldReceive('isGameStored')

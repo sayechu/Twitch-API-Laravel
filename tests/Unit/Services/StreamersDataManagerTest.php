@@ -3,10 +3,12 @@
 namespace Tests\Unit\Services;
 
 use App\Services\StreamersDataManager;
+use Tests\Builders\AnalyticsParameters;
 use Tests\Builders\StreamerDataBuilder;
 use App\Services\TokenProvider;
 use Illuminate\Http\Response;
 use App\Services\ApiClient;
+use Tests\Feature\GetStreamersTest;
 use Tests\TestCase;
 use Exception;
 use Mockery;
@@ -16,11 +18,6 @@ class StreamersDataManagerTest extends TestCase
     private TokenProvider $tokenProvider;
     private ApiClient $apiClient;
     private StreamersDataManager $userDataManager;
-
-    private const GET_TOKEN_ERROR_MESSAGE = 'No se puede establecer conexión con Twitch en este momento';
-    private const GET_USERS_ERROR_MESSAGE = 'No se pueden devolver usuarios en este momento, inténtalo más tarde';
-    private const TWITCH_TOKEN = 'nrtovbe5h02os45krmjzvkt3hp74vf';
-    private const GET_USERS_URLS = 'https://api.twitch.tv/helix/users';
 
     protected function setUp(): void
     {
@@ -51,10 +48,10 @@ class StreamersDataManagerTest extends TestCase
         $this->tokenProvider
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::GET_USERS_URLS . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(AnalyticsParameters::ANALYTICS_GET_USERS_URL . '?id=1234', [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->once()
             ->andReturn($getUserDataResponse);
 
@@ -72,15 +69,15 @@ class StreamersDataManagerTest extends TestCase
             ->withTestValues()
             ->withHttpCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         $getUserDataResponse = $responseBuilder->build();
-        $expectedResponse = self::GET_USERS_ERROR_MESSAGE;
+        $expectedResponse = GetStreamersTest::GET_USERS_ERROR_MESSAGE;
 
         $this->tokenProvider
             ->expects('getToken')
             ->once()
-            ->andReturn(self::TWITCH_TOKEN);
+            ->andReturn(AnalyticsParameters::TWITCH_TOKEN);
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with(self::GET_USERS_URLS . '?id=1234', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with(AnalyticsParameters::ANALYTICS_GET_USERS_URL . '?id=1234', [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->once()
             ->andReturn($getUserDataResponse);
         $this->expectException(Exception::class);
@@ -96,13 +93,13 @@ class StreamersDataManagerTest extends TestCase
     {
         $getTokenResponse = [
             'response' => json_encode([
-                'access_token' => self::TWITCH_TOKEN,
+                'access_token' => AnalyticsParameters::TWITCH_TOKEN,
                 'expires_in' => 5089418,
                 'token_type' => 'bearer'
             ]),
             'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR
         ];
-        $expectedResponse = self::GET_TOKEN_ERROR_MESSAGE;
+        $expectedResponse = GetStreamersTest::GET_TOKEN_ERROR_MESSAGE;
 
         $this->tokenProvider
             ->expects('getToken')

@@ -7,11 +7,11 @@ use Illuminate\Http\Response;
 use App\Services\ApiClient;
 use App\Services\DBClient;
 use Mockery;
+use Tests\Builders\AnalyticsParameters;
 use Tests\TestCase;
 
 class TopGamesProviderTest extends TestCase
 {
-    private const TWITCH_TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
     private TopGamesProvider $topGamesProvider;
     private DBClient $databaseClient;
     private ApiClient $apiClient;
@@ -36,10 +36,10 @@ class TopGamesProviderTest extends TestCase
 
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with('https://api.twitch.tv/helix/games/top?first=3', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with('https://api.twitch.tv/helix/games/top?first=3', [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->andReturn($topGamesResponse);
 
-        $getTopGamesResponse = $this->topGamesProvider->getTopThreeGames([0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN]);
+        $getTopGamesResponse = $this->topGamesProvider->getTopThreeGames([0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN]);
 
         $this->assertEquals($topGamesResponse, $getTopGamesResponse);
     }
@@ -96,13 +96,13 @@ class TopGamesProviderTest extends TestCase
 
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with('https://api.twitch.tv/helix/games/top?first=3', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with('https://api.twitch.tv/helix/games/top?first=3', [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->andReturn($topGamesResponse);
         $this->databaseClient
             ->shouldReceive('isGameStored')
             ->andReturn(true);
 
-        $getTopGamesResponse = $this->topGamesProvider->getTopThreeGames([0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN]);
+        $getTopGamesResponse = $this->topGamesProvider->getTopThreeGames([0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN]);
 
         $this->assertEquals($expectedResponse, $getTopGamesResponse);
     }
@@ -159,7 +159,7 @@ class TopGamesProviderTest extends TestCase
 
         $this->apiClient
             ->expects('makeCurlCall')
-            ->with('https://api.twitch.tv/helix/games/top?first=3', [0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN])
+            ->with('https://api.twitch.tv/helix/games/top?first=3', [0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN])
             ->andReturn($topGamesResponse);
         $this->databaseClient
             ->shouldReceive('isGameStored')
@@ -167,7 +167,7 @@ class TopGamesProviderTest extends TestCase
         $this->databaseClient
             ->shouldReceive('storeTopGame');
 
-        $getTopGamesResponse = $this->topGamesProvider->getTopThreeGames([0 => 'Authorization: Bearer ' . self::TWITCH_TOKEN]);
+        $getTopGamesResponse = $this->topGamesProvider->getTopThreeGames([0 => 'Authorization: Bearer ' . AnalyticsParameters::TWITCH_TOKEN]);
 
         $this->assertEquals($expectedResponse, $getTopGamesResponse);
     }
