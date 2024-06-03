@@ -70,7 +70,7 @@ class FollowStreamerManager
             throw new UnauthorizedException(self::GET_STREAMER_ERROR_MESSAGE);
         }
 
-        return json_decode($streamerResponse['response'], true)['data'];
+        return $streamerResponse['response']['data'];
     }
 
     private function requestHas500Code(mixed $requestResponse): bool
