@@ -169,7 +169,7 @@ class TimelineStreamsTest extends TestCase
     {
         $followingStreamers = ['streamer1'];
         $streamsResponse = [
-            'response' => json_encode([
+            'response' => [
                 'data' => [
                     [
                         'id' => 'userId',
@@ -184,7 +184,7 @@ class TimelineStreamsTest extends TestCase
                         'created_at' => 'createdAt'
                     ]
                 ]
-            ]),
+            ],
             'http_code' => Response::HTTP_OK
         ];
         $expectedResponse = [
