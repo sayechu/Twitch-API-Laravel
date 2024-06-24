@@ -6,13 +6,14 @@ grumphp:
         phpcs:
             standard: [PSR12]
             whitelist_patterns:
-                - /^app\/Http\/Controllers\/(.*)/
+                - /^app\/Infrastructure\/(.*)/
                 - /^app\/Services\/(.*)/
         phpmd:
             whitelist_patterns:
-                - /^app\/Http\/Controllers\/(.*)/
+                - /^app\/Infrastructure\/(.*)/
                 - /^app\/Services\/(.*)/
             ruleset: ['cleancode', 'codesize', 'naming']
+            exclude: [DBClient.php]
         git_commit_message:
             allow_empty_message: false
             enforce_capitalized_subject: false
@@ -25,3 +26,6 @@ grumphp:
                 - '/^\d+-[a-zA-Z\$]+/'
                 - 'main'
                 - 'master'
+        phpunit:
+            config_file: './phpunit.xml'
+            always_execute: true

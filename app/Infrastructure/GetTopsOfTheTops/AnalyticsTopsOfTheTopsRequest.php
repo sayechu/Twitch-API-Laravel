@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Requests;
+namespace App\Infrastructure\GetTopsOfTheTops;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -15,6 +15,14 @@ class AnalyticsTopsOfTheTopsRequest extends FormRequest
     {
         return [
             'since' => 'nullable|integer|min:1',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'since.integer' => 'El atributo since debe ser un entero',
+            'since.min' => 'El atributo since debe ser como mínimo 1',
         ];
     }
 }

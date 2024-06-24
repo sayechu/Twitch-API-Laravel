@@ -1,66 +1,86 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## <p style="text-align: center;">Twitch API</p>
 
-## About Laravel
+This project is a **Twitch API** developed in `PHP` using the `Laravel` framework and `Docker` for containerization. It adheres to Clean Code principles, includes comprehensive testing, and incorporates regular code refactoring to maintain high code quality. The API provides the following endpoints: 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+> ### **/streamers:id** (`GET`): Retrieves data for a given Twitch streamer by id.
+>>```bash 
+>>  curl -X GET 'http://localhost/analytics/streamers?id=459331509'
+>>```
+> ### **/streams** (`GET`): Obtains live Twitch streams.
+>>```bash 
+>>  curl -X GET 'http://localhost/analytics/streams'
+>>```
+> ### **/topsofthetops:since** (`GET`): Retrieves data for the top 40 videos of each of the top three most popular games, with an optional integer parameter `since` to filter results based on time (seconds).
+>>```bash 
+>>  curl -X GET 'http://localhost/analytics/topsofthetops'
+>>```
+>>```bash 
+>>  curl -X GET 'http://localhost/analytics/topsofthetops?since=150'
+>>```
+> ### **/timeline:username** (`GET`): Retrieves the list of recent streams from followed streamers.
+>>```bash 
+>>  curl -X GET 'http://localhost/analytics/timeline?username=user_name'
+>>```
+> ### **/follow** (`POST`): Allows registered users to follow a streamer.
+>>```bash 
+>>  curl -X POST 'http://localhost/analytics/follow' \
+>>  -H "Content-Type: application/json" \
+>>  -d '{"username": "user_name", "streamerId": "streamer_id"}'
+>>```
+> ### **/unfollow** (`DELETE`): Allows registered users to unfollow a streamer.
+>>```bash 
+>>  curl -X DELETE 'http://localhost/analytics/unfollow' \
+>>  -H "Content-Type: application/json" \
+>>  -d '{"username": "user_name", "streamerId": "streamer_id"}'
+>>```
+> ### **/users** (`POST`): Creates a new user with a specified username.
+>>```bash 
+>>  curl -X POST 'http://localhost/analytics/users' \
+>>  -H "Content-Type: application/json" \
+>>  -d '{"username": "user_name", "password": "password"}'
+>>```
+> ### **/users** (`GET`): Retrieves a list of all registered users, including the streamers each user follows.
+>>```bash 
+>>  curl -X GET 'http://localhost/analytics/users'
+>>```
+---
+### How to run the project?
+#### 1. Clone Repository:
+```bash
+  git clone git@github.com:sayechu/laravel-twitch-api.git
+```
+#### 2. Move to directory and composer install:
+```bash
+  cd laravel-twitch-api
+  composer install
+```
+#### 3. Copy environment variables file:
+```bash
+  cp .env.example .env
+```
+#### 4. Run sail
+Note I: `alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'` \
+Note II: run Docker Desktop before executing this command
+```bash
+  sail up -d
+```
+#### 5. Run migrations
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+  sail php artisan migrate
+```
+---
+- To **stop the running containers**, execute:
+```bash 
+  sail down
+```
+- To run the **unitary and integrations tests**:
+```bash
+  ./vendor/bin/phpunit
+```
+- To rollback the migrations:
+```bash
+  sail php artisan migrate:rollback
+```

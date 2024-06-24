@@ -2,10 +2,12 @@
 
 namespace Tests\Unit\Services;
 
+use Illuminate\Http\Response;
 use App\Services\ApiClient;
 use App\Services\DBClient;
 use App\Services\TokenProvider;
 use Mockery;
+use Tests\Builders\AnalyticsParameters;
 use Tests\TestCase;
 
 class TokenProviderTest extends TestCase
@@ -13,7 +15,6 @@ class TokenProviderTest extends TestCase
     private DBClient $databaseClient;
     private ApiClient $apiClient;
     private TokenProvider $tokenProvider;
-    const TOKEN = "nrtovbe5h02os45krmjzvkt3hp74vf";
 
     protected function setUp(): void
     {
@@ -26,7 +27,7 @@ class TokenProviderTest extends TestCase
     /**
      * @test
      */
-    public function test_get_token_stored_in_database(): void
+    public function get_stored_token(): void
     {
         $tokenResponse = 'nrtovbe5h02os45krmjzvkt3hp74vf';
 
@@ -47,11 +48,11 @@ class TokenProviderTest extends TestCase
     /**
      * @test
      */
-    public function test_get_token_with_api_error(): void
+    public function get_token_returns_curl_error(): void
     {
         $apiResponse = [
             "response" => null,
-            "http_code" => 500
+            "http_code" => Response::HTTP_INTERNAL_SERVER_ERROR
         ];
 
         $this->databaseClient
@@ -71,11 +72,11 @@ class TokenProviderTest extends TestCase
     /**
      * @test
      */
-    public function test_get_token(): void
+    public function get_token_returns_token_response(): void
     {
         $apiResponse = [
-            "response" => '{"access_token":"' . self::TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
-            "http_code" => 200
+            "response" => '{"access_token":"' . AnalyticsParameters::TWITCH_TOKEN . '","expires_in":5590782,"token_type":"bearer"}',
+            "http_code" => Response::HTTP_OK
         ];
 
         $this->databaseClient
@@ -89,11 +90,11 @@ class TokenProviderTest extends TestCase
         $this->databaseClient
             ->expects('storeToken')
             ->once()
-            ->with(self::TOKEN);
+            ->with(AnalyticsParameters::TWITCH_TOKEN);
 
         $getTokenResponse = $this->tokenProvider->getToken();
 
-        $this->assertEquals(self::TOKEN, $getTokenResponse);
+        $this->assertEquals(AnalyticsParameters::TWITCH_TOKEN, $getTokenResponse);
     }
 
     protected function tearDown(): void
