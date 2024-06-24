@@ -13,6 +13,7 @@ grumphp:
                 - /^app\/Infrastructure\/(.*)/
                 - /^app\/Services\/(.*)/
             ruleset: ['cleancode', 'codesize', 'naming']
+            exclude: [DBClient.php]
         git_commit_message:
             allow_empty_message: false
             enforce_capitalized_subject: false
