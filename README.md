@@ -49,11 +49,11 @@ This project is a **Twitch API** developed in `PHP` using the `Laravel` framewor
 ### How to run the project?
 #### 1. Clone Repository:
 ```bash
-  git clone git@github.com:sayechu/Twitch-API-Laravel.git
+  git clone git@github.com:sayechu/laravel-twitch-api.git
 ```
 #### 2. Move to directory and composer install:
 ```bash
-  cd Twitch-API-Laravel
+  cd laravel-twitch-api
   composer install
 ```
 #### 3. Copy environment variables file:
